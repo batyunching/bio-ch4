@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第4章 生物體的協調作用｜神經指揮中心</title>
+<meta name="description" content="國中自然（生物）一上 第4章 生物體的協調作用：4-1 神經系統、4-2 內分泌系統、4-3 植物的感應 互動學習網站">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://batyunching.github.io/bio/js/account.js" data-chapter="ch4" data-prefix="ch4."></script>
+<style>
+/* ---------- 開場 ---------- */
+.hero{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:18px; }
+.hero .kicker{ font-family:var(--num); font-size:.72rem; letter-spacing:.28em; color:var(--c-neuro); font-weight:700; }
+.hero h1{ margin:4px 0 0; }
+.hero p{ margin:4px 0 0; color:var(--c-muted); }
+.status{ display:flex; gap:10px; flex-wrap:wrap; }
+.status .chip{ border:1px solid var(--c-line); border-radius:12px; padding:6px 12px; font-size:.75rem; color:var(--c-muted); background:var(--c-panel); }
+.status .chip b{ font-family:var(--num); color:var(--c-text); font-size:.95rem; margin-left:4px; }
+.status .chip .dot{ display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--c-ok); box-shadow:0 0 8px var(--c-ok); margin-right:6px; animation:breathe 2s ease-in-out infinite; }
+
+/* ---------- 小劇場 ---------- */
+.theater{ display:grid; grid-template-columns:1.1fr 1fr; gap:20px; align-items:stretch; }
+@media (max-width:900px){ .theater{ grid-template-columns:1fr; } }
+.stage{ padding:0; overflow:hidden; display:flex; flex-direction:column; }
+.stage .screen{ position:relative; background:#0A1026; flex:1; min-height:300px; display:flex; align-items:center; }
+.stage svg.scene{ width:100%; height:auto; display:block; transition:filter .6s; }
+.stage .hud-label{
+  position:absolute; left:14px; top:12px; font-family:var(--num); font-size:.62rem; letter-spacing:.2em;
+  color:#22D3EE; background:rgba(10,16,38,.75); border:1px solid rgba(34,211,238,.45); border-radius:8px; padding:4px 10px;
+}
+.stage .hud-rec{ position:absolute; right:14px; top:12px; font-family:var(--num); font-size:.62rem; color:#FB7185; letter-spacing:.15em; }
+.stage .hud-rec::before{ content:"● "; animation:breathe 1.2s infinite; }
+.stage .caption{
+  position:absolute; left:12px; right:12px; bottom:12px; background:rgba(10,16,38,.82); color:#E8EEFF;
+  border-radius:12px; padding:8px 14px; font-size:.82rem; border:1px solid rgba(140,165,255,.3);
+}
+.eyes{ display:flex; gap:8px; padding:12px; flex-wrap:wrap; border-top:1px solid var(--c-line); }
+.eyes button{
+  flex:1; min-width:96px; min-height:48px; border-radius:12px; border:1px solid var(--c-line); background:transparent; color:var(--c-text);
+  font:inherit; font-weight:700; font-size:.85rem; cursor:pointer;
+}
+.eyes button[aria-pressed="true"]{ background:var(--c-neuro); color:#0B1022; border-color:var(--c-neuro); box-shadow:0 0 16px rgba(34,211,238,.45); }
+html.projector .eyes button[aria-pressed="true"]{ color:#fff; }
+.eyes button:disabled{ opacity:.35; cursor:not-allowed; }
+.eyes .lock{ width:100%; text-align:center; font-size:.75rem; color:var(--c-muted); }
+
+.dialog{ display:flex; flex-direction:column; gap:12px; }
+.lines{ flex:1; display:flex; flex-direction:column; gap:12px; min-height:300px; }
+.line{ display:flex; gap:10px; align-items:flex-end; animation:pop .35s ease both; }
+.line.right{ flex-direction:row-reverse; }
+.line .who{ flex:0 0 auto; text-align:center; font-size:.68rem; font-weight:700; color:var(--c-muted); width:58px; }
+.line .who svg{ display:block; margin:0 auto 2px; }
+.bubble{ background:rgba(140,165,255,.12); border:1px solid var(--c-line); border-radius:16px; padding:10px 14px; max-width:82%; }
+.line.right .bubble{ background:rgba(244,114,182,.12); border-color:rgba(244,114,182,.35); }
+.line.sys .bubble{ background:rgba(34,211,238,.10); border-color:rgba(34,211,238,.45); font-family:inherit; }
+.line.sys .bubble::before{ content:"▸ 指揮中心　"; font-family:var(--num); font-size:.62rem; letter-spacing:.12em; color:var(--c-neuro); display:block; }
+.bubble b{ color:var(--c-neuro); }
+html.projector .bubble b{ color:var(--c-neuro-d); }
+@keyframes pop{ from{ opacity:0; transform:translateY(12px) scale(.96);} to{ opacity:1; transform:none; } }
+.dialog-ctrl{ display:flex; gap:10px; flex-wrap:wrap; }
+
+/* ---------- 神經網路成長地圖 ---------- */
+.netwrap{ padding:12px 12px 16px; }
+.net{ width:100%; height:auto; display:block; }
+.net .edge{ stroke:var(--c-line); stroke-width:2; fill:none; }
+.net .edge.on{ stroke:var(--ec); stroke-opacity:.55; }
+.net .spark{ stroke:var(--ec); stroke-width:3; fill:none; stroke-linecap:round; stroke-dasharray:6 120; animation:spark 2.6s linear infinite; filter:drop-shadow(0 0 4px var(--ec)); }
+@keyframes spark{ to{ stroke-dashoffset:-126; } }
+.net .node{ cursor:pointer; }
+.net .node circle.body{ fill:var(--c-bg2); stroke:var(--c-line); stroke-width:2; transition:fill .4s, stroke .4s; }
+.net .node.l1 circle.body{ fill:color-mix(in srgb, var(--nc) 30%, var(--c-bg2)); stroke:var(--nc); }
+.net .node.l2 circle.body{ fill:var(--nc); stroke:var(--nc); filter:drop-shadow(0 0 8px var(--nc)); }
+.net .node .ring{ fill:none; stroke:var(--nc); stroke-width:2; opacity:0; transform-box:fill-box; transform-origin:center; }
+.net .node.l2 .ring{ animation:ring 2.4s ease-out infinite; }
+@keyframes ring{ 0%{ opacity:.8; transform:scale(1); } 100%{ opacity:0; transform:scale(1.9); } }
+.net .node text{ fill:var(--c-muted); font-size:14px; font-weight:700; text-anchor:middle; font-family:var(--font); }
+.net .node.l1 text, .net .node.l2 text{ fill:var(--c-text); }
+.net .node:hover circle.body, .net .node:focus circle.body{ stroke-width:4; }
+.net .node:focus{ outline:none; }
+.net .hub circle{ fill:var(--c-bg2); stroke:var(--c-amber); stroke-width:2.5; }
+.net .hub text{ fill:var(--c-amber); font-weight:900; text-anchor:middle; font-size:15px; }
+.net .glabel{ font-family:var(--num); font-size:12px; letter-spacing:.2em; font-weight:700; }
+.legend{ display:flex; gap:18px; flex-wrap:wrap; justify-content:center; font-size:.78rem; color:var(--c-muted); margin-top:4px; }
+.legend i{ display:inline-block; width:14px; height:14px; border-radius:50%; vertical-align:-2px; margin-right:6px; border:2px solid var(--c-muted); }
+.legend i.l1{ border-color:var(--c-neuro); background:color-mix(in srgb, var(--c-neuro) 30%, transparent); }
+.legend i.l2{ border-color:var(--c-neuro); background:var(--c-neuro); box-shadow:0 0 8px var(--c-neuro); }
+.netstat{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+.netstat .progress{ flex:1; min-width:200px; height:14px; }
+.netstat .progress > span{ background:linear-gradient(90deg,var(--c-neuro),var(--c-hormone),var(--c-plant)); box-shadow:none; }
+.netstat b{ font-family:var(--num); }
+
+/* ---------- 單元卡 ---------- */
+.units{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+@media (max-width:900px){ .units{ grid-template-columns:1fr; } }
+.unit-card{ text-decoration:none; display:flex; flex-direction:column; gap:10px; transition:transform .2s, box-shadow .2s; border-top:4px solid var(--u); }
+.unit-card:hover{ transform:translateY(-4px); box-shadow:0 0 0 1px var(--u), 0 0 28px color-mix(in srgb, var(--u) 35%, transparent); }
+.unit-card .head{ display:flex; align-items:center; gap:14px; }
+.unit-card .icon{ width:76px; height:76px; border-radius:20px; background:var(--u-l); color:var(--u); display:flex; align-items:center; justify-content:center; flex:0 0 auto; border:1px solid color-mix(in srgb, var(--u) 40%, transparent); }
+.unit-card .dept{ font-family:var(--num); font-size:.6rem; letter-spacing:.18em; color:var(--u); font-weight:700; }
+.unit-card h3{ margin:0; }
+.unit-card ul{ margin:0; padding-left:1.1em; color:var(--c-muted); font-size:.88rem; }
+.unit-card .meta{ display:flex; justify-content:space-between; font-size:.8rem; color:var(--c-muted); }
+.unit-card .meta b{ font-family:var(--num); color:var(--c-text); }
+.unit-card .go{ margin-top:auto; font-weight:900; color:var(--u); }
+html.projector .unit-card .go, html.projector .unit-card .dept{ color:var(--u-d); }
+.free-note{ color:var(--c-muted); font-size:.85rem; margin:-6px 0 14px; }
+
+/* ---------- 學習動線 ---------- */
+.path{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.path a{
+  text-decoration:none; background:var(--c-panel); border:1px solid var(--c-line); border-radius:14px; padding:10px 16px;
+  font-weight:700; min-height:48px; display:flex; align-items:center; gap:6px;
+}
+.path a:hover{ border-color:var(--c-neuro); }
+.path .arrow{ color:var(--c-neuro); font-weight:900; }
+</style>
+</head>
+<body data-page="home" data-root="./">
+<main class="wrap">
+
+  <div class="hero">
+    <div>
+      <div class="kicker">NEURO COMMAND · CHAPTER 04</div>
+      <h1>指揮官，歡迎報到！</h1>
+      <p>身體的每個動作，都需要有人「指揮協調」。這一章，你要學會調度神經、激素，還有植物的感應。</p>
+    </div>
+    <div class="status" aria-label="我的狀態">
+      <span class="chip"><span class="dot"></span>系統連線</span>
+      <span class="chip">神經網路 <b id="stNodes">0/19</b></span>
+      <span class="chip">訊號能量 <b id="stEnergy">0</b></span>
+    </div>
+  </div>
+
+  <!-- ===== 小劇場 ===== -->
+  <section>
+    <div class="sec-title"><span class="code">SCENE 00</span><h2>生活情境小劇場：為什麼打不到蒼蠅？</h2></div>
+    <div class="theater">
+      <div class="panel stage">
+        <div class="screen">
+          <span class="hud-label" id="eyeLabel">EYE CAM · 人類</span>
+          <span class="hud-rec">LIVE</span>
+          <svg class="scene" id="scene" viewBox="100 0 400 300" role="img" aria-label="從高處看向一片草地與樹林的風景，草地上有一隻老鼠">
+            <defs>
+              <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7DD3FC"/><stop offset="1" stop-color="#E0F2FE"/></linearGradient>
+              <filter id="blurC"><feGaussianBlur stdDeviation="5"/></filter>
+              <radialGradient id="vig" cx=".5" cy=".5" r=".7"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>
+            </defs>
+            <g id="world">
+              <rect x="0" y="0" width="600" height="300" fill="url(#sky)"/>
+              <circle cx="520" cy="46" r="22" fill="#FDE68A"/>
+              <path d="M0 150 Q80 110 170 140 T340 130 T600 140 V300 H0Z" fill="#86EFAC"/>
+              <path d="M0 190 Q120 160 260 182 T600 176 V300 H0Z" fill="#4ADE80"/>
+              <!-- 樹林 -->
+              <g fill="#15803D">
+                <circle cx="40" cy="160" r="26"/><circle cx="70" cy="150" r="22"/><circle cx="560" cy="150" r="28"/><circle cx="590" cy="162" r="20"/>
+                <circle cx="150" cy="168" r="18"/><circle cx="470" cy="160" r="20"/>
+              </g>
+              <g fill="#78350F"><rect x="37" y="180" width="6" height="22"/><rect x="557" y="172" width="6" height="26"/><rect x="148" y="182" width="4" height="16"/><rect x="468" y="176" width="4" height="16"/></g>
+              <!-- 小路與圍籬 -->
+              <path d="M300 300 Q290 240 310 200 Q330 170 300 150" stroke="#FDE68A" stroke-width="16" fill="none" opacity=".75"/>
+              <g stroke="#A16207" stroke-width="3"><path d="M180 250 H260"/><path d="M180 262 H260"/><path d="M190 244 V272 M215 244 V272 M240 244 V272"/></g>
+              <!-- 遠處的老鼠 -->
+              <g id="mouse" transform="translate(372 214)">
+                <ellipse cx="0" cy="0" rx="7" ry="4.2" fill="#6B7280"/><circle cx="6.5" cy="-2.5" r="3" fill="#6B7280"/>
+                <circle cx="6" cy="-5.5" r="1.5" fill="#9CA3AF"/><circle cx="8" cy="-3" r=".7" fill="#111"/>
+                <path d="M-7 0 q-6 2 -9 -2" stroke="#6B7280" stroke-width="1" fill="none"/>
+              </g>
+              <!-- 花 -->
+              <g><circle cx="120" cy="270" r="4" fill="#F472B6"/><circle cx="420" cy="280" r="4" fill="#FBBF24"/><circle cx="500" cy="262" r="3.5" fill="#F472B6"/></g>
+            </g>
+            <!-- 馬：正前方看不清 -->
+            <g id="horseBlind" opacity="0">
+              <rect x="268" y="0" width="64" height="300" fill="#0A1026" opacity=".35" filter="url(#blurC)"/>
+            </g>
+            <!-- 猛禽：準星 -->
+            <g id="raptorAim" opacity="0" stroke="#FB7185" stroke-width="1" fill="none">
+              <circle cx="375" cy="212" r="16"/><path d="M375 190 V202 M375 222 V234 M353 212 H365 M385 212 H397"/>
+            </g>
+            <rect id="vignette" x="0" y="0" width="600" height="300" fill="url(#vig)" pointer-events="none"/>
+          </svg>
+          <div class="caption" id="eyeCaption">人類：雙眼在臉的前方，看到的影像較有立體感，容易判斷遠近。</div>
+        </div>
+        <div class="eyes" role="group" aria-label="切換動物的眼睛">
+          <button id="eyeHuman" data-eye="human" aria-pressed="true">🧑 人類</button>
+          <button id="eyeHorse" data-eye="horse" aria-pressed="false" disabled>🐴 馬</button>
+          <button id="eyeRaptor" data-eye="raptor" aria-pressed="false" disabled>🦅 猛禽</button>
+          <div class="lock" id="eyeLock">🔒 看完左邊的對話，就能切換其他動物的眼睛</div>
+        </div>
+      </div>
+
+      <div class="panel dialog">
+        <div class="lines" id="lines" aria-live="polite"></div>
+        <div class="dialog-ctrl">
+          <button class="btn" id="btnNext">下一句 ▶</button>
+          <button class="btn ghost" id="btnAuto">自動播放</button>
+          <button class="btn ghost" id="btnReplay">↺ 重播</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 神經網路成長地圖 ===== -->
+  <section>
+    <div class="sec-title"><span class="code">NETWORK MAP</span><h2>我的神經網路</h2></div>
+    <div class="panel netwrap">
+      <div class="netstat" style="padding:4px 10px 10px">
+        <span>已連線 <b id="netCount">0 / 19</b> 個神經元</span>
+        <div class="progress" aria-hidden="true"><span id="netBar"></span></div>
+        <span class="secondary" style="color:var(--c-muted);font-size:.8rem">點神經元可以直接跳到那張概念卡</span>
+      </div>
+      <svg class="net" id="net" viewBox="0 0 1000 500" role="img" aria-label="神經網路成長地圖：19 個概念神經元，學會的會亮起來"></svg>
+      <div class="legend">
+        <span><i></i>還沒學</span>
+        <span><i class="l1"></i>概念卡按了「我懂了」</span>
+        <span><i class="l2"></i>精熟：練習題答對率 80% 以上</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 三個單元 ===== -->
+  <section>
+    <div class="sec-title"><span class="code">DEPARTMENTS</span><h2>三個部門（單元）</h2></div>
+    <p class="free-note">想從哪個單元開始都可以，沒有關卡限制。</p>
+    <div class="units">
+      <a class="panel unit-card unit-41" href="unit4-1.html">
+        <div class="head"><div class="icon" id="ic41"></div><div><div class="dept">NEURAL COMM</div><h3>4-1 神經系統</h3></div></div>
+        <ul><li>受器、動器與神經元</li><li>中樞神經：大腦、小腦、腦幹、脊髓</li><li>神經傳導途徑：意識反應與反射</li></ul>
+        <div class="meta"><span>概念卡 7・動畫 5</span><b id="p41t">0/7</b></div>
+        <div class="progress"><span id="p41"></span></div>
+        <span class="go">進入神經通訊部 ▶</span>
+      </a>
+      <a class="panel unit-card unit-42" href="unit4-2.html">
+        <div class="head"><div class="icon" id="ic42"></div><div><div class="dept">HORMONE LOGISTICS</div><h3>4-2 內分泌系統</h3></div></div>
+        <ul><li>內分泌腺、激素與目標細胞</li><li>腦垂腺、甲狀腺、腎上腺、胰島、性腺</li><li>神經系統 vs 內分泌系統</li></ul>
+        <div class="meta"><span>概念卡 7・動畫 5</span><b id="p42t">0/7</b></div>
+        <div class="progress"><span id="p42"></span></div>
+        <span class="go">進入激素物流部 ▶</span>
+      </a>
+      <a class="panel unit-card unit-43" href="unit4-3.html">
+        <div class="head"><div class="icon" id="ic43"></div><div><div class="dept">PLANT SENSING</div><h3>4-3 植物的感應</h3></div></div>
+        <ul><li>膨壓：觸發、捕蟲、睡眠運動</li><li>向性：向光性、向地性、向觸性</li><li>探索活動：綠豆向光</li></ul>
+        <div class="meta"><span>概念卡 5・動畫 4</span><b id="p43t">0/5</b></div>
+        <div class="progress"><span id="p43"></span></div>
+        <span class="go">進入植物感應溫室 ▶</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ===== 學習動線 ===== -->
+  <section>
+    <div class="sec-title"><span class="code">ROUTE</span><h2>建議學習動線</h2></div>
+    <div class="path">
+      <a href="#lines">🎬 小劇場</a><span class="arrow">›</span>
+      <a href="unit4-1.html">📘 單元概念卡</a><span class="arrow">›</span>
+      <a href="lab.html">🧪 實驗模擬</a><span class="arrow">›</span>
+      <a href="quiz.html">✏️ 練習題</a><span class="arrow">›</span>
+      <a href="analysis.html">🔍 錯題分析</a><span class="arrow">›</span>
+      <a href="mindmap.html">🧠 心智圖</a><span class="arrow">›</span>
+      <a href="games/index.html">🎮 遊戲複習</a>
+    </div>
+  </section>
+
+  <div class="footer">
+    <a href="https://batyunching.github.io/bio/">🏠 生物網站總目錄</a>　·　<a id="ch3Link" href="#">← 回到第3章「生物體內的運輸」</a><br>
+    國中自然（生物）一上・第4章 生物體的協調作用｜內容依據課本 p.126–155｜圖形皆為原創 SVG 繪製
+  </div>
+</main>
+
+<script src="js/common.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+
+  /* ================= 小劇場：對話 ================= */
+  function face(kind){
+    if(kind === 'kid') return '<svg viewBox="0 0 48 48" width="44" height="44"><circle cx="24" cy="24" r="21" fill="#FCD9B6"/><path d="M5 20 Q8 4 24 4 Q40 4 43 20 Q34 12 24 13 Q14 12 5 20Z" fill="#3B2A20"/><circle cx="17" cy="25" r="2.6" fill="#1B2340"/><circle cx="31" cy="25" r="2.6" fill="#1B2340"/><path d="M17 34 Q24 30 31 34" stroke="#1B2340" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M12 19 l7 2 M36 19 l-7 2" stroke="#3B2A20" stroke-width="2.4" stroke-linecap="round"/></svg>';
+    if(kind === 'fly') return '<svg viewBox="0 0 48 48" width="44" height="44"><ellipse cx="13" cy="15" rx="10" ry="6" fill="#BAE6FD" opacity=".85" transform="rotate(-25 13 15)"/><ellipse cx="35" cy="15" rx="10" ry="6" fill="#BAE6FD" opacity=".85" transform="rotate(25 35 15)"/><ellipse cx="24" cy="30" rx="12" ry="13" fill="#334155"/><circle cx="16" cy="24" r="7" fill="#B91C1C"/><circle cx="32" cy="24" r="7" fill="#B91C1C"/><g fill="#FCA5A5" opacity=".7"><circle cx="14" cy="22" r="1.4"/><circle cx="18" cy="25" r="1.4"/><circle cx="14" cy="27" r="1.4"/><circle cx="30" cy="22" r="1.4"/><circle cx="34" cy="25" r="1.4"/><circle cx="30" cy="27" r="1.4"/></g><path d="M20 36 Q24 39 28 36" stroke="#F8FAFC" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
+    return '<svg viewBox="0 0 48 48" width="44" height="44">' + CH4.icons.logo().replace('<svg viewBox="0 0 40 40" aria-hidden="true">','<svg viewBox="0 0 40 40" x="4" y="4" width="40" height="40">') + '</svg>';
+  }
+  var WHO = { kid:'小翔', fly:'蒼蠅', sys:'指揮中心' };
+  var SCRIPT = [
+    { w:'kid', t:'可惡，又沒打到！我明明已經偷偷靠近，牠應該看不到我才對啊……' },
+    { w:'fly', t:'嘿嘿！我的眼睛由<b>好多個小眼</b>組成，四周幾乎都看得到，你從背後來也沒用。' },
+    { w:'fly', t:'而且我身體輕、翅膀靈活，<b>反應速度</b>比你們人類快好幾倍。想打到我？再練十年吧！' },
+    { w:'kid', t:'哼……那我的眼睛跟你到底差在哪裡？其他動物看到的世界也跟我不一樣嗎？' },
+    { w:'sys', t:'不同動物「看見」的世界不一樣！左邊的監視畫面已解鎖，換上<b>馬</b>和<b>猛禽</b>的眼睛看看。', unlock:true },
+    { w:'sys', t:'眼睛只是接收刺激的其中一個器官。除了眼睛，人還有哪些器官能接收刺激？訊息又怎麼傳到身體各處、做出反應？' },
+    { w:'sys', t:'答案就在 <b>4-1 神經系統</b>。指揮官，出發吧！' }
+  ];
+  var linesEl = $('lines'), btnNext = $('btnNext'), btnAuto = $('btnAuto');
+  var idx = 0, timer = null;
+  function show(){
+    if(idx >= SCRIPT.length){ stopAuto(); return; }
+    var s = SCRIPT[idx++];
+    var d = document.createElement('div');
+    d.className = 'line' + (s.w === 'fly' ? ' right' : '') + (s.w === 'sys' ? ' sys' : '');
+    d.innerHTML = '<div class="who">' + face(s.w) + WHO[s.w] + '</div><div class="bubble">' + s.t + '</div>';
+    linesEl.appendChild(d);
+    if(s.unlock) unlockEyes();
+    if(idx >= SCRIPT.length){
+      btnNext.textContent = '進入 4-1 ▶'; stopAuto();
+      if(!CH4.store.get('theaterDone', false)){ CH4.store.set('theaterDone', true); CH4.energy.add(10, '看完小劇場'); refreshStatus(); }
+    }
+  }
+  function stopAuto(){ clearInterval(timer); timer = null; btnAuto.textContent = '自動播放'; }
+  btnNext.addEventListener('click', function(){
+    if(idx >= SCRIPT.length){ location.href = 'unit4-1.html'; return; }
+    stopAuto(); show();
+  });
+  btnAuto.addEventListener('click', function(){
+    if(timer){ stopAuto(); return; }
+    if(idx >= SCRIPT.length) replay();
+    btnAuto.textContent = '⏸ 暫停'; show(); timer = setInterval(show, 2800);
+  });
+  function replay(){ stopAuto(); idx = 0; linesEl.innerHTML = ''; btnNext.textContent = '下一句 ▶'; show(); }
+  $('btnReplay').addEventListener('click', replay);
+
+  /* ================= 小劇場：動物之眼 ================= */
+  var EYES = {
+    human:  { label:'人類', vb:[100,0,400,300], cap:'人類：雙眼在臉的前方，兩眼一起看，影像較有<b>立體感</b>，容易判斷遠近。' },
+    horse:  { label:'馬',   vb:[0,0,600,300],   cap:'馬：雙眼在臉的兩側，看得到的範圍<b>很寬</b>；但正前方中央較難看清楚，影像也較沒有立體感。' },
+    raptor: { label:'猛禽', vb:[330,180,90,68], cap:'猛禽：視力非常敏銳，從高空就像拿著望遠鏡，看得到草地上的<b>老鼠</b>。' }
+  };
+  var scene = $('scene'), anim = null;
+  function setEye(k){
+    var e = EYES[k];
+    document.querySelectorAll('.eyes button').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-eye') === k); });
+    $('eyeLabel').textContent = 'EYE CAM · ' + e.label;
+    $('eyeCaption').innerHTML = e.cap;
+    $('horseBlind').setAttribute('opacity', k === 'horse' ? 1 : 0);
+    $('raptorAim').setAttribute('opacity', k === 'raptor' ? 1 : 0);
+    $('vignette').setAttribute('opacity', k === 'horse' ? 0.35 : 1);
+    scene.style.filter = k === 'horse' ? 'saturate(.75)' : '';
+    tweenViewBox(e.vb);
+  }
+  function tweenViewBox(to){
+    var from = scene.getAttribute('viewBox').split(/\s+/).map(Number);
+    var reduce = document.documentElement.classList.contains('reduce-motion') || matchMedia('(prefers-reduced-motion: reduce)').matches;
+    cancelAnimationFrame(anim);
+    if(reduce){ scene.setAttribute('viewBox', to.join(' ')); return; }
+    var t0 = performance.now(), dur = 700;
+    (function step(now){
+      var p = Math.min(1, (now - t0) / dur), q = p < .5 ? 2*p*p : 1 - Math.pow(-2*p + 2, 2) / 2;
+      scene.setAttribute('viewBox', from.map(function(f, i){ return (f + (to[i] - f) * q).toFixed(2); }).join(' '));
+      if(p < 1) anim = requestAnimationFrame(step);
+    })(t0);
+  }
+  function unlockEyes(){
+    $('eyeHorse').disabled = false; $('eyeRaptor').disabled = false;
+    $('eyeLock').textContent = '👆 點按鈕，換不同動物的眼睛看同一片風景';
+    CH4.store.set('eyesUnlocked', true);
+  }
+  document.querySelectorAll('.eyes button').forEach(function(b){
+    b.addEventListener('click', function(){ setEye(b.getAttribute('data-eye')); });
+  });
+  if(CH4.store.get('eyesUnlocked', false)) unlockEyes();
+  show();
+
+  /* ================= 神經網路成長地圖 ================= */
+  var COLORS = { '4-1':'var(--c-neuro)', '4-2':'var(--c-hormone)', '4-3':'var(--c-plant)' };
+  var POS = {
+    '4-1-c1':[ 80,170], '4-1-c2':[190,110], '4-1-c3':[305,160], '4-1-c4':[300,290],
+    '4-1-c5':[185,245], '4-1-c6':[ 85,345], '4-1-c7':[205,385],
+    '4-2-c1':[440,205], '4-2-c2':[405,320], '4-2-c3':[560,185], '4-2-c4':[640,275],
+    '4-2-c5':[590,385], '4-2-c6':[475,410], '4-2-c7':[525,295],
+    '4-3-c1':[740,170], '4-3-c2':[855,120], '4-3-c3':[935,230], '4-3-c4':[860,345], '4-3-c5':[745,310]
+  };
+  var HUB = [500, 70];
+  var EDGES = [
+    ['4-1-c1','4-1-c2'],['4-1-c2','4-1-c3'],['4-1-c3','4-1-c4'],['4-1-c4','4-1-c5'],['4-1-c5','4-1-c1'],
+    ['4-1-c2','4-1-c5'],['4-1-c5','4-1-c6'],['4-1-c6','4-1-c7'],['4-1-c7','4-1-c4'],
+    ['4-2-c1','4-2-c3'],['4-2-c3','4-2-c4'],['4-2-c4','4-2-c5'],['4-2-c5','4-2-c6'],['4-2-c6','4-2-c2'],['4-2-c2','4-2-c1'],
+    ['4-2-c1','4-2-c7'],['4-2-c7','4-2-c4'],['4-2-c7','4-2-c6'],
+    ['4-3-c1','4-3-c2'],['4-3-c2','4-3-c3'],['4-3-c3','4-3-c4'],['4-3-c4','4-3-c5'],['4-3-c5','4-3-c1'],['4-3-c1','4-3-c4'],
+    ['4-1-c4','4-2-c2'],   // 神經系統 ⟷ 神經 vs 內分泌
+    ['4-1-c1','4-3-c2']    // 刺激與反應 ⟷ 植物也會感應（繞上方）
+  ];
+  var HUBLINKS = ['4-1-c3','4-2-c3','4-3-c1'];
+  function curve(a, b, bend){
+    var mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
+    var dx = b[0] - a[0], dy = b[1] - a[1], len = Math.sqrt(dx*dx + dy*dy) || 1;
+    var k = bend == null ? 0.12 : bend;
+    var cx = mx - dy / len * len * k, cy = my + dx / len * len * k;
+    return 'M' + a[0] + ' ' + a[1] + ' Q' + cx.toFixed(1) + ' ' + cy.toFixed(1) + ' ' + b[0] + ' ' + b[1];
+  }
+  var unitOf = {}, titleOf = {};
+  CH4.CONCEPTS.forEach(function(c){ unitOf[c.id] = c.unit; titleOf[c.id] = c.t; });
+
+  function drawNet(){
+    var lv = {}, lit = 0;
+    CH4.CONCEPTS.forEach(function(c){ lv[c.id] = CH4.progress.level(c.id); if(lv[c.id] > 0) lit++; });
+    var s = '';
+    // 部門標籤
+    s += '<text class="glabel" x="190" y="40" text-anchor="middle" fill="var(--c-neuro)">4-1 NEURAL</text>';
+    s += '<text class="glabel" x="530" y="488" text-anchor="middle" fill="var(--c-hormone)">4-2 HORMONE</text>';
+    s += '<text class="glabel" x="845" y="40" text-anchor="middle" fill="var(--c-plant)">4-3 PLANT</text>';
+    // 連線
+    EDGES.forEach(function(e, i){
+      var a = POS[e[0]], b = POS[e[1]], on = lv[e[0]] > 0 && lv[e[1]] > 0;
+      var bend = (e[0] === '4-1-c1' && e[1] === '4-3-c2') ? -0.32 : 0.12;
+      var col = unitOf[e[0]] === unitOf[e[1]] ? COLORS[unitOf[e[0]]] : 'var(--c-amber)';
+      var d = curve(a, b, bend);
+      s += '<path class="edge' + (on ? ' on' : '') + '" style="--ec:' + col + '" d="' + d + '"/>';
+      if(on) s += '<path class="spark" style="--ec:' + col + ';animation-delay:-' + (i * 0.37 % 2.6).toFixed(2) + 's" d="' + d + '"/>';
+    });
+    HUBLINKS.forEach(function(id, i){
+      var on = CH4.CONCEPT_CARDS[unitOf[id]].some(function(x){ return lv[x] > 0; });
+      var d = curve(HUB, POS[id], i === 1 ? 0 : (i === 0 ? 0.15 : -0.15));
+      s += '<path class="edge' + (on ? ' on' : '') + '" style="--ec:var(--c-amber)" d="' + d + '"/>';
+      if(on) s += '<path class="spark" style="--ec:var(--c-amber);animation-delay:-' + i + 's" d="' + d + '"/>';
+    });
+    // 中樞
+    s += '<g class="hub"><circle cx="' + HUB[0] + '" cy="' + HUB[1] + '" r="30"/><text x="' + HUB[0] + '" y="' + (HUB[1] - 2) + '">協調</text><text x="' + HUB[0] + '" y="' + (HUB[1] + 16) + '" style="font-size:11px">中樞</text></g>';
+    // 神經元
+    CH4.CONCEPTS.forEach(function(c){
+      var p = POS[c.id], l = lv[c.id];
+      var status = l === 2 ? '精熟' : (l === 1 ? '已懂' : '還沒學');
+      var ty = p[1] + 40;
+      s += '<g class="node l' + l + '" style="--nc:' + COLORS[c.unit] + '" tabindex="0" role="link" data-id="' + c.id + '" aria-label="' + c.unit + ' ' + c.t + '（' + status + '）">' +
+        '<title>' + c.unit + '　' + c.t + '（' + status + '）</title>' +
+        '<circle class="ring" cx="' + p[0] + '" cy="' + p[1] + '" r="18"/>' +
+        '<circle class="body" cx="' + p[0] + '" cy="' + p[1] + '" r="18"/>' +
+        (l > 0 ? '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="6" fill="' + (l === 2 ? 'var(--c-bg)' : COLORS[c.unit]) + '"/>' : '') +
+        '<text x="' + p[0] + '" y="' + ty + '">' + c.t + '</text></g>';
+    });
+    $('net').innerHTML = s;
+    $('netCount').textContent = lit + ' / ' + CH4.CONCEPTS.length;
+    $('netBar').style.width = Math.round(lit / CH4.CONCEPTS.length * 100) + '%';
+    $('stNodes').textContent = lit + '/' + CH4.CONCEPTS.length;
+  }
+  function go(id){ location.href = CH4.UNIT_PAGES[unitOf[id]] + '#' + id; }
+  $('net').addEventListener('click', function(e){ var g = e.target.closest('.node'); if(g) go(g.getAttribute('data-id')); });
+  $('net').addEventListener('keydown', function(e){
+    if(e.key !== 'Enter' && e.key !== ' ') return;
+    var g = e.target.closest('.node'); if(g){ e.preventDefault(); go(g.getAttribute('data-id')); }
+  });
+
+  /* ================= 單元卡與狀態 ================= */
+  $('ic41').innerHTML = CH4.icons.brain(54);
+  $('ic42').innerHTML = CH4.icons.gland(54);
+  $('ic43').innerHTML = CH4.icons.plant(54);
+  function bar(id, p){
+    $(id).style.width = (p.total ? Math.round(p.done / p.total * 100) : 0) + '%';
+    $(id + 't').textContent = p.done + '/' + p.total;
+  }
+  function refreshStatus(){ $('stEnergy').textContent = CH4.energy.get().toLocaleString(); }
+  function refreshAll(){
+    drawNet(); refreshStatus();
+    bar('p41', CH4.progress.unit('4-1')); bar('p42', CH4.progress.unit('4-2')); bar('p43', CH4.progress.unit('4-3'));
+  }
+  setTimeout(refreshAll, 150);
+  // 雲端進度載入完成後再更新一次
+  if(window.BIO_ACCOUNT && BIO_ACCOUNT.ready) BIO_ACCOUNT.ready.then(function(){ setTimeout(refreshAll, 300); }, function(){});
+  window.addEventListener('pageshow', function(e){ if(e.persisted) refreshAll(); });
+
+  $('ch3Link').href = CH4.CH3_URL;
+})();
+</script>
+</body>
+</html>

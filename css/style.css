@@ -1,0 +1,184 @@
+/* =========================================================
+   第4章 生物體的協調作用 — 共用樣式
+   主題：神經指揮中心 NEURO COMMAND
+   平板預設深色；html.projector = 投影模式（淺色、字放大）
+   ========================================================= */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Orbitron:wght@500;700;900&display=swap');
+
+:root{
+  /* 單元色 */
+  --c-neuro:#22D3EE;  --c-neuro-d:#0891B2; --c-neuro-l:rgba(34,211,238,.14);
+  --c-hormone:#F472B6; --c-hormone-d:#DB2777; --c-hormone-l:rgba(244,114,182,.14);
+  --c-plant:#A3E635;  --c-plant-d:#65A30D; --c-plant-l:rgba(163,230,53,.14);
+  --c-amber:#FBBF24;  --c-amber-d:#B45309;
+
+  /* 版面（深色） */
+  --c-bg:#0E1530;     --c-bg2:#111B3D;
+  --c-panel:rgba(22,33,72,.78); --c-panel-solid:#162148;
+  --c-text:#E8EEFF;   --c-muted:#9AA8D6; --c-line:rgba(140,165,255,.22);
+  --c-grid:rgba(120,150,255,.07);
+  --c-ok:#4ADE80;     --c-ng:#FB7185;
+  --glow:0 0 0 1px var(--c-line), 0 8px 28px rgba(0,0,0,.35);
+  --radius:18px;
+  --fs:18px; --nav-h:64px;
+  --font:'Noto Sans TC','PingFang TC','Microsoft JhengHei','Heiti TC',system-ui,sans-serif;
+  --num:'Orbitron','Noto Sans TC',monospace;
+}
+
+/* ---------- 投影模式：淺色＋字放大 ---------- */
+html.projector{
+  --fs:23.4px;
+  --c-neuro:#0891B2;  --c-neuro-d:#0E7490; --c-neuro-l:#E0F7FB;
+  --c-hormone:#DB2777; --c-hormone-d:#9D174D; --c-hormone-l:#FCE7F3;
+  --c-plant:#65A30D;  --c-plant-d:#3F6212; --c-plant-l:#ECFCCB;
+  --c-amber:#D97706;  --c-amber-d:#92400E;
+  --c-bg:#F3F5FA; --c-bg2:#E9EDF6;
+  --c-panel:#FFFFFF; --c-panel-solid:#FFFFFF;
+  --c-text:#1B2340; --c-muted:#56608A; --c-line:#D5DBEA;
+  --c-grid:rgba(30,50,120,.05);
+  --c-ok:#15803D; --c-ng:#BE123C;
+  --glow:0 0 0 1px var(--c-line), 0 4px 16px rgba(20,30,80,.08);
+}
+html.projector .secondary{ display:none !important; }
+
+*{ box-sizing:border-box; }
+html{ font-size:var(--fs); -webkit-text-size-adjust:100%; }
+body{
+  margin:0; font-family:var(--font); color:var(--c-text); line-height:1.65; min-height:100vh;
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(34,211,238,.10), transparent 60%),
+    radial-gradient(900px 500px at -10% 30%, rgba(244,114,182,.08), transparent 60%),
+    linear-gradient(var(--c-grid) 1px, transparent 1px) 0 0/32px 32px,
+    linear-gradient(90deg, var(--c-grid) 1px, transparent 1px) 0 0/32px 32px,
+    var(--c-bg);
+  background-attachment:fixed;
+}
+html.projector body{ background:var(--c-bg); }
+h1,h2,h3{ line-height:1.35; margin:.2em 0 .5em; }
+h1{ font-size:1.9rem; font-weight:900; } h2{ font-size:1.5rem; font-weight:900; } h3{ font-size:1.18rem; }
+a{ color:inherit; }
+img,svg{ max-width:100%; }
+.num{ font-family:var(--num); letter-spacing:.03em; }
+.wrap{ max-width:1180px; margin:0 auto; padding:24px 20px 80px; }
+.visually-hidden{ position:absolute !important; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+
+/* ---------- 減少動態 ---------- */
+html.reduce-motion *, html.reduce-motion *::before, html.reduce-motion *::after{
+  animation-duration:.001s !important; animation-iteration-count:1 !important; transition-duration:.001s !important;
+}
+@media (prefers-reduced-motion:reduce){
+  html:not(.allow-motion) *{ animation-duration:.001s !important; animation-iteration-count:1 !important; transition-duration:.001s !important; }
+}
+
+/* ---------- 頂部指揮列 ---------- */
+.topnav{
+  position:sticky; top:0; z-index:50; min-height:var(--nav-h);
+  display:flex; align-items:center; gap:10px; padding:8px 16px;
+  background:rgba(10,16,38,.86); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--c-line);
+}
+html.projector .topnav{ background:rgba(255,255,255,.94); }
+.topnav::after{ /* 底部流動訊號線 */
+  content:""; position:absolute; left:0; right:0; bottom:-1px; height:2px;
+  background:linear-gradient(90deg, transparent, var(--c-neuro), var(--c-hormone), var(--c-plant), transparent);
+  background-size:300% 100%; animation:flow 6s linear infinite; opacity:.8;
+}
+@keyframes flow{ to{ background-position:-300% 0; } }
+.topnav .brand{ display:flex; align-items:center; gap:10px; font-weight:900; text-decoration:none; white-space:nowrap; }
+.topnav .brand svg{ width:40px; height:40px; flex:0 0 auto; }
+.topnav .brand small{ display:block; font-family:var(--num); font-size:.55rem; letter-spacing:.18em; color:var(--c-neuro); font-weight:700; line-height:1.1; }
+.topnav .brand span{ font-size:.95rem; line-height:1.2; }
+.topnav .links{ display:flex; gap:2px; margin-left:auto; align-items:center; flex-wrap:wrap; }
+.topnav .links a{
+  text-decoration:none; padding:8px 11px; border-radius:12px; font-weight:700; font-size:.8rem;
+  min-height:44px; display:flex; align-items:center; color:var(--c-muted); white-space:nowrap;
+}
+.topnav .links a:hover{ color:var(--c-text); background:rgba(140,165,255,.10); }
+.topnav .links a.active{ color:#0B1022; background:var(--c-text); }
+.topnav .links a[data-unit="4-1"].active{ background:var(--c-neuro); }
+.topnav .links a[data-unit="4-2"].active{ background:var(--c-hormone); }
+.topnav .links a[data-unit="4-3"].active{ background:var(--c-plant); }
+html.projector .topnav .links a.active{ color:#fff; }
+.topnav .tools{ display:flex; gap:6px; margin-left:6px; align-items:center; }
+.energy{
+  display:flex; align-items:center; gap:6px; padding:6px 12px; border-radius:999px; min-height:40px;
+  border:1px solid rgba(251,191,36,.45); color:var(--c-amber); font-family:var(--num); font-weight:700; font-size:.78rem; white-space:nowrap;
+  background:rgba(251,191,36,.08);
+}
+.energy.bump{ animation:bump .5s ease; }
+@keyframes bump{ 40%{ transform:scale(1.18); box-shadow:0 0 18px rgba(251,191,36,.6); } }
+.icon-btn{
+  min-width:44px; min-height:44px; border-radius:12px; border:1px solid var(--c-line); background:transparent;
+  color:var(--c-text); font-size:1.05rem; cursor:pointer; display:flex; align-items:center; justify-content:center;
+}
+.icon-btn:hover{ background:rgba(140,165,255,.12); }
+.icon-btn[aria-pressed="true"]{ background:var(--c-text); color:var(--c-bg); }
+.hamburger{ display:none; }
+@media (max-width:1100px){
+  .hamburger{ display:flex; margin-left:auto; }
+  .topnav{ flex-wrap:wrap; }
+  .topnav .links{ display:none; order:10; width:100%; flex-direction:column; align-items:stretch; padding:8px 0; }
+  .topnav.open .links{ display:flex; }
+  .topnav .links a{ font-size:1rem; }
+  .topnav .tools{ margin-left:0; }
+}
+
+/* ---------- 共用元件 ---------- */
+.panel{
+  background:var(--c-panel); border-radius:var(--radius); padding:22px; box-shadow:var(--glow);
+  position:relative;
+}
+.panel.u{ box-shadow:0 0 0 1px var(--c-line), 0 0 0 0 transparent, inset 0 3px 0 var(--u); }
+.unit-41{ --u:var(--c-neuro);   --u-d:var(--c-neuro-d);   --u-l:var(--c-neuro-l); }
+.unit-42{ --u:var(--c-hormone); --u-d:var(--c-hormone-d); --u-l:var(--c-hormone-l); }
+.unit-43{ --u:var(--c-plant);   --u-d:var(--c-plant-d);   --u-l:var(--c-plant-l); }
+
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:48px; padding:10px 20px;
+  border-radius:14px; border:0; font:inherit; font-weight:900; cursor:pointer; text-decoration:none;
+  background:var(--u, var(--c-neuro)); color:#0B1022; transition:transform .15s, box-shadow .2s;
+}
+html.projector .btn{ color:#fff; }
+html.projector .btn.ghost{ color:var(--c-text); }
+.btn:hover{ transform:translateY(-2px); box-shadow:0 0 22px color-mix(in srgb, var(--u, var(--c-neuro)) 55%, transparent); }
+.btn:active{ transform:translateY(0); }
+.btn.ghost{ background:transparent; color:var(--c-text); border:1px solid var(--c-line); }
+.btn.ghost:hover{ border-color:var(--u, var(--c-neuro)); box-shadow:none; }
+.btn:disabled{ opacity:.4; cursor:not-allowed; transform:none; box-shadow:none; }
+
+.tag{
+  display:inline-flex; align-items:center; gap:4px; padding:2px 12px; border-radius:999px; font-size:.75rem; font-weight:700;
+  color:var(--u, var(--c-neuro)); background:var(--u-l, var(--c-neuro-l)); border:1px solid color-mix(in srgb, var(--u, var(--c-neuro)) 40%, transparent);
+}
+html.projector .tag{ color:var(--u-d, var(--c-neuro-d)); }
+
+.progress{ height:12px; background:rgba(140,165,255,.14); border-radius:999px; overflow:hidden; }
+.progress > span{
+  display:block; height:100%; width:0; border-radius:999px; transition:width .9s ease;
+  background:var(--u, var(--c-neuro)); box-shadow:0 0 12px var(--u, var(--c-neuro));
+}
+html.projector .progress > span{ box-shadow:none; }
+
+.sec-title{ display:flex; align-items:center; gap:12px; margin:44px 0 16px; flex-wrap:wrap; }
+.sec-title h2{ margin:0; }
+.sec-title .code{ font-family:var(--num); font-size:.7rem; letter-spacing:.2em; color:var(--c-muted); }
+section:first-of-type .sec-title{ margin-top:6px; }
+
+.footer{ text-align:center; color:var(--c-muted); font-size:.78rem; padding:28px 20px 40px; }
+.footer a{ color:var(--c-muted); }
+
+.toast{
+  position:fixed; left:50%; bottom:76px; transform:translateX(-50%) translateY(140px); z-index:9500;
+  background:var(--c-panel-solid); color:var(--c-text); padding:12px 22px; border-radius:14px; font-weight:700;
+  box-shadow:var(--glow); border:1px solid var(--c-line); transition:transform .35s ease; max-width:90vw;
+}
+.toast.show{ transform:translateX(-50%) translateY(0); }
+
+/* 建置中頁面 */
+.coming{ text-align:center; padding:48px 20px; }
+.coming .big{ font-size:3.4rem; }
+.coming ul{ text-align:left; display:inline-block; margin:12px auto 20px; color:var(--c-muted); }
+
+/* 發光脈衝（共用） */
+@keyframes pulse-dot{ 0%{ opacity:0; } 10%{ opacity:1; } 90%{ opacity:1; } 100%{ opacity:0; } }
+@keyframes breathe{ 50%{ opacity:.55; } }

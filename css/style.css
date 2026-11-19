@@ -309,6 +309,10 @@ html.projector .seg button[aria-pressed="true"]{ color:#fff; }
 .sortlist li .n{ font-family:var(--num); color:var(--c-muted); width:1.6em; }
 .sortlist li .mv{ margin-left:auto; display:flex; gap:4px; }
 .sortlist li .mv button{ min-width:40px; min-height:40px; border-radius:10px; border:1px solid var(--c-line); background:transparent; color:var(--c-text); cursor:pointer; }
+.sortlist li.picked{ border-color:var(--c-amber); background:rgba(251,191,36,.14); box-shadow:0 0 0 2px var(--c-amber); }
+.sortlist li .mv{ order:2; }
+.sortlist li.picked::after{ content:"已選取：點要放的位置"; order:1; margin-left:auto; font-size:.7rem; color:var(--c-amber); font-weight:700; }
+.sortlist li.picked .mv{ margin-left:8px; }
 .sortlist li.ok{ border-color:var(--c-ok); } .sortlist li.ng{ border-color:var(--c-ng); }
 
 /* 分類小測驗 */
@@ -329,3 +333,26 @@ html.projector .seg button[aria-pressed="true"]{ color:#fff; }
 
 .concept:focus{ outline:none; }
 .concept:focus-visible .face{ box-shadow:0 0 0 3px var(--u); }
+
+/* ---------- 概念卡自我檢核 ---------- */
+.check-overlay{ position:fixed; inset:0; z-index:9000; background:rgba(5,8,22,.72); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:16px; }
+.check-overlay[hidden]{ display:none; }
+html.projector .check-overlay{ background:rgba(30,40,80,.45); }
+.check-box{
+  position:relative; width:min(640px,100%); max-height:92vh; overflow:auto; background:var(--c-panel-solid); border-radius:22px; padding:24px 24px 20px;
+  box-shadow:0 0 0 1px var(--u, var(--c-neuro)), 0 0 40px color-mix(in srgb, var(--u, var(--c-neuro)) 30%, transparent); animation:pop .3s ease;
+}
+.check-x{ position:absolute; top:12px; right:12px; }
+.check-kicker{ font-family:var(--num); font-size:.66rem; letter-spacing:.18em; color:var(--u, var(--c-neuro)); font-weight:700; padding-right:50px; }
+html.projector .check-kicker{ color:var(--u-d, var(--c-neuro-d)); }
+.check-dots{ display:flex; gap:8px; margin:10px 0 6px; }
+.check-dots span{ width:34px; height:8px; border-radius:999px; background:rgba(140,165,255,.2); }
+.check-dots span.cur{ background:var(--u, var(--c-neuro)); opacity:.5; }
+.check-dots span.ok{ background:var(--c-ok); } .check-dots span.ng{ background:var(--c-ng); }
+.check-q{ font-size:1.12rem; margin:8px 0 14px; }
+.check-opts{ display:flex; flex-direction:column; gap:8px; }
+.check-opts .chip-btn{ text-align:left; min-height:52px; font-size:.95rem; }
+.check-exp{ color:var(--c-muted); font-size:.9rem; }
+.check-nav{ display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap; margin-top:14px; }
+.check-result.ok{ color:var(--c-ok); } .check-result.ng{ color:var(--c-amber); }
+@keyframes pop{ from{ opacity:0; transform:translateY(12px) scale(.97);} to{ opacity:1; transform:none; } }

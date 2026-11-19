@@ -356,3 +356,20 @@ html.projector .check-kicker{ color:var(--u-d, var(--c-neuro-d)); }
 .check-nav{ display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap; margin-top:14px; }
 .check-result.ok{ color:var(--c-ok); } .check-result.ng{ color:var(--c-amber); }
 @keyframes pop{ from{ opacity:0; transform:translateY(12px) scale(.97);} to{ opacity:1; transform:none; } }
+
+/* ---------- 動畫 SVG 共用文字與元件 ---------- */
+.fig text{ font-family:var(--font); font-weight:700; fill:var(--c-text); }
+.fig .lbl{ font-size:14px; }
+.fig .sml{ font-size:12px; fill:var(--c-muted); font-weight:500; }
+.fig .pulse{ fill:#FDE68A; filter:drop-shadow(0 0 6px #FBBF24); }
+.case{ font-weight:700; padding:12px 14px; border-radius:12px; background:var(--u-l); border:1px dashed var(--u); }
+.gauges{ display:flex; flex-direction:column; gap:10px; }
+.gauge{ display:grid; grid-template-columns:7.5em 1fr 3.2em; align-items:center; gap:10px; font-size:.86rem; font-weight:700; }
+.gauge .progress{ height:16px; }
+.gauge .progress > span{ transition:width 1.2s ease; }
+.gauge .v{ font-family:var(--num); font-size:.75rem; color:var(--c-muted); text-align:right; }
+.hchips{ display:flex; gap:8px; flex-wrap:wrap; }
+.hchip{ padding:6px 12px; border-radius:999px; border:1px solid var(--c-line); font-size:.8rem; font-weight:700; color:var(--c-muted); transition:all .3s; }
+.hchip.on{ color:#0B1022; background:var(--hc); border-color:var(--hc); box-shadow:0 0 14px var(--hc); }
+html.projector .hchip.on{ color:#fff; box-shadow:none; }
+input[type=range]{ width:100%; accent-color:var(--u, var(--c-neuro)); min-height:40px; }

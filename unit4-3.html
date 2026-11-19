@@ -4,19 +4,563 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>4-3 植物的感應｜第4章 生物體的協調作用</title>
-<link rel="stylesheet" href="./css/style.css">
+<link rel="stylesheet" href="css/style.css">
 <script src="https://batyunching.github.io/bio/js/account.js" data-chapter="ch4" data-prefix="ch4."></script>
+<style>
+.fig .guard{ fill:#4ADE80; stroke:#15803D; stroke-width:3; }
+.fig .pore{ fill:#0A1026; }
+.fig .chl{ fill:#15803D; }
+.fig .epi{ fill:#D9F99D; fill-opacity:.25; stroke:#A3E635; stroke-opacity:.4; }
+.fig .stem{ stroke:#65A30D; stroke-width:5; fill:none; stroke-linecap:round; }
+.fig .pet{ stroke:#65A30D; stroke-width:3; stroke-linecap:round; }
+.fig .leaflet{ fill:#4ADE80; stroke:#15803D; stroke-width:1; }
+.fig .rot{ transition:transform .35s ease; }
+.fig .rot.slow{ transition:transform 2.4s ease; }
+.fig .sky{ transition:fill .8s; }
+.fig .petal{ fill:#E9D5FF; stroke:#A855F7; stroke-width:1.5; }
+.fig .lobe{ fill:#84CC16; stroke:#3F6212; stroke-width:2; }
+.fig .lobe-in{ fill:#F87171; fill-opacity:.7; }
+.fig .tent{ stroke:#DC2626; stroke-width:2.2; stroke-linecap:round; }
+.fig .tdrop{ fill:#FCA5A5; }
+.fig .bug{ transition:transform 1.2s ease; }
+.fig .shoot{ fill:none; stroke:#4ADE80; stroke-width:5; stroke-linecap:round; stroke-linejoin:round; }
+.fig .root{ fill:none; stroke:#FDE68A; stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
+html.projector .fig .root{ stroke:#B45309; }
+html.projector .fig .shoot{ stroke:#16A34A; }
+.fig .seed{ fill:#A16207; stroke:#713F12; stroke-width:2; }
+.fig .ray{ stroke:#FDE047; stroke-width:3; stroke-linecap:round; opacity:.8; }
+.mini-figs{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; }
+.mini-figs figure{ margin:0; }
+.mini-figs figcaption{ font-size:.85rem; color:var(--c-muted); text-align:center; margin-top:6px; }
+.daytag{ font-family:var(--num); font-weight:700; color:var(--c-plant); }
+html.projector .daytag{ color:var(--c-plant-d); }
+</style>
 </head>
 <body data-page="4-3" data-root="./">
-<main class="wrap">
-  <div class="panel u unit-43 coming">
-    <div class="big">🛠️</div>
-    <h1>4-3 植物的感應</h1>
-    <p>這一頁正在建置中，預計在<b>第3階段</b>完成，內容包括：</p>
-    <ul><li>5 張概念卡：膨壓與氣孔、觸發運動、捕蟲與睡眠運動、莖的向性、根的向性</li><li>互動動畫：氣孔開關、碰一下含羞草、日夜開關、向性模擬器</li><li>迷思小警報、快問快答</li></ul>
-    <div><a class="btn" href="./index.html">◀ 回第4章首頁</a></div>
+<main class="wrap unit-43">
+
+  <div class="unit-hero">
+    <div class="ic" id="heroIc"></div>
+    <div class="txt">
+      <div class="dept">DEPT. 03 · PLANT SENSING</div>
+      <h1>4-3 植物的感應</h1>
+      <p>植物沒有神經、也沒有肌肉，卻能感受碰觸、光線和地球引力，還會做出反應。它們是怎麼辦到的？</p>
+    </div>
+    <div class="mini">
+      本單元神經元連線 <b data-unit-progress-text>0 / 5</b>
+      <div class="progress" data-unit-progress="4-3"><span></span></div>
+    </div>
   </div>
+
+  <nav class="toc" aria-label="本頁目錄">
+    <a href="#b1">① 膨壓與氣孔</a><a class="anim" href="#a1">氣孔開關</a>
+    <a href="#b2">② 觸發・捕蟲・睡眠運動</a><a class="anim" href="#a2">碰一下含羞草</a><a class="anim" href="#a3">捕蟲與日夜開關</a>
+    <a href="#b3">③ 植物的向性</a><a class="anim" href="#a4">向性模擬器</a>
+    <a href="#qq">⚡ 快問快答</a>
+  </nav>
+  <div class="block-tools"><button class="btn ghost" id="flipAll">全部翻到說明面</button></div>
+
+  <!-- ================= 1 ================= -->
+  <div class="block-title" id="b1"><span class="num">01</span><h2>膨壓與氣孔</h2><span class="kind">概念卡</span></div>
+  <div class="cards">
+    <div class="concept" id="4-3-c1" data-id="4-3-c1"><div class="inner">
+      <div class="face front">
+        <svg class="ic" viewBox="0 0 120 120" aria-hidden="true"><path d="M58 20 C30 22 22 60 30 92 C34 104 48 104 54 96 C60 70 60 44 58 20Z M62 20 C90 22 98 60 90 92 C86 104 72 104 66 96 C60 70 60 44 62 20Z" fill="currentColor" fill-opacity=".35" stroke="currentColor" stroke-width="3"/><path d="M60 30 C54 50 54 74 60 92 C66 74 66 50 60 30Z" fill="currentColor" opacity=".15"/></svg>
+        <h3>膨壓與氣孔</h3><div class="sub">較快速的感應</div><div class="hint">點一下翻面</div>
+      </div>
+      <div class="face back">
+        <h3>水分一進一出，就能動！</h3>
+        <ul>
+          <li><span class="kw">膨壓</span>：植物細胞內的<b>水分</b>對<b>細胞壁</b>的推擠壓力。</li>
+          <li>植物<b>較快速的感應</b>和<b>膨壓變化</b>有關。</li>
+          <li>水分進入<b>保衛細胞</b>：膨壓變大 → 氣孔<b>打開</b>。</li>
+          <li>保衛細胞失水：膨壓變小 → 氣孔<b>關閉</b>。</li>
+        </ul>
+        <div class="myth"><b class="t">⚠ MYTH ALERT 迷思小警報</b><span class="x">植物動得快是因為有肌肉</span>　→　<span class="o">植物沒有肌肉和神經，快速的動作靠細胞內<b>水分</b>改變膨壓。</span></div>
+        <div class="ft"><span class="page">課本 P.146</span><button class="got">我懂了？</button></div>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="block-title" id="a1"><span class="num">🎬</span><h2>氣孔開關</h2><span class="kind anim">互動動畫</span></div>
+  <div class="panel lab">
+    <div class="grid2">
+      <svg class="fig" id="stomaFig" viewBox="0 0 320 240" role="img" aria-label="一對保衛細胞與中間的氣孔">
+        <rect class="epi" x="10" y="10" width="300" height="220" rx="14"/>
+        <ellipse class="pore" id="pore" cx="160" cy="120" rx="4" ry="70"/>
+        <g id="gL"><ellipse class="guard" id="cL" cx="128" cy="120" rx="28" ry="86"/></g>
+        <g id="gR"><ellipse class="guard" id="cR" cx="192" cy="120" rx="28" ry="86"/></g>
+        <g id="chls"></g>
+        <text x="160" y="226" text-anchor="middle" class="sml" id="stomaTxt">保衛細胞（示意）</text>
+      </svg>
+      <div>
+        <label for="water" style="font-weight:700">保衛細胞的含水量：<span id="waterTxt">少</span></label>
+        <input type="range" id="water" min="0" max="100" value="10" aria-describedby="stomaInfo">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px">
+          <button class="chip-btn" data-w="90">💧 吸水</button><button class="chip-btn" data-w="10">🔥 失水</button>
+        </div>
+        <div class="gauge"><span>膨壓</span><div class="progress"><span id="turgor" style="width:10%"></span></div><span class="v" id="turgorV">小</span></div>
+        <div class="info" id="stomaInfo" style="margin-top:12px"><h3>氣孔：關閉</h3><p>保衛細胞缺水、膨壓小，兩個細胞靠在一起，氣孔關閉。拖曳滑桿讓保衛細胞吸水看看。</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 2 ================= -->
+  <div class="block-title" id="b2"><span class="num">02</span><h2>觸發運動・捕蟲運動・睡眠運動</h2><span class="kind">概念卡</span></div>
+  <div class="cards">
+    <div class="concept" id="4-3-c2" data-id="4-3-c2"><div class="inner">
+      <div class="face front"><div class="ic" id="icMimosa"></div><h3>觸發運動</h3><div class="sub">含羞草</div><div class="hint">點一下翻面</div></div>
+      <div class="face back">
+        <h3>一碰就「害羞」</h3>
+        <ul>
+          <li><span class="kw">含羞草</span>被碰觸後，<b>小葉迅速閉合</b>、<b>葉柄下垂</b>，稱為<span class="kw">觸發運動</span>。</li>
+          <li>和細胞內的水分（<b>膨壓</b>）變化有關，屬於<b>較快速的感應</b>，很快就看得到。</li>
+          <li>過一陣子，小葉會再慢慢張開。</li>
+        </ul>
+        <div class="myth"><b class="t">⚠ MYTH ALERT 迷思小警報</b><span class="x">觸發運動是向觸性</span>　→　<span class="o">向觸性是莖<b>朝接觸物生長</b>（要好幾天）；觸發運動是<b>膨壓</b>造成的快速閉合。</span></div>
+        <div class="ft"><span class="page">課本 P.146</span><button class="got">我懂了？</button></div>
+      </div>
+    </div></div>
+    <div class="concept" id="4-3-c3" data-id="4-3-c3"><div class="inner">
+      <div class="face front">
+        <svg class="ic" viewBox="0 0 120 120" aria-hidden="true"><path d="M60 98 C30 90 18 62 24 40 C40 52 52 70 60 98Z M60 98 C90 90 102 62 96 40 C80 52 68 70 60 98Z" fill="currentColor" fill-opacity=".4" stroke="currentColor" stroke-width="3"/><path d="M24 40 l-6 -8 M30 48 l-8 -5 M96 40 l6 -8 M90 48 l8 -5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="90" cy="20" r="9" fill="none" stroke="currentColor" stroke-width="3" opacity=".6"/></svg>
+        <h3>捕蟲運動・睡眠運動</h3><div class="sub">捕蠅草・毛氈苔・酢漿草・睡蓮</div><div class="hint">點一下翻面</div>
+      </div>
+      <div class="face back">
+        <h3>也是膨壓運動</h3>
+        <table>
+          <tr><th>種類</th><th>例子</th></tr>
+          <tr><td><span class="kw">捕蟲運動</span></td><td><b>捕蠅草</b>的葉會迅速閉合捕蟲；<b>毛氈苔</b>的葉會捲曲捕蟲</td></tr>
+          <tr><td><span class="kw">睡眠運動</span></td><td><b>酢漿草</b>的葉片、<b>睡蓮</b>的花朵：白天展開、夜晚閉合</td></tr>
+        </table>
+        <p style="margin:0 0 6px">觸發運動、捕蟲運動、睡眠運動、氣孔開閉，都和<b>膨壓</b>變化有關。</p>
+        <div class="myth"><b class="t">⚠ MYTH ALERT 迷思小警報</b><span class="x">捕蠅草閉合靠肌肉收縮</span>　→　<span class="o">捕蠅草葉片快速閉合和細胞<b>水分流失</b>（膨壓改變）有關。</span></div>
+        <div class="ft"><span class="page">課本 P.146–147</span><button class="got">我懂了？</button></div>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="block-title" id="a2"><span class="num">🎬</span><h2>碰一下含羞草</h2><span class="kind anim">互動動畫</span></div>
+  <div class="panel lab">
+    <div class="grid2">
+      <svg class="fig" id="mimosaFig" viewBox="0 0 520 330" role="img" aria-label="含羞草，點一下葉子會閉合">
+        <rect x="200" y="300" width="120" height="26" rx="6" fill="#92400E" opacity=".7"/>
+        <path class="stem" d="M260 300 C258 240 262 180 260 70"/>
+        <g id="petioles"></g>
+        <text class="sml" x="510" y="320" text-anchor="end" id="mimTxt">👆 點葉子碰碰看</text>
+      </svg>
+      <div class="info" id="mimInfo"><h3>含羞草</h3><p>點左圖的葉子碰碰看。注意觀察：小葉怎麼閉合？葉柄有什麼變化？要多久才看得到？</p></div>
+    </div>
+  </div>
+
+  <div class="block-title" id="a3"><span class="num">🎬</span><h2>捕蟲運動與睡眠運動</h2><span class="kind anim">互動動畫</span></div>
+  <div class="panel lab">
+    <div class="bar">
+      <button class="btn" id="bugGo">🪰 放一隻小蟲</button><button class="btn ghost" id="bugReset">↺ 重新打開</button>
+      <span style="flex:1"></span>
+      <div class="seg" id="segDay"><button data-v="day" aria-pressed="true">☀ 白天</button><button data-v="night">🌙 夜晚</button></div>
+    </div>
+    <div class="mini-figs">
+      <figure>
+        <svg class="fig" id="trapFig" viewBox="0 0 240 200" role="img" aria-label="捕蠅草">
+          <path class="stem" d="M120 196 V128" style="stroke-width:4"/>
+          <g class="bug" id="bug1" style="transform:translate(200px,20px)"><ellipse cx="0" cy="0" rx="6" ry="4" fill="#1E293B"/><ellipse cx="-3" cy="-4" rx="4" ry="2.5" fill="#BAE6FD" opacity=".85"/><ellipse cx="3" cy="-4" rx="4" ry="2.5" fill="#BAE6FD" opacity=".85"/></g>
+          <g transform="translate(120 128)">
+            <g class="rot" id="lobeL" style="transform:rotate(22deg)"><path class="lobe" d="M0 0 C-10 -40 -60 -60 -78 -36 C-86 -22 -50 -2 0 0Z"/><path class="lobe-in" d="M-4 -4 C-14 -34 -54 -48 -68 -32 C-72 -22 -44 -8 -4 -4Z"/><path d="M-78 -36 l-10 -6 M-70 -46 l-8 -9 M-56 -54 l-4 -10 M-82 -26 l-11 -2" stroke="#3F6212" stroke-width="2"/></g>
+            <g class="rot" id="lobeR" style="transform:rotate(-22deg)"><path class="lobe" d="M0 0 C10 -40 60 -60 78 -36 C86 -22 50 -2 0 0Z"/><path class="lobe-in" d="M4 -4 C14 -34 54 -48 68 -32 C72 -22 44 -8 4 -4Z"/><path d="M78 -36 l10 -6 M70 -46 l8 -9 M56 -54 l4 -10 M82 -26 l11 -2" stroke="#3F6212" stroke-width="2"/></g>
+          </g>
+        </svg>
+        <figcaption>捕蠅草：葉迅速閉合</figcaption>
+      </figure>
+      <figure>
+        <svg class="fig" id="dewFig" viewBox="0 0 240 200" role="img" aria-label="毛氈苔">
+          <path class="stem" d="M120 196 V130" style="stroke-width:4"/>
+          <circle cx="120" cy="100" r="30" fill="#84CC16" stroke="#3F6212" stroke-width="2"/>
+          <g id="tents"></g>
+          <g class="bug" id="bug2" style="transform:translate(210px,20px)"><ellipse cx="0" cy="0" rx="6" ry="4" fill="#1E293B"/><ellipse cx="-3" cy="-4" rx="4" ry="2.5" fill="#BAE6FD" opacity=".85"/><ellipse cx="3" cy="-4" rx="4" ry="2.5" fill="#BAE6FD" opacity=".85"/></g>
+        </svg>
+        <figcaption>毛氈苔：葉會捲曲</figcaption>
+      </figure>
+      <figure>
+        <svg class="fig" id="sleepFig" viewBox="0 0 240 200" role="img" aria-label="酢漿草與睡蓮，白天展開、夜晚閉合">
+          <rect class="sky" id="sky" x="0" y="0" width="240" height="200" rx="14" fill="#BAE6FD" fill-opacity=".25"/>
+          <circle id="sun" cx="210" cy="28" r="12" fill="#FDE047"/>
+          <path id="moon" d="M210 16 a12 12 0 1 0 8 22 a9 9 0 1 1 -8 -22z" fill="#E2E8F0" opacity="0"/>
+          <!-- 酢漿草 -->
+          <path class="stem" d="M64 196 V110" style="stroke-width:3"/>
+          <g transform="translate(64 110)">
+            <g class="rot slow oxl" style="transform:rotate(-70deg)"><path d="M0 0 C-6 -10 -2 -30 0 -32 C2 -30 6 -10 0 0Z M0 -32 C-14 -40 -22 -26 -12 -18 C-6 -14 -2 -12 0 0 C2 -12 6 -14 12 -18 C22 -26 14 -40 0 -32Z" fill="#4ADE80" stroke="#15803D" stroke-width="1.2"/></g>
+            <g class="rot slow oxl" style="transform:rotate(0deg)"><path d="M0 0 C-6 -10 -2 -30 0 -32 C2 -30 6 -10 0 0Z M0 -32 C-14 -40 -22 -26 -12 -18 C-6 -14 -2 -12 0 0 C2 -12 6 -14 12 -18 C22 -26 14 -40 0 -32Z" fill="#4ADE80" stroke="#15803D" stroke-width="1.2"/></g>
+            <g class="rot slow oxl" style="transform:rotate(70deg)"><path d="M0 0 C-6 -10 -2 -30 0 -32 C2 -30 6 -10 0 0Z M0 -32 C-14 -40 -22 -26 -12 -18 C-6 -14 -2 -12 0 0 C2 -12 6 -14 12 -18 C22 -26 14 -40 0 -32Z" fill="#4ADE80" stroke="#15803D" stroke-width="1.2"/></g>
+          </g>
+          <!-- 睡蓮 -->
+          <ellipse cx="170" cy="176" rx="56" ry="12" fill="#38BDF8" opacity=".35"/>
+          <ellipse cx="150" cy="172" rx="22" ry="6" fill="#22C55E" opacity=".8"/>
+          <g transform="translate(176 164)" id="lily"></g>
+          <text class="sml" x="64" y="70" text-anchor="middle">酢漿草</text><text class="sml" x="176" y="112" text-anchor="middle">睡蓮</text>
+        </svg>
+        <figcaption>睡眠運動：白天展開、夜晚閉合</figcaption>
+      </figure>
+    </div>
+    <div class="info" id="sleepInfo" style="margin-top:12px"><p>按「🪰 放一隻小蟲」，看捕蠅草和毛氈苔怎麼抓蟲；切換「☀ 白天／🌙 夜晚」，看酢漿草的葉和睡蓮的花有什麼變化。</p></div>
+  </div>
+
+  <!-- ================= 3 ================= -->
+  <div class="block-title" id="b3"><span class="num">03</span><h2>植物的向性</h2><span class="kind">概念卡</span></div>
+  <div class="cards">
+    <div class="concept" id="4-3-c4" data-id="4-3-c4"><div class="inner">
+      <div class="face front">
+        <svg class="ic" viewBox="0 0 120 120" aria-hidden="true"><path d="M40 110 C40 80 50 54 84 38" stroke="currentColor" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M84 38 l-4 -14 l14 6z" fill="currentColor"/><circle cx="104" cy="18" r="8" fill="var(--c-amber)"/><path d="M104 4 v-2 M118 18 h2 M94 8 l-2 -2" stroke="var(--c-amber)" stroke-width="3"/></svg>
+        <h3>莖的向性</h3><div class="sub">向光性・負向地性・向觸性</div><div class="hint">點一下翻面</div>
+      </div>
+      <div class="face back">
+        <h3>莖：向光、背地、向觸</h3>
+        <p style="margin:0 0 6px"><span class="kw">向性</span>：植物接受光線、地球引力等刺激<b>一段時間後</b>，產生<b>朝向或背離</b>刺激方向<b>生長</b>的反應。</p>
+        <table>
+          <tr><th>名稱</th><th>表現</th></tr>
+          <tr><td><span class="kw">向光性</span></td><td>光從側面照，莖頂端<b>朝向光源</b>生長，讓葉片獲得更多光線</td></tr>
+          <tr><td><span class="kw">負向地性</span>（背地性）</td><td>植物橫放，莖頂端<b>背離地心</b>向上生長</td></tr>
+          <tr><td><span class="kw">向觸性</span></td><td>牽牛花等藤蔓的莖碰到物體，<b>朝接觸的物體捲曲</b>生長</td></tr>
+        </table>
+        <div class="myth"><b class="t">⚠ MYTH ALERT 迷思小警報</b><span class="x">向性也是幾秒內就能看到</span>　→　<span class="o">向性是<b>生長</b>的反應，要<b>好幾天</b>才看得出來。</span></div>
+        <div class="ft"><span class="page">課本 P.148</span><button class="got">我懂了？</button></div>
+      </div>
+    </div></div>
+    <div class="concept" id="4-3-c5" data-id="4-3-c5"><div class="inner">
+      <div class="face front">
+        <svg class="ic" viewBox="0 0 120 120" aria-hidden="true"><path d="M20 30 H100" stroke="currentColor" stroke-width="3" opacity=".4"/><circle cx="36" cy="30" r="8" fill="var(--c-amber)"/><path d="M60 30 C60 50 56 70 64 100 M60 60 C48 70 44 84 46 96 M62 70 C74 78 80 88 78 98" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M60 110 v6 M54 108 l6 8 l6 -8" stroke="currentColor" stroke-width="3" fill="none"/></svg>
+        <h3>根的向性</h3><div class="sub">向地性・負向光性</div><div class="hint">點一下翻面</div>
+      </div>
+      <div class="face back">
+        <h3>根：向地、背光</h3>
+        <table>
+          <tr><th>名稱</th><th>表現</th></tr>
+          <tr><td><span class="kw">向地性</span></td><td>植物橫放，根尖受地球引力影響<b>朝向地心</b>生長</td></tr>
+          <tr><td><span class="kw">負向光性</span>（背光性）</td><td>根會<b>背離光源</b>生長</td></tr>
+        </table>
+        <table>
+          <tr><th>比較</th><th>較快速的感應</th><th>向性</th></tr>
+          <tr><td>原因</td><td>細胞內水分（膨壓）變化</td><td>朝向或背離刺激方向<b>生長</b></td></tr>
+          <tr><td>時間</td><td>很快就看得到</td><td>需要一段時間（數天）</td></tr>
+        </table>
+        <div class="myth"><b class="t">⚠ MYTH ALERT 迷思小警報</b><span class="x">根向光、莖向地</span>　→　<span class="o">剛好相反！<b>莖</b>：向光、背地；<b>根</b>：向地、背光。</span></div>
+        <div class="ft"><span class="page">課本 P.148、151</span><button class="got">我懂了？</button></div>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="block-title" id="a4"><span class="num">🎬</span><h2>向性模擬器</h2><span class="kind anim">互動動畫</span></div>
+  <div class="panel lab">
+    <div class="bar">
+      <span style="font-weight:700">幼苗擺放：</span>
+      <div class="seg" id="segOri"><button data-v="0" aria-pressed="true">直立</button><button data-v="90">向右橫放</button><button data-v="-90">向左橫放</button></div>
+    </div>
+    <div class="bar">
+      <span style="font-weight:700">光源位置：</span>
+      <div class="seg" id="segLight"><button data-v="none">🌑 暗室</button><button data-v="top" aria-pressed="true">⬆ 上方</button><button data-v="left">⬅ 左方</button><button data-v="right">➡ 右方</button></div>
+      <span style="color:var(--c-muted);font-size:.8rem">生長途中也可以換光源！</span>
+    </div>
+    <div class="grid2">
+      <svg class="fig" id="tropFig" viewBox="0 0 480 400" role="img" aria-label="幼苗的莖和根隨著光線與地球引力生長的模擬圖">
+        <rect id="dark" x="0" y="0" width="480" height="400" rx="14" fill="#000" opacity="0"/>
+        <g id="lamp"></g>
+        <path d="M30 390 H450" stroke="var(--c-line)" stroke-width="2" stroke-dasharray="6 6"/>
+        <text class="sml" x="450" y="384" text-anchor="end">↓ 地心方向</text>
+        <path class="root" id="rootPath" d=""/>
+        <path class="shoot" id="shootPath" d=""/>
+        <g id="leaves"></g>
+        <ellipse class="seed" id="seed" cx="240" cy="236" rx="12" ry="8"/>
+        <text x="20" y="30" class="lbl daytag" id="dayTxt">第 0 天</text>
+      </svg>
+      <div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn" id="grow1">⏩ 過 1 天</button>
+          <button class="btn" id="grow5">⏩⏩ 過 5 天</button>
+          <button class="btn ghost" id="regrow">↺ 重新種</button>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+          <button class="chip-btn" id="qExplore">❓ 探索小Q：向右橫放＋右方光源</button>
+          <button class="chip-btn" id="qDark">❓ 暗室中橫放</button>
+          <button class="chip-btn" id="qS">🏆 挑戰：讓莖長成「S」形</button>
+        </div>
+        <div class="info" id="tropInfo" style="margin-top:12px"><h3>怎麼玩</h3><p>先選幼苗的擺放方式和光源位置，再按「過 1 天」。莖（綠色）和根（黃色）會怎麼長？向性要好幾天才看得出來喔！</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 快問快答 ================= -->
+  <div class="block-title" id="qq"><span class="num">⚡</span><h2>快問快答</h2><span class="kind">3 題</span></div>
+  <div class="panel qq" id="quick"></div>
+
+  <div class="next-unit">
+    <a class="btn ghost" href="unit4-2.html" style="--u:var(--c-hormone)">◀ 上一單元：4-2 內分泌系統</a>
+    <a class="btn" href="index.html">回第4章首頁，看看神經網路 ▶</a>
+  </div>
+  <div class="footer">國中自然（生物）一上・第4章 生物體的協調作用｜4-3 植物的感應（課本 p.146–149）｜圖形皆為原創 SVG 繪製</div>
 </main>
-<script src="./js/common.js"></script>
+
+<script src="js/common.js"></script>
+<script src="data/selfcheck.js"></script>
+<script src="js/unit.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var NS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs, parent){ var e = document.createElementNS(NS, tag); for(var k in attrs) e.setAttribute(k, attrs[k]); if(parent) parent.appendChild(e); return e; }
+  $('heroIc').innerHTML = CH4.icons.plant(70);
+  $('icMimosa').innerHTML = CH4.icons.plant(120);
+
+  /* ============ C1 氣孔 ============ */
+  var chls = $('chls');
+  function stoma(w){
+    var k = w / 100, rx = 24 + 12 * k, gap = 3 + 34 * k;
+    var lx = 160 - gap / 2 - rx, rxx = 160 + gap / 2 + rx;
+    $('cL').setAttribute('cx', lx); $('cL').setAttribute('rx', rx);
+    $('cR').setAttribute('cx', rxx); $('cR').setAttribute('rx', rx);
+    $('pore').setAttribute('rx', Math.max(1, gap / 2 + 2));
+    chls.innerHTML = '';
+    [[-0.3,-40],[0.2,-10],[-0.1,25],[0.25,50],[-0.25,-70]].forEach(function(d){
+      el('circle', { class:'chl', cx: lx + d[0] * rx, cy: 120 + d[1], r: 4 }, chls);
+      el('circle', { class:'chl', cx: rxx - d[0] * rx, cy: 120 + d[1], r: 4 }, chls);
+    });
+    $('turgor').style.width = Math.max(6, w) + '%';
+    var open = w >= 55, mid = w > 25 && w < 55;
+    $('turgorV').textContent = w >= 55 ? '大' : (mid ? '中' : '小');
+    $('waterTxt').textContent = w >= 55 ? '多' : (mid ? '中' : '少');
+    $('stomaInfo').innerHTML = open
+      ? '<h3>氣孔：打開 ✓</h3><p>水分進入保衛細胞，<b>膨壓變大</b>，保衛細胞鼓起來、向外彎，中間的<b>氣孔打開</b>。</p>'
+      : (mid ? '<h3>氣孔：半開</h3><p>保衛細胞的水分慢慢改變中，膨壓也跟著改變。</p>' : '<h3>氣孔：關閉</h3><p>保衛細胞<b>失水</b>、<b>膨壓變小</b>，兩個細胞靠在一起，<b>氣孔關閉</b>。</p>');
+    if(open) UNIT.rewardOnce('a43-stoma', 5);
+  }
+  $('water').addEventListener('input', function(){ stoma(+this.value); });
+  var wAnim = null;
+  document.querySelectorAll('[data-w]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var to = +b.getAttribute('data-w'), r = $('water'); clearInterval(wAnim);
+      wAnim = setInterval(function(){ var v = +r.value; v += (to > v ? 3 : -3); if(Math.abs(to - v) < 3) { v = to; clearInterval(wAnim); } r.value = v; stoma(v); }, UNIT.reduced() ? 1 : 30);
+    });
+  });
+  stoma(10);
+
+  /* ============ C2 含羞草 ============ */
+  var PET = [ { x:260, y:250, a:-25, len:150, side:1 }, { x:260, y:190, a:205, len:140, side:-1 }, { x:260, y:130, a:-40, len:130, side:1 }, { x:260, y:100, a:215, len:110, side:-1 } ];
+  var petRoot = $('petioles'), pets = [];
+  PET.forEach(function(p, pi){
+    var g0 = el('g', { transform: 'translate(' + p.x + ' ' + p.y + ')' }, petRoot);
+    var g = el('g', { class:'rot', style:'transform:rotate(' + p.a + 'deg)' }, g0);
+    el('line', { class:'pet', x1:0, y1:0, x2:p.len, y2:0 }, g);
+    var lfs = [];
+    for(var i = 1; i <= 7; i++){
+      var x = p.len * (0.18 + i * 0.115);
+      [-1, 1].forEach(function(s){
+        var lg0 = el('g', { transform: 'translate(' + x + ' 0)' }, g);
+        var lg = el('g', { class:'rot', style:'transform:rotate(' + (s * 65) + 'deg)' }, lg0);
+        el('ellipse', { class:'leaflet', cx: 11, cy: 0, rx: 11, ry: 4.2 }, lg);
+        lfs.push({ g:lg, s:s, i:i });
+      });
+    }
+    pets.push({ p:p, g:g, lfs:lfs, closed:false });
+    g0.style.cursor = 'pointer';
+    g0.addEventListener('click', function(){ touch(pi); });
+  });
+  var timers = [];
+  function touch(pi){
+    var t0 = performance.now(), R = UNIT.reduced();
+    $('mimTxt').textContent = '⏱ 觸碰！';
+    // 從被碰的那片開始，訊息傳到其他葉
+    pets.forEach(function(pt, k){
+      var delay = Math.abs(k - pi) * (R ? 0 : 500);
+      pt.lfs.forEach(function(lf){
+        timers.push(setTimeout(function(){ lf.g.classList.remove('slow'); lf.g.style.transform = 'rotate(' + (lf.s * 6) + 'deg)'; }, delay + (R ? 0 : lf.i * 70)));
+      });
+      timers.push(setTimeout(function(){ pt.g.classList.remove('slow'); pt.g.style.transform = 'rotate(' + (pt.p.a + pt.p.side * 50) + 'deg)'; }, delay + (R ? 0 : 650)));
+      pt.closed = true;
+    });
+    setTimeout(function(){
+      $('mimInfo').innerHTML = '<h3>小葉閉合、葉柄下垂！</h3><p>碰到之後<b>幾秒內</b>就看到變化，這就是<b>觸發運動</b>，屬於較快速的感應。它和細胞內的<b>水分改變（膨壓變化）</b>有關，含羞草沒有肌肉也沒有神經喔！</p><p>等一下，小葉會慢慢再張開。</p>';
+      $('mimTxt').textContent = '幾秒內就閉合了';
+      UNIT.rewardOnce('a43-mimosa', 5);
+    }, R ? 50 : 1800);
+    clearTimeout(touch.reopen);
+    touch.reopen = setTimeout(function(){
+      pets.forEach(function(pt){
+        pt.g.classList.add('slow'); pt.g.style.transform = 'rotate(' + pt.p.a + 'deg)';
+        pt.lfs.forEach(function(lf){ lf.g.classList.add('slow'); lf.g.style.transform = 'rotate(' + (lf.s * 65) + 'deg)'; });
+      });
+      $('mimTxt').textContent = '慢慢張開了，再碰一次看看';
+    }, R ? 1500 : 9000);
+  }
+
+  /* ============ C3 捕蟲＋睡眠運動 ============ */
+  var tents = $('tents'), tlist = [];
+  for(var i = 0; i < 16; i++){
+    var a = i / 16 * Math.PI * 2;
+    var g0 = el('g', { transform: 'translate(' + (120 + Math.cos(a) * 26) + ' ' + (100 + Math.sin(a) * 26) + ') rotate(' + (a * 180 / Math.PI) + ')' }, tents);
+    var g = el('g', { class:'rot slow' }, g0);
+    el('line', { class:'tent', x1:0, y1:0, x2:20, y2:0 }, g); el('circle', { class:'tdrop', cx:21, cy:0, r:3 }, g);
+    tlist.push(g);
+  }
+  $('bugGo').addEventListener('click', function(){
+    var R = UNIT.reduced();
+    $('bug1').style.transform = 'translate(120px,96px)'; $('bug2').style.transform = 'translate(120px,100px)';
+    setTimeout(function(){
+      $('lobeL').style.transform = 'rotate(63deg)'; $('lobeR').style.transform = 'rotate(-63deg)';
+      tlist.forEach(function(t){ t.style.transform = 'rotate(150deg) scale(.9)'; });
+      $('sleepInfo').innerHTML = '<p>🪰 小蟲碰到葉片內側 → <b>捕蠅草</b>的葉<b>迅速閉合</b>；<b>毛氈苔</b>的腺毛黏住小蟲，葉<b>慢慢捲曲</b>把蟲包住。這是<b>捕蟲運動</b>，也和膨壓變化有關。</p>';
+      UNIT.rewardOnce('a43-trap', 5);
+    }, R ? 30 : 1300);
+  });
+  $('bugReset').addEventListener('click', function(){
+    $('lobeL').style.transform = 'rotate(22deg)'; $('lobeR').style.transform = 'rotate(-22deg)';
+    tlist.forEach(function(t){ t.style.transform = ''; });
+    $('bug1').style.transform = 'translate(200px,20px)'; $('bug2').style.transform = 'translate(210px,20px)';
+  });
+  // 睡蓮花瓣
+  var lily = $('lily'), petals = [];
+  [-70,-40,-14,14,40,70].forEach(function(a){
+    var g = el('g', { class:'rot slow', style:'transform:rotate(' + a + 'deg)' }, lily);
+    el('path', { class:'petal', d:'M0 0 C-7 -10 -6 -30 0 -38 C6 -30 7 -10 0 0Z' }, g);
+    petals.push({ g:g, a:a });
+  });
+  el('circle', { cx:0, cy:-4, r:5, fill:'#FDE047' }, lily);
+  UNIT.seg($('segDay'), function(v){
+    var night = v === 'night';
+    $('sky').setAttribute('fill', night ? '#0F172A' : '#BAE6FD'); $('sky').setAttribute('fill-opacity', night ? .9 : .25);
+    $('sun').setAttribute('opacity', night ? 0 : 1); $('moon').setAttribute('opacity', night ? 1 : 0);
+    var ox = document.querySelectorAll('.oxl');
+    [-70, 0, 70].forEach(function(a, k){ ox[k].style.transform = 'rotate(' + (night ? (a === 0 ? 180 : a * 2.3) : a) + 'deg)'; });
+    petals.forEach(function(p){ p.g.style.transform = 'rotate(' + (night ? p.a * 0.15 : p.a) + 'deg)'; });
+    $('sleepInfo').innerHTML = night
+      ? '<p>🌙 夜晚：<b>酢漿草</b>的小葉垂下閉合，<b>睡蓮</b>的花瓣收起來，好像在睡覺——這就是<b>睡眠運動</b>，和膨壓變化有關。</p>'
+      : '<p>☀ 白天：酢漿草的葉片和睡蓮的花朵又<b>展開</b>了。</p>';
+    if(night) UNIT.rewardOnce('a43-sleep', 5);
+  });
+
+  /* ============ C4 向性模擬器 ============ */
+  var ori = 0, light = 'top', day = 0, stem = [], root = [], sDir, rDir, history = [], sAng = [];
+  var C = { x:240, y:236 };
+  var LIGHT = { top:{ x:0, y:-1 }, left:{ x:-1, y:0 }, right:{ x:1, y:0 } };
+  function rot(v, deg){ var r = deg * Math.PI / 180; return { x: v.x * Math.cos(r) - v.y * Math.sin(r), y: v.x * Math.sin(r) + v.y * Math.cos(r) }; }
+  function norm(v){ var l = Math.sqrt(v.x * v.x + v.y * v.y) || 1; return { x:v.x / l, y:v.y / l }; }
+  function ang(v){ return Math.atan2(v.y, v.x); }
+  function turn(cur, target, maxDeg){
+    var d = ang(target) - ang(cur); while(d > Math.PI) d -= 2 * Math.PI; while(d < -Math.PI) d += 2 * Math.PI;
+    var m = maxDeg * Math.PI / 180; d = Math.max(-m, Math.min(m, d));
+    return rot(cur, d * 180 / Math.PI);
+  }
+  function plant(){
+    day = 0; history = []; sAng = []; sWin = false;
+    sDir = rot({ x:0, y:-1 }, ori); rDir = rot({ x:0, y:1 }, ori);
+    stem = [ { x:C.x, y:C.y }, { x:C.x + sDir.x * 22, y:C.y + sDir.y * 22 } ];
+    root = [ { x:C.x, y:C.y }, { x:C.x + rDir.x * 16, y:C.y + rDir.y * 16 } ];
+    $('seed').setAttribute('transform', 'rotate(' + ori + ' ' + C.x + ' ' + C.y + ')');
+    draw();
+  }
+  function inside(p){ return p.x > 14 && p.x < 466 && p.y > 40 && p.y < 386; }
+  function growDay(){
+    day++; history.push(light);
+    for(var k = 0; k < 6; k++){
+      var L = LIGHT[light];
+      var tS = norm({ x: 0 * 0.6 + (L ? L.x * 1.1 : 0), y: -0.6 + (L ? L.y * 1.1 : 0) });
+      sDir = turn(sDir, tS, 12);
+      if(stem.length && inside({ x: stem[stem.length-1].x + sDir.x * 3.4, y: stem[stem.length-1].y + sDir.y * 3.4 })) sAng.push(ang(sDir));
+      var tip = stem[stem.length - 1], nx = { x: tip.x + sDir.x * 3.4, y: tip.y + sDir.y * 3.4 };
+      if(inside(nx)) stem.push(nx);
+      var tR = norm({ x: L ? -L.x * 0.45 : 0, y: 1 + (L ? -L.y * 0.45 : 0) });
+      rDir = turn(rDir, tR, 10);
+      var rt = root[root.length - 1], nr = { x: rt.x + rDir.x * 2.6, y: rt.y + rDir.y * 2.6 };
+      if(inside(nr)) root.push(nr);
+    }
+    draw(); explain();
+  }
+  function pathD(pts){ return pts.map(function(p, i){ return (i ? 'L' : 'M') + p.x.toFixed(1) + ' ' + p.y.toFixed(1); }).join(' '); }
+  function draw(){
+    $('shootPath').setAttribute('d', pathD(stem)); $('rootPath').setAttribute('d', pathD(root));
+    var tip = stem[stem.length - 1], a = ang(sDir) * 180 / Math.PI, lv = $('leaves'); lv.innerHTML = '';
+    var g = el('g', { transform: 'translate(' + tip.x + ' ' + tip.y + ') rotate(' + (a + 90) + ')' }, lv);
+    el('ellipse', { cx:-9, cy:2, rx:9, ry:4.5, fill:'#4ADE80', stroke:'#15803D', transform:'rotate(-25)' }, g);
+    el('ellipse', { cx:9, cy:2, rx:9, ry:4.5, fill:'#4ADE80', stroke:'#15803D', transform:'rotate(25)' }, g);
+    $('dayTxt').textContent = '第 ' + day + ' 天';
+    // 光源
+    var lamp = $('lamp'); lamp.innerHTML = '';
+    $('dark').setAttribute('opacity', light === 'none' ? .55 : 0);
+    if(light !== 'none'){
+      var P = { top:{ x:240, y:22 }, left:{ x:22, y:180 }, right:{ x:458, y:180 } }[light], L = LIGHT[light];
+      el('circle', { cx:P.x, cy:P.y, r:14, fill:'#FDE047' }, lamp);
+      for(var i = -2; i <= 2; i++){
+        var off = rot({ x:-L.x, y:-L.y }, i * 14);
+        el('line', { class:'ray', x1: P.x + off.x * 20, y1: P.y + off.y * 20, x2: P.x + off.x * 46, y2: P.y + off.y * 46 }, lamp);
+      }
+    } else {
+      el('text', { x:240, y:60, 'text-anchor':'middle', class:'lbl', fill:'#E2E8F0' }, lamp).textContent = '🌑 暗室：沒有光';
+    }
+  }
+  function sShape(){ // 用每一步的生長方向判斷：先往一邊彎、再往另一邊彎
+    var turns = [], acc = 0, sign = 0;
+    for(var i = 1; i < sAng.length; i++){
+      var d = sAng[i] - sAng[i-1]; while(d > Math.PI) d -= 2 * Math.PI; while(d < -Math.PI) d += 2 * Math.PI;
+      if(Math.abs(d) < 1e-6) continue;
+      var s = d > 0 ? 1 : -1;
+      if(s !== sign){ if(Math.abs(acc) > 0.45) turns.push(sign); acc = 0; sign = s; }
+      acc += d;
+    }
+    if(Math.abs(acc) > 0.45) turns.push(sign);
+    for(var k = 1; k < turns.length; k++) if(turns[k] !== turns[k-1]) return true;
+    return false;
+  }
+  var challenge = false, sWin = false;
+  function explain(){
+    var t = '<h3>第 ' + day + ' 天的觀察</h3><ul style="margin:0;padding-left:1.1em">';
+    if(light === 'none') t += '<li>🌑 暗室沒有光：莖只受地球引力影響，<b>背離地心向上</b>長（負向地性）。</li>';
+    else if(light === 'top') t += '<li>光從上方來：莖<b>朝上（光源）</b>長。</li>';
+    else t += '<li>光從' + (light === 'left' ? '左' : '右') + '方來：莖彎向<b>光源</b>（向光性），同時也受引力影響有點往上（負向地性）。</li>';
+    t += '<li>根一直<b>往下（地心）</b>長（向地性）' + (light !== 'none' && light !== 'top' ? '，並稍微<b>背離光源</b>（負向光性）' : '') + '。</li></ul>';
+    if(day <= 1) t += '<p style="margin-top:6px">⏱ 向性是<b>生長</b>的反應，才 1 天變化還不明顯，多等幾天再看看。</p>';
+    if(challenge){
+      if(sShape()){ sWin = true; UNIT.rewardOnce('a43-S', 15, 'S 形挑戰成功'); challenge = false; }
+      else if(day >= 3) t += '<p style="color:var(--c-amber);font-weight:700;margin-top:6px">💡 提示：先讓光從一側照幾天，再把光源換到另一側。</p>';
+    }
+    if(sWin) t += '<p class="feedback ok">🏆 挑戰成功！莖長成了 S 形。你在生長途中改變了光源方向，莖就跟著改變生長方向（向光性）。</p>';
+    $('tropInfo').innerHTML = t;
+    if(day >= 3) UNIT.rewardOnce('a43-trop', 5);
+  }
+  function setSeg(id, v){ document.querySelectorAll('#' + id + ' button').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-v') === String(v)); }); }
+  UNIT.seg($('segOri'), function(v){ ori = +v; plant(); $('tropInfo').innerHTML = '<h3>重新種好了</h3><p>按「過 1 天」開始觀察。</p>'; });
+  UNIT.seg($('segLight'), function(v){ light = v; draw(); });
+  $('grow1').addEventListener('click', growDay);
+  $('grow5').addEventListener('click', function(){
+    var n = 0, t = setInterval(function(){ growDay(); if(++n >= 5) clearInterval(t); }, UNIT.reduced() ? 1 : 220);
+  });
+  $('regrow').addEventListener('click', function(){ plant(); $('tropInfo').innerHTML = '<h3>重新種好了</h3><p>按「過 1 天」開始觀察。</p>'; });
+  $('qExplore').addEventListener('click', function(){
+    ori = 90; light = 'right'; setSeg('segOri', 90); setSeg('segLight', 'right'); challenge = false; plant();
+    $('tropInfo').innerHTML = '<h3>❓ 探索小Q（課本 p.148）</h3><p>若將植物<b>向右橫放</b>，並在<b>右方</b>擺放光源，莖會怎麼生長？先想一想，再按「過 5 天」驗證。</p>';
+  });
+  $('qDark').addEventListener('click', function(){
+    ori = 90; light = 'none'; setSeg('segOri', 90); setSeg('segLight', 'none'); challenge = false; plant();
+    $('tropInfo').innerHTML = '<h3>❓ 暗室中橫放</h3><p>把幼苗<b>橫放在暗室</b>中，排除光的影響。莖和根會怎麼長？按「過 5 天」看看。</p>';
+  });
+  $('qS').addEventListener('click', function(){
+    ori = 0; light = 'left'; setSeg('segOri', 0); setSeg('segLight', 'left'); challenge = true; plant();
+    $('tropInfo').innerHTML = '<h3>🏆 挑戰：讓莖長成「S」形</h3><p>課本探究時間的問題：要怎麼操作，才能讓莖彎成 S 形？目前光源在<b>左方</b>，請你自己決定什麼時候換光源。</p>';
+  });
+  plant();
+
+  /* ============ 快問快答 ============ */
+  var POOL = [
+    { c:'4-3-c1', q:'保衛細胞吸水、膨壓變大時，氣孔會怎樣？', o:['打開','關閉','消失','長大'], a:0, e:'吸水→膨壓大→氣孔打開。' },
+    { c:'4-3-c2', q:'含羞草被碰觸後小葉閉合，和什麼有關？', o:['細胞內的水分變化','肌肉收縮','神經傳導','向光生長'], a:0, e:'較快速的感應和膨壓變化有關。' },
+    { c:'4-3-c3', q:'毛氈苔捕捉昆蟲的原理，和細胞內哪一種物質最有關？', o:['水','生長素','醣類','葉綠體'], a:0, e:'捕蟲運動和細胞內水分（膨壓）變化有關。' },
+    { c:'4-3-c3', q:'捕蠅草葉片快速閉合的原理，和下列哪一個現象相似？', o:['睡眠運動','蒸散作用','根的向地性','莖的向觸性'], a:0, e:'捕蟲運動和睡眠運動都和膨壓有關。' },
+    { c:'4-3-c4', q:'植物莖朝向光源生長，主要目的是什麼？', o:['使葉片吸收到更多陽光','吸收更多養分','吸收更多水分','躲避其他生物'], a:0, e:'向光性有助於獲得更多光線。' },
+    { c:'4-3-c4', q:'把幼苗橫放在不透光的暗室，一週後莖向上彎曲，這稱為？', o:['背地性（負向地性）','向光性','向觸性','向地性'], a:0, e:'暗室排除了光的影響，莖背離地心生長。' },
+    { c:'4-3-c5', q:'四組同學的觀察紀錄，哪一組最不合理？', o:['豌豆苗的莖 1 分鐘內就往光源彎曲','綠豆苗的根 2 天後往下長','含羞草 1 分鐘內小葉閉合','捕蠅草 1 分鐘內葉片閉合'], a:0, e:'向光性是生長反應，需要好幾天。' },
+    { c:'4-3-c5', q:'根會背離光源生長，這稱為什麼？', o:['負向光性（背光性）','向光性','向地性','睡眠運動'], a:0, e:'根：向地性、負向光性。' },
+    { c:'4-3-c5', q:'植物水平放在下方開口有光的箱子裡，根向下長、莖維持水平，下列推論何者「錯誤」？', o:['此植物不受光照影響','根表現了向地性','莖可能同時受向光性與背地性影響','同一刺激對不同部位可能有不同反應'], a:0, e:'莖往上（背地）和往下（向光）兩種影響互相抵消，才維持水平，不是不受光影響。' }
+  ];
+  UNIT.quickQuiz($('quick'), POOL, 3);
+})();
+</script>
 </body>
 </html>

@@ -4,19 +4,716 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>4-1 神經系統｜第4章 生物體的協調作用</title>
-<link rel="stylesheet" href="./css/style.css">
+<link rel="stylesheet" href="css/style.css">
 <script src="https://batyunching.github.io/bio/js/account.js" data-chapter="ch4" data-prefix="ch4."></script>
+<style>
+/* 動畫內的 SVG 共用色 */
+.fig .skin{ fill:#FCD9B6; } .fig .skin-l{ fill:#F5C49C; }
+.fig .ink{ fill:none; stroke:var(--c-muted); stroke-width:2; }
+.fig text{ font-family:var(--font); font-weight:700; fill:var(--c-text); }
+.fig .lbl{ font-size:14px; }
+.fig .sml{ font-size:12px; fill:var(--c-muted); font-weight:500; }
+.fig .rcp{ fill:var(--c-neuro); fill-opacity:.25; stroke:var(--c-neuro); stroke-width:2; }
+.fig .hot.sel .rcp, .fig .hot.hit .rcp{ fill-opacity:.75; }
+.fig .hot.miss .rcp{ fill:var(--c-ng); stroke:var(--c-ng); fill-opacity:.6; }
+.stim{ font-size:1.25rem; font-weight:900; text-align:center; padding:14px; border-radius:14px; border:1px dashed var(--c-neuro); background:var(--c-neuro-l); }
+/* 神經元 */
+.fig .fiber{ fill:none; stroke:var(--c-neuro); stroke-width:6; stroke-linecap:round; }
+.fig .fiber-s{ fill:none; stroke:var(--c-neuro); stroke-width:3.5; stroke-linecap:round; }
+.fig .soma{ fill:color-mix(in srgb, var(--c-neuro) 35%, var(--c-bg2)); stroke:var(--c-neuro); stroke-width:3; }
+.fig .nuc{ fill:var(--c-hormone); }
+.fig .pulse{ fill:#FDE68A; filter:drop-shadow(0 0 6px #FBBF24); }
+/* 腦 */
+.fig .region{ stroke-width:2.5; cursor:pointer; transition:fill-opacity .2s; fill-opacity:.35; }
+.fig .region:hover, .fig .region:focus{ fill-opacity:.6; outline:none; }
+.fig .region.sel{ fill-opacity:.85; }
+.fig .region.ok{ fill:var(--c-ok) !important; fill-opacity:.8; }
+.fig .region.ng{ fill:var(--c-ng) !important; fill-opacity:.7; }
+.case{ font-weight:700; padding:12px 14px; border-radius:12px; background:var(--c-hormone-l); border:1px dashed var(--c-hormone); }
+/* 路徑 */
+.fig .node rect{ fill:var(--c-panel-solid); stroke:var(--c-line); stroke-width:2; }
+.fig .node.on rect{ stroke:var(--c-neuro); fill:color-mix(in srgb, var(--c-neuro) 22%, var(--c-panel-solid)); }
+.fig .node.brain.on rect{ stroke:var(--c-hormone); fill:color-mix(in srgb, var(--c-hormone) 22%, var(--c-panel-solid)); }
+.fig .wire{ fill:none; stroke:var(--c-line); stroke-width:4; stroke-linecap:round; }
+.fig .wire.on{ stroke:var(--c-neuro); }
+.fig .wire.on.up{ stroke:var(--c-hormone); }
+.fig .bang{ font-size:18px; font-weight:900; }
+.steps{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; counter-reset:s; }
+.steps li{ counter-increment:s; padding:6px 10px; border-radius:10px; border:1px solid var(--c-line); color:var(--c-muted); font-size:.86rem; }
+.steps li::before{ content:counter(s); font-family:var(--num); font-weight:700; margin-right:8px; color:var(--c-muted); }
+.steps li.on{ color:var(--c-text); border-color:var(--c-neuro); background:var(--c-neuro-l); }
+.steps li.on.r{ border-color:var(--c-hormone); background:var(--c-hormone-l); }
+.steps li.tag-r::after{ content:" 反射"; font-size:.7rem; color:var(--c-neuro); font-weight:900; }
+.steps li.tag-c::after{ content:" 意識"; font-size:.7rem; color:var(--c-hormone); font-weight:900; }
+.analogy{ display:none; margin-top:12px; }
+.analogy.show{ display:block; }
+.analogy .row{ display:flex; gap:6px; flex-wrap:wrap; align-items:center; font-size:.82rem; }
+.analogy .row span{ padding:4px 10px; border-radius:999px; border:1px solid var(--c-line); }
+.analogy .row i{ color:var(--c-neuro); font-style:normal; }
+</style>
 </head>
 <body data-page="4-1" data-root="./">
-<main class="wrap">
-  <div class="panel u unit-41 coming">
-    <div class="big">🛠️</div>
-    <h1>4-1 神經系統</h1>
-    <p>這一頁正在建置中，預計在<b>第2階段</b>完成，內容包括：</p>
-    <ul><li>7 張概念卡：刺激與反應、神經元、神經系統組成、中樞神經功能、神經傳導途徑、意識反應、反射</li><li>互動動畫：五感探測器、神經元放大鏡、腦部控制台、訊號快遞、雙路徑賽跑</li><li>迷思小警報、快問快答</li></ul>
-    <div><a class="btn" href="./index.html">◀ 回第4章首頁</a></div>
+<main class="wrap unit-41">
+
+  <div class="unit-hero">
+    <div class="ic" id="heroIc"></div>
+    <div class="txt">
+      <div class="dept">DEPT. 01 · NEURAL COMMUNICATION</div>
+      <h1>4-1 神經系統</h1>
+      <p>玩躲避球時，看到球飛來立刻閃開或接住——從「看到」到「動作」，中間發生了什麼事？</p>
+    </div>
+    <div class="mini">
+      本單元神經元連線 <b data-unit-progress-text>0 / 7</b>
+      <div class="progress" data-unit-progress="4-1"><span></span></div>
+    </div>
   </div>
+
+  <nav class="toc" aria-label="本頁目錄">
+    <a href="#b1">① 刺激與反應</a><a class="anim" href="#a1">五感探測器</a>
+    <a href="#b2">② 神經元</a><a class="anim" href="#a2">神經元放大鏡</a>
+    <a href="#b3">③ 神經系統與中樞神經</a><a class="anim" href="#a3">腦部控制台</a>
+    <a href="#b4">④ 神經傳導途徑</a><a class="anim" href="#a4">訊號快遞</a>
+    <a href="#b5">⑤ 意識反應與反射</a><a class="anim" href="#a5">雙路徑賽跑</a>
+    <a href="#qq">⚡ 快問快答</a>
+  </nav>
+  <div class="block-tools"><button class="btn ghost" id="flipAll">全部翻到說明面</button></div>
+
+  <!-- ================= 1 刺激與反應 ================= -->
+  <div class="block-title" id="b1"><span class="num">01</span><h2>刺激與反應</h2><span class="kind">概念卡</span></div>
+  <div class="cards">
+    <div class="concept" id="4-1-c1" data-id="4-1-c1"><div class="inner">
+      <div class="face front">
+        <svg class="ic" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="26" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="60" cy="60" r="10" fill="currentColor"/><path d="M14 60 h18 M88 60 h18 M60 14 v18 M60 88 v18" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M24 24 l12 12 M96 24 l-12 12 M24 96 l12 -12 M96 96 l-12 -12" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity=".5"/></svg>
+        <h3>刺激與反應</h3><div class="sub">受器・動器</div><div class="hint">點一下翻面</div>
+      </div>
+      <div class="face back">
+        <h3>受器接收刺激，動器產生反應</h3>
+        <table>
+          <tr><th>構造</th><th>功能</th><th>位置／例子</th></tr>
+          <tr><td><span class="kw">受器</span></td><td>接收刺激</td><td>眼（光線）、耳（聲音）、鼻（氣味）、舌（味道）、皮膚（冷、熱、觸、壓、痛）</td></tr>
+          <tr><td><span class="kw">動器</span></td><td>產生反應</td><td><b>肌肉</b>和<b>腺體</b></td></tr>
+        </table>
+        <ul>
+          <li>沙子跑進眼睛：不斷<b>眨眼</b>（肌肉），<b>淚腺</b>分泌更多淚液把沙子沖走（腺體）。</li>
+          <li>看到球靠近：手部<b>肌肉收縮</b>才能接住球。</li>
+        </ul>
+        <div class="myth"><b class="t">⚠ MYTH ALERT 迷思小警報</b><span class="x">動器只有肌肉</span>　→　<span class="o">腺體也是動器！流眼淚、分泌唾液都是「反應」。</span></div>
+        <div class="ft"><span class="page">課本 P.130–131</span><button class="got">我懂了？</button></div>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="block-title" id="a1"><span class="num">🎬</span><h2>五感探測器</h2><span class="kind anim">互動動畫</span></div>
+  <div class="panel lab">
+    <div class="bar">
+      <div class="seg" id="segSense"><button data-v="explore" aria-pressed="true">🔍 探索模式</button><button data-v="game">🎯 挑戰模式</button></div>
+      <span class="score" id="senseScore" hidden></span>
+    </div>
+    <div class="grid2">
+      <svg class="fig" id="senseFig" viewBox="0 0 420 320" role="img" aria-label="人的頭部側面與手，標出眼、耳、鼻、舌、皮膚五種受器">
+        <!-- 頭 -->
+        <path class="skin" d="M120 60 Q170 12 240 34 Q290 52 294 112 Q296 128 306 142 Q312 152 300 156 Q296 170 298 184 Q300 206 270 210 L250 212 Q246 250 240 270 L150 270 Q154 236 140 212 Q100 186 98 130 Q96 88 120 60Z"/>
+        <path d="M118 62 Q166 6 246 34 Q262 44 266 70 Q220 52 196 64 Q170 50 150 76 Q130 74 118 62Z" fill="#3B2A20"/>
+        <!-- 手（皮膚） -->
+        <path class="skin" d="M300 300 Q300 262 320 246 Q332 236 346 240 L384 226 Q398 222 400 234 Q402 244 388 248 L360 258 L392 254 Q404 254 404 264 Q404 274 392 274 L366 278 Q372 296 360 304Z"/>
+        <g class="hot" data-r="eye" tabindex="0" role="button" aria-label="眼">
+          <ellipse class="rcp" cx="250" cy="106" rx="22" ry="16"/><ellipse cx="252" cy="106" rx="9" ry="7" fill="#1B2340"/><circle cx="255" cy="103" r="2.5" fill="#fff"/>
+          <text class="lbl" x="250" y="84" text-anchor="middle">眼</text>
+        </g>
+        <g class="hot" data-r="ear" tabindex="0" role="button" aria-label="耳">
+          <ellipse class="rcp" cx="150" cy="134" rx="20" ry="30"/><path d="M146 116 Q162 120 160 136 Q158 150 148 150" stroke="#B9774A" stroke-width="3" fill="none"/>
+          <text class="lbl" x="150" y="182" text-anchor="middle">耳</text>
+        </g>
+        <g class="hot" data-r="nose" tabindex="0" role="button" aria-label="鼻">
+          <circle class="rcp" cx="300" cy="146" r="18"/><text class="lbl" x="336" y="142" text-anchor="middle">鼻</text>
+        </g>
+        <g class="hot" data-r="tongue" tabindex="0" role="button" aria-label="舌">
+          <circle class="rcp" cx="282" cy="190" r="17"/><path d="M270 188 Q282 200 292 186" fill="#F472B6" stroke="#BE185D" stroke-width="1.5"/><text class="lbl" x="322" y="200" text-anchor="middle">舌</text>
+        </g>
+        <g class="hot" data-r="skin" tabindex="0" role="button" aria-label="皮膚">
+          <circle class="rcp" cx="350" cy="262" r="26"/><text class="lbl" x="350" y="232" text-anchor="middle">皮膚</text>
+        </g>
+        <text class="sml" x="16" y="306">點一下閃著藍光的地方</text>
+      </svg>
+      <div>
+        <div class="info" id="senseInfo">
+          <h3>身體的「探測器」</h3>
+          <p>眼、耳、鼻、舌和皮膚都有<b>受器</b>。點左圖的器官，看看它能接收哪一種刺激。</p>
+        </div>
+        <div id="senseGame" hidden>
+          <div class="stim" id="senseStim">準備好了嗎？</div>
+          <div class="feedback" id="senseFb" aria-live="polite"></div>
+          <button class="btn" id="senseStart">開始挑戰（8 題）</button>
+        </div>
+        <div style="margin-top:14px">
+          <p style="margin:0 0 6px;font-weight:700">動器做了什麼？選一個情境：</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="chip-btn" data-eff="sand">沙子跑進眼睛</button>
+            <button class="chip-btn" data-eff="ball">看到球飛過來</button>
+            <button class="chip-btn" data-eff="food">聞到好吃的飯菜</button>
+          </div>
+          <div class="feedback" id="effFb" style="font-weight:500"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 2 神經元 ================= -->
+  <div class="block-title" id="b2"><span class="num">02</span><h2>神經元</h2><span class="kind">概念卡</span></div>
+  <div class="cards">
+    <div class="concept" id="4-1-c2" data-id="4-1-c2"><div class="inner">
+      <div class="face front">
+        <svg class="ic" viewBox="0 0 120 120" aria-hidden="true"><circle cx="40" cy="60" r="17" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="40" cy="60" r="6" fill="currentColor"/><path d="M27 48 L12 34 M25 62 L8 64 M30 74 L18 90 M42 43 L40 24 M57 60 Q80 56 104 70 M104 70 l8 -8 M104 70 l8 8 M104 70 l2 12" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+        <h3>神經元</h3><div class="sub">神經系統的基本單位</div><div class="hint">點一下翻面</div>
+      </div>
+      <div class="face back">
+        <h3>神經元＝神經細胞</h3>
+        <p style="margin:0 0 6px"><span class="kw">神經元</span>（神經細胞）是神經系統的基本單位，由兩部分組成：</p>
+        <table>
+          <tr><th>構造</th><th>功能</th></tr>
+          <tr><td><span class="kw">細胞本體</span></td><td>內有<b>細胞核</b>，能調節神經元的代謝、整合訊息</td></tr>
+          <tr><td><span class="kw">神經纖維</span></td><td>接收及<b>傳導</b>訊息</td></tr>
+        </table>
+        <div class="myth"><b class="t">⚠ MYTH ALERT 迷思小警報</b><span class="x">神經纖維是另一種細胞</span>　→　<span class="o">神經纖維是神經元的一部分，整個神經元只是一個細胞。</span></div>
+        <div class="ft"><span class="page">課本 P.131</span><button class="got">我懂了？</button></div>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="block-title" id="a2"><span class="num">🎬</span><h2>神經元放大鏡</h2><span class="kind anim">互動動畫</span></div>
+  <div class="panel lab">
+    <div class="bar">
+      <button class="btn" id="fireBtn">⚡ 傳送訊號</button>
+      <span style="color:var(--c-muted);font-size:.85rem">也可以點神經元的各部位看說明</span>
+    </div>
+    <svg class="fig" id="neuronFig" viewBox="0 0 640 230" role="img" aria-label="神經元示意圖：細胞本體、細胞核與神經纖維">
+      <g class="hot" data-part="fiber" tabindex="0" role="button" aria-label="神經纖維（接收訊息的一端）">
+        <path class="fiber-s" d="M118 98 L70 52 L40 40 M70 52 L62 22"/>
+        <path class="fiber-s" d="M110 128 L60 150 L30 140 M60 150 L44 182"/>
+        <path class="fiber-s" d="M132 80 L128 30"/>
+        <path class="fiber-s" d="M140 146 L132 200"/>
+      </g>
+      <g class="hot" data-part="soma" tabindex="0" role="button" aria-label="細胞本體">
+        <circle class="soma" cx="140" cy="112" r="40"/>
+      </g>
+      <g class="hot" data-part="nucleus" tabindex="0" role="button" aria-label="細胞核">
+        <circle class="nuc" cx="140" cy="112" r="14"/>
+      </g>
+      <g class="hot" data-part="fiber" tabindex="0" role="button" aria-label="神經纖維（傳導訊息出去的一端）">
+        <path class="fiber" id="axon" d="M180 112 Q300 90 420 116 T560 112"/>
+        <path class="fiber-s" d="M560 112 L600 84 M560 112 L606 112 M560 112 L598 142"/>
+      </g>
+      <path id="signalPath" d="M40 40 L70 52 L118 98 L140 112 L180 112 Q300 90 420 116 T560 112 L606 112" fill="none" stroke="none"/>
+      <circle class="pulse" id="pulse" r="8" cx="-20" cy="-20"/>
+      <text class="sml" x="196" y="164">細胞本體</text>
+      <text class="sml" x="370" y="150" text-anchor="middle">神經纖維</text>
+      <text class="sml" x="620" y="216" text-anchor="end">示意圖，非實際比例</text>
+    </svg>
+    <div class="info" id="neuronInfo" style="margin-top:12px"><h3>點點看</h3><p>神經元長得像一棵有長樹幹的樹。按「⚡ 傳送訊號」，看看訊息怎麼在神經元裡跑。</p></div>
+  </div>
+
+  <!-- ================= 3 神經系統組成與中樞神經 ================= -->
+  <div class="block-title" id="b3"><span class="num">03</span><h2>神經系統與中樞神經</h2><span class="kind">概念卡</span></div>
+  <div class="cards">
+    <div class="concept" id="4-1-c3" data-id="4-1-c3"><div class="inner">
+      <div class="face front">
+        <svg class="ic" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="24" r="16" fill="none" stroke="currentColor" stroke-width="4"/><path d="M60 40 V100" stroke="currentColor" stroke-width="6" stroke-linecap="round"/><path d="M60 52 L32 62 M60 52 L88 62 M60 68 L30 80 M60 68 L90 80 M60 84 L36 104 M60 84 L84 104" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity=".6"/></svg>
+        <h3>神經系統的組成</h3><div class="sub">中樞神經・周圍神經</div><div class="hint">點一下翻面</div>
+      </div>
+      <div class="face back">
+        <h3>中樞神經＋周圍神經</h3>
+        <table>
+          <tr><th>系統</th><th>包括</th></tr>
+          <tr><td><span class="kw">中樞神經</span></td><td><b>腦</b>（大腦、小腦、腦幹）和<b>脊髓</b>，都有<b>骨骼保護</b>（頭骨、脊椎）</td></tr>
+          <tr><td><span class="kw">周圍神經</span></td><td>與腦相連的 <b>12 對腦神經</b>、與脊髓相連的 <b>31 對脊神經</b></td></tr>
+        </table>
+        <p style="margin:0 0 6px">中樞神經和周圍神經共同完成傳遞神經訊息的工作。</p>
+        <div class="myth"><b class="t">⚠ MYTH ALERT 迷思小警報</b><span class="x">脊髓屬於周圍神經</span>　→　<span class="o">脊髓是<b>中樞</b>神經；和脊髓相連的「脊神經」才是周圍神經。</span></div>
+        <div class="ft"><span class="page">課本 P.132</span><button class="got">我懂了？</button></div>
+      </div>
+    </div></div>
+    <div class="concept" id="4-1-c4" data-id="4-1-c4"><div class="inner">
+      <div class="face front">
+        <div class="ic" id="icBrain"></div>
+        <h3>中樞神經的功能</h3><div class="sub">大腦・小腦・腦幹・脊髓</div><div class="hint">點一下翻面</div>
+      </div>
+      <div class="face back">
+        <h3>四個中樞，各司其職</h3>
+        <table>
+          <tr><th>構造</th><th>功能</th></tr>
+          <tr><td><span class="kw">大腦</span></td><td>掌管感覺、運動、意識、記憶、思考和語言。<b>左半球控制右半身，右半球控制左半身</b></td></tr>
+          <tr><td><span class="kw">小腦</span></td><td>協調全身肌肉，維持身體<b>平衡</b></td></tr>
+          <tr><td><span class="kw">腦幹</span></td><td>控制呼吸、心跳、血壓、唾液分泌，是<b>生命中樞</b></td></tr>
+          <tr><td><span class="kw">脊髓</span></td><td>把頸部以下的訊息上傳到腦、把腦的命令下傳；也是<b>四肢的反射中樞</b></td></tr>
+        </table>
+        <div class="myth"><b class="t">⚠ MYTH ALERT 迷思小警報</b><span class="x">小腦控制呼吸心跳</span>　→　<span class="o">小腦管<b>平衡</b>；呼吸、心跳是<b>腦幹</b>（生命中樞）的工作。</span></div>
+        <div class="ft"><span class="page">課本 P.132–133</span><button class="got">我懂了？</button></div>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="block-title" id="a3"><span class="num">🎬</span><h2>腦部控制台</h2><span class="kind anim">互動動畫</span></div>
+  <div class="panel lab">
+    <div class="bar">
+      <div class="seg" id="segBrain"><button data-v="explore" aria-pressed="true">🔍 探索模式</button><button data-v="case">🩺 受損模擬</button></div>
+      <span class="score" id="caseScore" hidden></span>
+    </div>
+    <div class="grid2">
+      <svg class="fig" id="brainFig" viewBox="0 0 420 380" role="img" aria-label="人頭側面的中樞神經：大腦、小腦、腦幹、脊髓">
+        <!-- 頭部輪廓（面向右） -->
+        <path d="M70 200 Q48 80 170 36 Q290 4 352 92 Q376 130 368 168 Q384 186 380 198 L366 202 Q372 222 360 236 Q350 250 330 248 L300 252 Q282 262 270 300 L270 372 L150 372 L150 300 Q96 272 70 200Z" fill="var(--c-bg2)" stroke="var(--c-line)" stroke-width="2"/>
+        <path class="region" data-b="cerebrum" tabindex="0" role="button" aria-label="大腦" fill="#F472B6" stroke="#F472B6"
+          d="M96 168 Q84 96 150 66 Q210 40 272 58 Q332 80 340 140 Q344 176 318 192 Q290 206 250 200 Q228 196 214 204 Q190 210 168 204 Q122 206 96 168Z"/>
+        <path d="M150 90 Q170 110 160 140 M210 70 Q224 100 206 130 Q196 150 214 176 M266 76 Q256 110 280 136 M300 110 Q290 150 312 176" stroke="rgba(0,0,0,.25)" stroke-width="3" fill="none" pointer-events="none"/>
+        <path class="region" data-b="cerebellum" tabindex="0" role="button" aria-label="小腦" fill="#A3E635" stroke="#A3E635"
+          d="M112 214 Q120 190 164 200 Q192 206 194 230 Q192 256 160 258 Q122 256 112 214Z"/>
+        <path d="M124 224 Q156 214 186 226 M124 238 Q156 230 184 242" stroke="rgba(0,0,0,.25)" stroke-width="2" fill="none" pointer-events="none"/>
+        <path class="region" data-b="stem" tabindex="0" role="button" aria-label="腦幹" fill="#FBBF24" stroke="#FBBF24"
+          d="M204 206 Q224 202 236 208 Q238 240 232 272 L208 272 Q204 240 204 206Z"/>
+        <path class="region" data-b="cord" tabindex="0" role="button" aria-label="脊髓" fill="#22D3EE" stroke="#22D3EE"
+          d="M209 272 L231 272 L228 372 L212 372Z"/>
+        <text class="lbl" x="220" y="130" text-anchor="middle" pointer-events="none" fill="#1B2340">大腦</text>
+        <text class="lbl" x="152" y="234" text-anchor="middle" pointer-events="none" fill="#1B2340">小腦</text>
+        <text class="sml" x="246" y="240" pointer-events="none">腦幹</text>
+        <text class="sml" x="238" y="330" pointer-events="none">脊髓</text>
+        <text class="sml" x="410" y="370" text-anchor="end">示意圖（側面，臉朝右）</text>
+      </svg>
+      <div>
+        <div class="info" id="brainInfo"><h3>指揮中心總部</h3><p>點左圖的大腦、小腦、腦幹或脊髓，看看各自負責什麼。</p></div>
+        <div id="caseBox" hidden style="margin-top:12px">
+          <div class="case" id="caseText"></div>
+          <div class="feedback" id="caseFb" aria-live="polite"></div>
+          <button class="btn" id="caseNext" hidden>下一個病例 ▶</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 4 神經傳導途徑 ================= -->
+  <div class="block-title" id="b4"><span class="num">04</span><h2>神經傳導途徑</h2><span class="kind">概念卡</span></div>
+  <div class="cards">
+    <div class="concept" id="4-1-c5" data-id="4-1-c5"><div class="inner">
+      <div class="face front">
+        <svg class="ic" viewBox="0 0 120 120" aria-hidden="true"><rect x="6" y="48" width="22" height="22" rx="6" fill="none" stroke="currentColor" stroke-width="4"/><rect x="49" y="48" width="22" height="22" rx="6" fill="currentColor"/><rect x="92" y="48" width="22" height="22" rx="6" fill="none" stroke="currentColor" stroke-width="4"/><path d="M30 59 H46 M73 59 H89" stroke="currentColor" stroke-width="4"/><path d="M40 52 l7 7 l-7 7 M83 52 l7 7 l-7 7" stroke="currentColor" stroke-width="4" fill="none"/></svg>
+        <h3>神經傳導途徑</h3><div class="sub">感覺神經元・運動神經元</div><div class="hint">點一下翻面</div>
+      </div>
+      <div class="face back">
+        <h3>訊息怎麼跑？</h3>
+        <p style="margin:0 0 6px;font-weight:700">刺激 → 受器 → <span class="kw">感覺神經元</span> → 中樞神經 → <span class="kw">運動神經元</span> → 動器 → 反應</p>
+        <table>
+          <tr><th>神經元</th><th>傳導方向</th></tr>
+          <tr><td>感覺神經元</td><td>受器 → 中樞神經</td></tr>
+          <tr><td>運動神經元</td><td>中樞神經 → 動器</td></tr>
+        </table>
+        <p style="margin:0 0 6px">就像結帳：掃描器（受器）讀到條碼 → 電腦（中樞神經）處理 → 印表機（動器）印出明細。</p>
+        <div class="myth"><b class="t">⚠ MYTH ALERT 迷思小警報</b><span class="x">運動神經元把訊息傳到腦</span>　→　<span class="o">「感覺」往<b>中樞</b>送，「運動」從中樞往<b>動器</b>送。</span></div>
+        <div class="ft"><span class="page">課本 P.134</span><button class="got">我懂了？</button></div>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="block-title" id="a4"><span class="num">🎬</span><h2>訊號快遞：排出正確路線</h2><span class="kind anim">互動動畫</span></div>
+  <div class="panel lab">
+    <p style="margin:0 0 10px">把下面 7 站拖曳（或按 ▲▼）排成正確的神經傳導途徑，再按「檢查路線」。</p>
+    <div class="grid2">
+      <ul class="sortlist" id="routeList"></ul>
+      <div>
+        <button class="btn" id="routeCheck">✓ 檢查路線</button>
+        <button class="btn ghost" id="routeShuffle">↻ 重新打亂</button>
+        <div class="feedback" id="routeFb" aria-live="polite"></div>
+        <div class="analogy" id="analogy">
+          <p style="margin:0 0 6px;font-weight:700">🛒 就像超市結帳：</p>
+          <div class="row"><span>商品條碼</span><i>›</i><span>掃描器</span><i>›</i><span>傳輸線</span><i>›</i><span>電腦</span><i>›</i><span>傳輸線</span><i>›</i><span>印表機</span><i>›</i><span>印出明細</span></div>
+          <div class="row" style="margin-top:6px"><span>刺激</span><i>›</i><span>受器</span><i>›</i><span>感覺神經元</span><i>›</i><span>中樞神經</span><i>›</i><span>運動神經元</span><i>›</i><span>動器</span><i>›</i><span>反應</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 5 意識反應與反射 ================= -->
+  <div class="block-title" id="b5"><span class="num">05</span><h2>意識反應與反射</h2><span class="kind">概念卡</span></div>
+  <div class="cards">
+    <div class="concept" id="4-1-c6" data-id="4-1-c6"><div class="inner">
+      <div class="face front">
+        <svg class="ic" viewBox="0 0 120 120" aria-hidden="true"><path d="M60 14 C42 6 22 18 24 38 C12 46 16 66 30 68 C34 82 52 84 60 74 C68 84 86 82 90 68 C104 66 108 46 96 38 C98 18 78 6 60 14Z" fill="none" stroke="currentColor" stroke-width="4"/><path d="M78 104 q8 -14 0 -26 M88 108 q14 -20 0 -40" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M60 74 V98 Q60 108 70 104" stroke="currentColor" stroke-width="4" fill="none"/></svg>
+        <h3>意識反應</h3><div class="sub">需要經過大腦整合</div><div class="hint">點一下翻面</div>
+      </div>
+      <div class="face back">
+        <h3>經過大腦想一想才行動</h3>
+        <p style="margin:0 0 6px">意識反應須經過<span class="kw">大腦</span>的整合。例：看到同學迎面走來，揮手打招呼。</p>
+        <p style="margin:0 0 6px;font-weight:700">受器（眼睛內）→ 感覺神經元 → <span class="kw">大腦</span> → 脊髓 → 運動神經元 → 動器（手的肌肉）</p>
+        <div class="myth"><b class="t">⚠ MYTH ALERT 迷思小警報</b><span class="x">意識反應不經過脊髓</span>　→　<span class="o">大腦發出的命令要經過<b>脊髓</b>，再由運動神經元傳到手。</span></div>
+        <div class="ft"><span class="page">課本 P.134–135</span><button class="got">我懂了？</button></div>
+      </div>
+    </div></div>
+    <div class="concept" id="4-1-c7" data-id="4-1-c7"><div class="inner">
+      <div class="face front">
+        <svg class="ic" viewBox="0 0 120 120" aria-hidden="true"><path d="M66 8 L34 64 H58 L48 112 L88 48 H62 Z" fill="currentColor"/></svg>
+        <h3>反射</h3><div class="sub">不須經過大腦的快速反應</div><div class="hint">點一下翻面</div>
+      </div>
+      <div class="face back">
+        <h3>來不及想，身體先動</h3>
+        <p style="margin:0 0 6px"><span class="kw">反射</span>不須經過大腦意識，可縮短反應時間，用來應付緊急狀況、降低傷害、節省腦力。</p>
+        <table>
+          <tr><th>控制中樞</th><th>例子</th></tr>
+          <tr><td><span class="kw">腦幹</span></td><td>不經意的眨眼、咳嗽、唾液分泌、瞳孔遇強光縮小</td></tr>
+          <tr><td><span class="kw">脊髓</span></td><td>手摸到熱茶壺立刻縮回、腳踩到尖物立刻縮回</td></tr>
+        </table>
+        <p style="margin:0 0 6px">摸到熱茶壺：<b>縮手</b>是反射（脊髓）；之後<b>感覺到痛</b>、撫摸檢查是意識反應（大腦）。</p>
+        <div class="myth"><b class="t">⚠ MYTH ALERT 迷思小警報</b><span class="x">反射不經過中樞神經；痛覺在脊髓產生</span>　→　<span class="o">反射仍經過中樞（腦幹或脊髓），只是不經<b>大腦</b>；「痛」的感覺在<b>大腦</b>產生。</span></div>
+        <div class="ft"><span class="page">課本 P.136–137</span><button class="got">我懂了？</button></div>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="block-title" id="a5"><span class="num">🎬</span><h2>雙路徑賽跑：意識反應 vs 反射</h2><span class="kind anim">互動動畫</span></div>
+  <div class="panel lab">
+    <div class="bar">
+      <button class="btn" id="runWave">👋 看到同學揮手（意識反應）</button>
+      <button class="btn" id="runPot" style="--u:var(--c-hormone)">🫖 手摸到熱茶壺</button>
+    </div>
+    <div class="grid2">
+      <svg class="fig" id="pathFig" viewBox="0 0 560 330" role="img" aria-label="神經傳導途徑示意圖：受器、感覺神經元、大腦、脊髓、運動神經元、動器">
+        <path class="wire" id="wRB" d="M110 220 Q120 70 230 60"/>
+        <path class="wire" id="wRS" d="M110 236 H240"/>
+        <path class="wire up" id="wSB" d="M272 210 V92"/>
+        <path class="wire" id="wBS" d="M292 92 V210"/>
+        <path class="wire" id="wSM" d="M320 236 H450"/>
+        <g class="node" id="nR"><rect x="20" y="206" width="90" height="60" rx="12"/><text x="65" y="232" text-anchor="middle" class="lbl">受器</text><text x="65" y="252" text-anchor="middle" class="sml" id="rLabel">（眼睛內）</text></g>
+        <g class="node brain" id="nB"><rect x="230" y="30" width="104" height="62" rx="14"/><text x="282" y="68" text-anchor="middle" class="lbl">大腦</text></g>
+        <g class="node" id="nS"><rect x="240" y="210" width="80" height="52" rx="12"/><text x="280" y="242" text-anchor="middle" class="lbl">脊髓</text></g>
+        <g class="node" id="nM"><rect x="450" y="206" width="96" height="60" rx="12"/><text x="498" y="232" text-anchor="middle" class="lbl">動器</text><text x="498" y="252" text-anchor="middle" class="sml">（手的肌肉）</text></g>
+        <text class="sml" id="lRS" x="175" y="226" text-anchor="middle">感覺神經元</text>
+        <text class="sml" x="385" y="226" text-anchor="middle">運動神經元</text>
+        <text class="sml" id="lRB" x="140" y="110">感覺神經元</text>
+        <text class="sml" x="300" y="150">命令往下</text>
+        <text class="sml" id="lSB" x="210" y="150" text-anchor="end">訊息往上</text>
+        <text class="bang" id="bang1" x="498" y="296" text-anchor="middle" fill="var(--c-neuro)" opacity="0">縮手！</text>
+        <text class="bang" id="bang2" x="282" y="20" text-anchor="middle" fill="var(--c-hormone)" opacity="0">好痛！</text>
+        <text class="bang" id="bang3" x="498" y="320" text-anchor="middle" fill="var(--c-hormone)" opacity="0">撫摸檢查</text>
+        <circle class="pulse" id="pulse2" r="9" cx="-20" cy="-20"/>
+        <circle class="pulse" id="pulse3" r="9" cx="-20" cy="-20" style="fill:#F9A8D4"/>
+      </svg>
+      <div>
+        <div class="info" id="pathInfo"><h3>選一個情境</h3><p>按上面的按鈕，看看訊號走哪條路。比較兩條路線的長短：哪一個比較快？</p></div>
+        <ol class="steps" id="steps" style="margin-top:10px"></ol>
+      </div>
+    </div>
+
+    <h3 style="margin:22px 0 8px">🧪 反射分類小測驗：由哪裡控制？</h3>
+    <p style="margin:0 0 10px;color:var(--c-muted);font-size:.88rem">每個情境選一個控制中樞：大腦（意識反應）、腦幹（反射）、脊髓（反射）。</p>
+    <div class="sorter" id="sorter"></div>
+    <div class="feedback" id="sorterFb"></div>
+  </div>
+
+  <!-- ================= 快問快答 ================= -->
+  <div class="block-title" id="qq"><span class="num">⚡</span><h2>快問快答</h2><span class="kind">3 題</span></div>
+  <div class="panel qq" id="quick"></div>
+
+  <div class="next-unit">
+    <a class="btn ghost" href="index.html">◀ 回第4章首頁</a>
+    <a class="btn" href="unit4-2.html" style="--u:var(--c-hormone)">下一單元：4-2 內分泌系統 ▶</a>
+  </div>
+
+  <div class="footer">國中自然（生物）一上・第4章 生物體的協調作用｜4-1 神經系統（課本 p.130–137）｜圖形皆為原創 SVG 繪製</div>
 </main>
-<script src="./js/common.js"></script>
+
+<script src="js/common.js"></script>
+<script src="js/unit.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  $('heroIc').innerHTML = CH4.icons.brain(70);
+  $('icBrain').innerHTML = CH4.icons.brain(120);
+
+  /* ============ A1 五感探測器 ============ */
+  var SENSE = {
+    eye:   { n:'眼', s:'光線', d:'眼內有受器，可接收<b>光線</b>的刺激，讓我們看見東西和顏色。' },
+    ear:   { n:'耳', s:'聲音', d:'耳內有受器，可接收<b>聲音</b>的刺激。' },
+    nose:  { n:'鼻', s:'氣味', d:'鼻內有受器，可接收<b>氣味</b>的刺激。' },
+    tongue:{ n:'舌', s:'味道', d:'舌上有受器，可接收<b>味道</b>的刺激。' },
+    skin:  { n:'皮膚', s:'冷、熱、觸、壓、痛', d:'皮膚內有受器，可接收<b>冷、熱、觸、壓、痛</b>等刺激。' }
+  };
+  var STIMS = [
+    { t:'🔔 下課鐘聲響了', r:'ear' }, { t:'🌹 聞到玫瑰花香', r:'nose' }, { t:'🍬 嚐到糖果的甜味', r:'tongue' },
+    { t:'🧊 握住一顆冰塊', r:'skin' }, { t:'💡 房間的燈突然亮了', r:'eye' }, { t:'📌 手指被針刺了一下', r:'skin' },
+    { t:'🎵 耳機傳來音樂', r:'ear' }, { t:'🍋 吃到很酸的檸檬', r:'tongue' }, { t:'🌈 看見天空的彩虹', r:'eye' },
+    { t:'🔥 手靠近熱水壺，覺得燙', r:'skin' }, { t:'🧄 切大蒜時聞到嗆味', r:'nose' }, { t:'✋ 同學輕拍你的肩膀', r:'skin' }
+  ];
+  var senseMode = 'explore', game = null;
+  var hots = document.querySelectorAll('#senseFig .hot');
+  function clearSense(){ hots.forEach(function(h){ h.classList.remove('sel','hit','miss'); }); }
+  function pickSense(r){
+    if(senseMode === 'explore'){
+      clearSense(); document.querySelector('#senseFig [data-r="'+r+'"]').classList.add('sel');
+      $('senseInfo').innerHTML = '<h3>' + SENSE[r].n + '：接收' + SENSE[r].s + '</h3><p>' + SENSE[r].d + '</p>';
+      return;
+    }
+    if(!game || game.lock) return;
+    var cur = game.list[game.i], g = document.querySelector('#senseFig [data-r="'+r+'"]');
+    clearSense(); game.lock = true;
+    if(r === cur.r){ g.classList.add('hit'); game.score++; $('senseFb').className = 'feedback ok'; $('senseFb').textContent = '✓ 正確！' + SENSE[r].n + '接收' + SENSE[r].s + '的刺激。'; }
+    else { g.classList.add('miss'); document.querySelector('#senseFig [data-r="'+cur.r+'"]').classList.add('hit'); $('senseFb').className = 'feedback ng'; $('senseFb').textContent = '✗ 這是「' + SENSE[cur.r].s + '」的刺激，要由' + SENSE[cur.r].n + '的受器接收。'; }
+    $('senseScore').textContent = '⚡ ' + game.score + ' / ' + (game.i + 1);
+    setTimeout(function(){ game.i++; game.lock = false; clearSense(); nextStim(); }, 1300);
+  }
+  function nextStim(){
+    if(game.i >= game.list.length){
+      $('senseStim').innerHTML = '🏁 完成！答對 ' + game.score + ' / ' + game.list.length;
+      $('senseFb').textContent = game.score === game.list.length ? '五感全開！' : '再挑戰一次，目標全對！';
+      $('senseFb').className = 'feedback ' + (game.score === game.list.length ? 'ok' : '');
+      $('senseStart').hidden = false; $('senseStart').textContent = '再挑戰一次 ↻';
+      if(game.score >= 7) UNIT.rewardOnce('a41-sense', 10, '五感探測器挑戰成功');
+      game = null; return;
+    }
+    $('senseStim').textContent = game.list[game.i].t;
+    $('senseFb').textContent = '這個刺激由哪個受器接收？點左圖。'; $('senseFb').className = 'feedback';
+  }
+  $('senseStart').addEventListener('click', function(){
+    game = { list: CH4.shuffle(STIMS).slice(0, 8), i:0, score:0, lock:false };
+    $('senseStart').hidden = true; $('senseScore').hidden = false; $('senseScore').textContent = '⚡ 0 / 0'; nextStim();
+  });
+  UNIT.seg($('segSense'), function(v){
+    senseMode = v; clearSense(); game = null;
+    $('senseInfo').hidden = v !== 'explore'; $('senseGame').hidden = v !== 'game'; $('senseScore').hidden = true;
+    $('senseStart').hidden = false; $('senseStart').textContent = '開始挑戰（8 題）'; $('senseStim').textContent = '準備好了嗎？'; $('senseFb').textContent = '';
+  });
+  hots.forEach(function(h){
+    h.addEventListener('click', function(){ pickSense(h.getAttribute('data-r')); });
+    h.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); pickSense(h.getAttribute('data-r')); } });
+  });
+  var EFF = {
+    sand: '受器：<b>眼</b>　→　動器：眼皮的<b>肌肉</b>不斷眨眼，<b>淚腺（腺體）</b>分泌更多淚液把沙子沖走。',
+    ball: '受器：<b>眼</b>　→　動器：手部<b>肌肉</b>收縮，把球接住或閃開。',
+    food: '受器：<b>鼻</b>　→　動器：<b>唾液腺（腺體）</b>分泌唾液，口水流出來了！'
+  };
+  document.querySelectorAll('[data-eff]').forEach(function(b){
+    b.addEventListener('click', function(){ $('effFb').innerHTML = EFF[b.getAttribute('data-eff')]; });
+  });
+
+  /* ============ A2 神經元放大鏡 ============ */
+  var PARTS = {
+    soma:    '<h3>細胞本體</h3><p>神經元的「主體」，裡面有細胞核。能<b>調節神經元的代謝</b>，並<b>整合</b>收到的訊息。</p>',
+    nucleus: '<h3>細胞核</h3><p>位在細胞本體中，負責調節神經元的生命活動。</p>',
+    fiber:   '<h3>神經纖維</h3><p>從細胞本體延伸出來的細長部分，可以<b>接收</b>及<b>傳導</b>訊息。神經纖維又細又長，訊息可以傳得很遠。</p>'
+  };
+  document.querySelectorAll('#neuronFig .hot').forEach(function(h){
+    function show(){ document.querySelectorAll('#neuronFig .hot').forEach(function(x){ x.classList.toggle('sel', x.getAttribute('data-part') === h.getAttribute('data-part')); }); $('neuronInfo').innerHTML = PARTS[h.getAttribute('data-part')]; }
+    h.addEventListener('click', show);
+    h.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); show(); } });
+  });
+  function runAlong(pathEl, dot, ms){
+    return new Promise(function(res){
+      var L = pathEl.getTotalLength(), t0 = null;
+      if(UNIT.reduced()){ var p = pathEl.getPointAtLength(L); dot.setAttribute('cx', p.x); dot.setAttribute('cy', p.y); setTimeout(res, 80); return; }
+      function step(now){
+        if(t0 === null) t0 = now;
+        var k = Math.min(1, (now - t0) / ms), p = pathEl.getPointAtLength(L * k);
+        dot.setAttribute('cx', p.x); dot.setAttribute('cy', p.y);
+        if(k < 1) requestAnimationFrame(step); else res();
+      }
+      requestAnimationFrame(step);
+    });
+  }
+  var firing = false;
+  $('fireBtn').addEventListener('click', function(){
+    if(firing) return; firing = true;
+    $('neuronInfo').innerHTML = '<h3>訊號傳送中…</h3><p>神經纖維<b>接收</b>訊息 → 細胞本體<b>整合</b> → 再由神經纖維<b>傳導</b>出去。</p>';
+    runAlong($('signalPath'), $('pulse'), 2200).then(function(){
+      $('pulse').setAttribute('cx', -20); firing = false; UNIT.rewardOnce('a41-neuron', 5, '第一次傳送神經訊號');
+    });
+  });
+
+  /* ============ A3 腦部控制台 ============ */
+  var BRAIN = {
+    cerebrum:  '<h3>大腦</h3><p>分成左、右兩半球，掌管<b>感覺、運動、意識、記憶、思考和語言</b>。</p><p>⚡ 交叉控制：<b>左半球控制右半身</b>，右半球控制左半身。</p>',
+    cerebellum:'<h3>小腦</h3><p>位於大腦的下後方，<b>協調全身肌肉、維持身體平衡</b>。走路、騎腳踏車不跌倒都要靠它。</p>',
+    stem:      '<h3>腦幹</h3><p>位於大腦下方、小腦前方，控制<b>呼吸、心跳、血壓、唾液分泌</b>等，是人體的<b>生命中樞</b>。嚴重受損時，個體將無法存活。</p>',
+    cord:      '<h3>脊髓</h3><p>位於腦幹下方，把頸部以下的訊息<b>往上傳到腦</b>，也把腦的命令<b>往下傳</b>到軀幹和四肢；還能控制部分頸部以下的反應，是<b>四肢的反射中樞</b>。</p>'
+  };
+  var NAMES = { cerebrum:'大腦', cerebellum:'小腦', stem:'腦幹', cord:'脊髓' };
+  var CASES = [
+    { t:'🐿️ 松鼠能在樹梢間快速穿梭、不會掉下來。牠的哪個部位應該很發達？', a:'cerebellum', e:'小腦協調肌肉、維持平衡。' },
+    { t:'🏥 腦死的病人無法自己維持呼吸和心跳。哪個部位嚴重受損？', a:'stem', e:'腦幹是控制呼吸、心跳的生命中樞。' },
+    { t:'🛏️ 植物人失去了意識，但仍能自己呼吸、心跳。哪個部位嚴重受損？', a:'cerebrum', e:'意識由大腦掌管；腦幹還正常，所以能呼吸心跳。' },
+    { t:'🚶 某人走路搖搖晃晃、很容易跌倒，但思考和說話都正常。最可能是哪裡出問題？', a:'cerebellum', e:'平衡出問題，與小腦有關。' },
+    { t:'🙈 某人腦中長了腫瘤，聽不到也看不到，但呼吸、心跳和走路都正常。腫瘤可能在哪裡？', a:'cerebrum', e:'視覺、聽覺等感覺由大腦掌管。' }
+  ];
+  var brainMode = 'explore', ci = 0, cscore = 0, clock = false;
+  var regions = document.querySelectorAll('#brainFig .region');
+  function clearRegions(){ regions.forEach(function(r){ r.classList.remove('sel','ok','ng'); }); }
+  function showCase(){
+    clearRegions(); clock = false; $('caseNext').hidden = true; $('caseFb').textContent = '';
+    if(ci >= CASES.length){
+      $('caseText').innerHTML = '🏁 全部病例完成！答對 ' + cscore + ' / ' + CASES.length;
+      $('caseNext').hidden = false; $('caseNext').textContent = '再診斷一次 ↻';
+      if(cscore >= 4) UNIT.rewardOnce('a41-brain', 10, '腦部控制台診斷完成');
+      return;
+    }
+    $('caseText').innerHTML = '病例 ' + (ci + 1) + '／' + CASES.length + '　' + CASES[ci].t;
+    $('caseScore').textContent = '⚡ ' + cscore;
+  }
+  function pickRegion(b){
+    clearRegions();
+    var el = document.querySelector('#brainFig [data-b="'+b+'"]');
+    if(brainMode === 'explore'){ el.classList.add('sel'); $('brainInfo').innerHTML = BRAIN[b]; return; }
+    if(clock || ci >= CASES.length) return; clock = true;
+    var c = CASES[ci];
+    if(b === c.a){ el.classList.add('ok'); cscore++; $('caseFb').className = 'feedback ok'; $('caseFb').textContent = '✓ 診斷正確！' + c.e; }
+    else { el.classList.add('ng'); document.querySelector('#brainFig [data-b="'+c.a+'"]').classList.add('ok'); $('caseFb').className = 'feedback ng'; $('caseFb').textContent = '✗ 不是' + NAMES[b] + '，應該是' + NAMES[c.a] + '。' + c.e; }
+    $('caseScore').textContent = '⚡ ' + cscore;
+    $('caseNext').hidden = false; $('caseNext').textContent = ci + 1 >= CASES.length ? '看結果 ▶' : '下一個病例 ▶';
+    ci++;
+  }
+  $('caseNext').addEventListener('click', function(){ if(ci >= CASES.length && $('caseNext').textContent.indexOf('再') === 0){ ci = 0; cscore = 0; } showCase(); });
+  UNIT.seg($('segBrain'), function(v){
+    brainMode = v; clearRegions();
+    $('caseBox').hidden = v !== 'case'; $('caseScore').hidden = v !== 'case';
+    if(v === 'case'){ ci = 0; cscore = 0; showCase(); $('brainInfo').innerHTML = '<h3>受損模擬</h3><p>閱讀病例，點左圖中你認為出問題的部位。</p>'; }
+    else $('brainInfo').innerHTML = '<h3>指揮中心總部</h3><p>點左圖的大腦、小腦、腦幹或脊髓，看看各自負責什麼。</p>';
+  });
+  regions.forEach(function(r){
+    r.addEventListener('click', function(){ pickRegion(r.getAttribute('data-b')); });
+    r.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); pickRegion(r.getAttribute('data-b')); } });
+  });
+
+  /* ============ A4 訊號快遞 ============ */
+  var ROUTE = ['刺激','受器','感覺神經元','中樞神經','運動神經元','動器','反應'];
+  function fillRoute(){
+    var order;
+    do { order = CH4.shuffle(ROUTE); } while(order.join() === ROUTE.join());
+    $('routeList').innerHTML = order.map(function(t){
+      return '<li data-v="' + t + '"><span class="n"></span>' + t + '<span class="mv"><button data-mv="up" aria-label="上移">▲</button><button data-mv="down" aria-label="下移">▼</button></span></li>';
+    }).join('');
+    UNIT.sortable($('routeList'), function(){ $('routeFb').textContent = ''; });
+    $('analogy').classList.remove('show'); $('routeFb').textContent = '';
+  }
+  $('routeCheck').addEventListener('click', function(){
+    var lis = $('routeList').children, ok = 0;
+    Array.prototype.forEach.call(lis, function(li, k){ var g = li.getAttribute('data-v') === ROUTE[k]; li.classList.toggle('ok', g); li.classList.toggle('ng', !g); if(g) ok++; });
+    var fb = $('routeFb');
+    if(ok === ROUTE.length){
+      fb.className = 'feedback ok'; fb.textContent = '✓ 路線全對！訊號順利送達。'; $('analogy').classList.add('show');
+      UNIT.rewardOnce('a41-route', 10, '訊號快遞送達');
+    } else { fb.className = 'feedback ng'; fb.textContent = '有 ' + (ROUTE.length - ok) + ' 站位置不對（紅框），再調整看看。提示：感覺神經元把訊息「送進」中樞。'; }
+  });
+  $('routeShuffle').addEventListener('click', fillRoute);
+  fillRoute();
+
+  /* ============ A5 雙路徑賽跑 ============ */
+  var W = { RB:$('wRB'), RS:$('wRS'), SB:$('wSB'), BS:$('wBS'), SM:$('wSM') };
+  var N = { R:$('nR'), B:$('nB'), S:$('nS'), M:$('nM') };
+  var running = false;
+  function resetPath(){
+    Object.keys(W).forEach(function(k){ W[k].classList.remove('on'); });
+    Object.keys(N).forEach(function(k){ N[k].classList.remove('on'); });
+    ['bang1','bang2','bang3'].forEach(function(id){ $(id).setAttribute('opacity', 0); });
+    $('pulse2').setAttribute('cx', -20); $('pulse3').setAttribute('cx', -20);
+  }
+  function only(mode){ // wave：受器→大腦；pot：受器→脊髓
+    var wave = mode === 'wave';
+    [W.RB, $('lRB')].forEach(function(e){ e.style.opacity = wave ? 1 : .2; });
+    [W.RS, $('lRS'), W.SB, $('lSB')].forEach(function(e){ e.style.opacity = wave ? .2 : 1; });
+  }
+  function stepsList(items){
+    $('steps').innerHTML = items.map(function(s){ return '<li class="' + (s.k ? 'tag-' + s.k : '') + '">' + s.t + '</li>'; }).join('');
+    return $('steps').children;
+  }
+  async function hop(dot, wire, node, li, ms, isR){
+    if(li){ li.classList.add('on'); if(isR) li.classList.add('r'); }
+    if(wire){ wire.classList.add('on'); await runAlong(wire, dot, ms); }
+    if(node) node.classList.add('on');
+    await UNIT.wait(150);
+  }
+  $('runWave').addEventListener('click', async function(){
+    if(running) return; running = true; resetPath(); only('wave');
+    $('rLabel').textContent = '（眼睛內）';
+    $('pathInfo').innerHTML = '<h3>👋 看到同學揮手 → 揮手回應</h3><p>這是<b>意識反應</b>：訊息要先送到<b>大腦</b>整合，大腦決定「揮手」後，命令經<b>脊髓</b>傳到手。</p>';
+    var li = stepsList([{t:'受器（眼睛內）接收刺激'},{t:'感覺神經元 → 大腦'},{t:'大腦整合，發出命令'},{t:'命令傳到脊髓'},{t:'運動神經元 → 動器（手的肌肉）'},{t:'揮手打招呼！'}]);
+    var d = $('pulse3');
+    N.R.classList.add('on'); li[0].classList.add('on','r'); await UNIT.wait(400);
+    await hop(d, W.RB, N.B, li[1], 1300, true);
+    li[2].classList.add('on','r'); await UNIT.wait(500);
+    await hop(d, W.BS, N.S, li[3], 900, true);
+    await hop(d, W.SM, N.M, li[4], 900, true);
+    li[5].classList.add('on','r'); $('bang3').textContent = '揮手！'; $('bang3').setAttribute('opacity', 1);
+    running = false; UNIT.rewardOnce('a41-wave', 5);
+  });
+  $('runPot').addEventListener('click', async function(){
+    if(running) return; running = true; resetPath(); only('pot');
+    $('rLabel').textContent = '（手的皮膚內）'; $('bang3').textContent = '撫摸檢查';
+    $('pathInfo').innerHTML = '<h3>🫖 手摸到熱茶壺</h3><p>藍色是<b>反射</b>：訊息只到<b>脊髓</b>就折返，手立刻縮回。粉紅色是<b>意識反應</b>：訊息再往上到大腦，才「感覺到痛」並撫摸檢查。</p>';
+    var li = stepsList([
+      {t:'受器（手的皮膚內）接收熱的刺激', k:'r'},{t:'感覺神經元 → 脊髓', k:'r'},{t:'脊髓直接下令：運動神經元 → 手的肌肉', k:'r'},{t:'手立刻縮回！', k:'r'},
+      {t:'訊息同時由脊髓往上傳到大腦', k:'c'},{t:'大腦產生「痛」的感覺', k:'c'},{t:'大腦命令 → 脊髓 → 運動神經元 → 手的肌肉', k:'c'},{t:'用手撫摸檢查', k:'c'}]);
+    var d = $('pulse2'), d2 = $('pulse3');
+    N.R.classList.add('on'); li[0].classList.add('on'); await UNIT.wait(400);
+    await hop(d, W.RS, N.S, li[1], 700);
+    var up = (async function(){ await UNIT.wait(150); await hop(d2, W.SB, N.B, li[4], 1300, true); })();
+    await hop(d, W.SM, N.M, li[2], 700);
+    li[3].classList.add('on'); $('bang1').setAttribute('opacity', 1);
+    await up;
+    li[5].classList.add('on','r'); $('bang2').setAttribute('opacity', 1); await UNIT.wait(600);
+    await hop(d2, W.BS, null, li[6], 900, true); await hop(d2, W.SM, N.M, null, 800, true);
+    li[7].classList.add('on','r'); $('bang3').setAttribute('opacity', 1);
+    $('pathInfo').innerHTML += '<p style="margin-top:8px">⏱ 發現了嗎？<b>縮手比「感覺到痛」還早</b>，因為反射的路線比較短，不必等大腦。</p>';
+    running = false; UNIT.rewardOnce('a41-pot', 5);
+  });
+
+  /* 反射分類 */
+  var SORT = [
+    { q:'不經意的眨眼', a:'stem', e:'不經意的眨眼是反射，由腦幹控制。' },
+    { q:'咳嗽', a:'stem', e:'咳嗽是反射，由腦幹控制。' },
+    { q:'瞳孔遇到強光縮小', a:'stem', e:'由腦幹控制的反射。' },
+    { q:'手摸到熱茶壺立刻縮回', a:'cord', e:'四肢的反射由脊髓控制。' },
+    { q:'腳踩到尖物立刻縮回', a:'cord', e:'由脊髓控制的反射。' },
+    { q:'看到同學走來，揮手打招呼', a:'brain', e:'需要大腦整合，是意識反應。' },
+    { q:'看到尺掉下來，用手指接住', a:'brain', e:'接尺要專心看、判斷，經過大腦，是意識反應。' },
+    { q:'被燙到後「感覺到痛」', a:'brain', e:'所有感覺都在大腦產生。' }
+  ];
+  var SNAME = { brain:'大腦', stem:'腦幹', cord:'脊髓' };
+  var sorted = 0, sortOk = 0;
+  $('sorter').innerHTML = CH4.shuffle(SORT).map(function(s, k){
+    return '<div class="row" data-a="' + s.a + '" data-e="' + s.e + '"><span class="q">' + s.q + '</span><span class="opts">' +
+      ['brain','stem','cord'].map(function(o){ return '<button class="chip-btn" data-o="' + o + '">' + SNAME[o] + '</button>'; }).join('') +
+      '</span><span class="why"></span></div>';
+  }).join('');
+  document.querySelectorAll('#sorter .row').forEach(function(row){
+    row.querySelectorAll('[data-o]').forEach(function(b){
+      b.addEventListener('click', function(){
+        if(row.classList.contains('answered')) return;
+        row.classList.add('answered'); sorted++;
+        var a = row.getAttribute('data-a'), ok = b.getAttribute('data-o') === a;
+        b.classList.add(ok ? 'ok' : 'ng'); if(!ok) row.querySelector('[data-o="' + a + '"]').classList.add('ok');
+        if(ok) sortOk++;
+        row.querySelector('.why').textContent = (ok ? '✓ ' : '✗ 答案是' + SNAME[a] + '。') + row.getAttribute('data-e');
+        UNIT.record(a === 'brain' ? '4-1-c6' : '4-1-c7', ok);
+        if(sorted === SORT.length){
+          $('sorterFb').className = 'feedback ' + (sortOk >= 7 ? 'ok' : '');
+          $('sorterFb').textContent = '分類完成：答對 ' + sortOk + ' / ' + SORT.length + (sortOk === SORT.length ? '　全對！🎉' : '　看看灰色的說明，找出錯在哪。');
+          if(sortOk >= 7) UNIT.rewardOnce('a41-sort', 10, '反射分類完成');
+        }
+      });
+    });
+  });
+
+  /* ============ 快問快答 ============ */
+  var POOL = [
+    { c:'4-1-c4', q:'腦死的病人無法自行維持呼吸和心跳，最可能是哪個部位嚴重受損？', o:['大腦','小腦','腦幹','脊髓'], a:2, e:'腦幹控制呼吸、心跳、血壓，是生命中樞。' },
+    { c:'4-1-c4', q:'松鼠能在樹梢間快速穿梭不跌倒，哪個部位應該特別發達？', o:['大腦','小腦','腦幹','脊髓'], a:1, e:'小腦協調全身肌肉、維持平衡。' },
+    { c:'4-1-c7', q:'手摸到熱茶壺立刻縮回，這個反射由哪裡控制？', o:['大腦','小腦','腦幹','脊髓'], a:3, e:'四肢的反射中樞是脊髓。' },
+    { c:'4-1-c7', q:'下列哪一個「不是」反射？', o:['不經意的眨眼','咳嗽','看到同學揮手打招呼','瞳孔遇強光縮小'], a:2, e:'揮手打招呼要經過大腦整合，是意識反應。' },
+    { c:'4-1-c5', q:'把訊息由中樞神經傳到動器的是哪一種神經元？', o:['感覺神經元','運動神經元','腦神經','受器'], a:1, e:'運動神經元：中樞神經 → 動器。' },
+    { c:'4-1-c1', q:'下列何者屬於「動器」？', o:['皮膚','淚腺','耳朵','鼻子'], a:1, e:'動器包括肌肉和腺體，淚腺是腺體。' },
+    { c:'4-1-c3', q:'下列何者屬於周圍神經系統？', o:['脊髓','腦幹','脊神經','小腦'], a:2, e:'周圍神經包括 12 對腦神經和 31 對脊神經。' },
+    { c:'4-1-c2', q:'神經元中，含有細胞核、能整合訊息的部位是？', o:['神經纖維','細胞本體','受器','動器'], a:1, e:'細胞本體內有細胞核，能調節代謝、整合訊息。' },
+    { c:'4-1-c7', q:'手被燙到時，「感覺到痛」是在哪裡產生的？', o:['手的皮膚','脊髓','大腦','運動神經元'], a:2, e:'各種感覺都在大腦產生。' },
+    { c:'4-1-c6', q:'看到同學揮手而揮手回應，大腦發出的命令接著會先傳到哪裡？', o:['脊髓','感覺神經元','受器','小腦'], a:0, e:'大腦的命令經脊髓，再由運動神經元傳到手的肌肉。' },
+    { c:'4-1-c4', q:'大腦左半球受傷，可能影響身體哪一側的活動？', o:['左半身','右半身','兩側都不影響','只影響頭部'], a:1, e:'大腦左半球控制右半身，右半球控制左半身。' }
+  ];
+  UNIT.quickQuiz($('quick'), POOL, 3);
+})();
+</script>
 </body>
 </html>

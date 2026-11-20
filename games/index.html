@@ -6,17 +6,68 @@
 <title>遊戲大廳｜第4章 生物體的協調作用</title>
 <link rel="stylesheet" href="../css/style.css">
 <script src="https://batyunching.github.io/bio/js/account.js" data-chapter="ch4" data-prefix="ch4."></script>
+<style>
+.games{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px; }
+.game{ text-decoration:none; display:flex; flex-direction:column; gap:8px; border-top:4px solid var(--u); transition:transform .2s, box-shadow .2s; }
+.game:hover{ transform:translateY(-4px); box-shadow:0 0 0 1px var(--u), 0 0 26px color-mix(in srgb, var(--u) 35%, transparent); }
+.game .em{ font-size:2.8rem; }
+.game h3{ margin:0; }
+.game p{ margin:0; color:var(--c-muted); font-size:.9rem; }
+.game .meta{ display:flex; gap:6px; flex-wrap:wrap; }
+.game .best{ margin-top:auto; font-family:var(--num); font-weight:700; color:var(--c-amber); font-size:.85rem; }
+.badges{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; }
+.badge{ text-align:center; padding:14px 10px; border-radius:16px; border:1px solid var(--c-line); background:var(--c-panel); }
+.badge .ic{ font-size:2.4rem; filter:grayscale(1) opacity(.35); }
+.badge.got{ border-color:var(--c-amber); box-shadow:0 0 18px rgba(251,191,36,.25); }
+.badge.got .ic{ filter:none; }
+.badge b{ display:block; font-size:.9rem; }
+.badge small{ color:var(--c-muted); font-size:.75rem; }
+</style>
 </head>
 <body data-page="games" data-root="../">
 <main class="wrap">
-  <div class="panel u unit-42 coming">
-    <div class="big">🛠️</div>
-    <h1>遊戲大廳</h1>
-    <p>這一頁正在建置中，預計在<b>第5階段</b>完成，內容包括：</p>
-    <ul><li>⚡ 訊號特快車（4-1）</li><li>🧪 激素調控室（4-2）</li><li>🌱 向性迷宮（4-3）</li><li>🎯 協調賓果（全章，全班同步）</li><li>🏅 徽章牆</li></ul>
-    <div><a class="btn" href="../index.html">◀ 回第4章首頁</a></div>
+  <div class="sec-title" style="margin-top:6px"><span class="code">ARCADE</span><h1 style="margin:0">🎮 遊戲大廳</h1></div>
+  <p style="color:var(--c-muted);margin-top:-6px">玩遊戲也是在複習！遊戲中的對錯也會記到你的概念掌握度和錯題分析裡。</p>
+  <div class="games">
+    <a class="panel game unit-41" href="signal.html"><span class="em">⚡</span><h3>訊號特快車</h3><div class="meta"><span class="tag">4-1</span><span class="tag">路線解謎</span><span class="tag">個人</span></div><p>依生活情境鋪出神經傳導路線，判斷是意識反應還是反射。共 8 關。</p><span class="best" id="b-signal"></span></a>
+    <a class="panel game unit-42" href="hormone.html"><span class="em">🧪</span><h3>激素調控室</h3><div class="meta"><span class="tag">4-2</span><span class="tag">限時反應</span><span class="tag">個人</span></div><p>小翔的一天發生 10 件事，限時派出正確的激素，維持身體平衡！</p><span class="best" id="b-hormone"></span></a>
+    <a class="panel game unit-43" href="maze.html"><span class="em">🌱</span><h3>向性迷宮</h3><div class="meta"><span class="tag">4-3</span><span class="tag">模擬解謎</span><span class="tag">個人</span></div><p>調整擺放方向和光源，讓莖長到星星、根長到水滴。共 6 關。</p><span class="best" id="b-maze"></span></a>
+    <a class="panel game" href="bingo.html" style="--u:var(--c-amber)"><span class="em">🎯</span><h3>協調賓果</h3><div class="meta"><span class="tag" style="--u:var(--c-amber)">全章</span><span class="tag" style="--u:var(--c-amber)">全班同步</span></div><p>老師大螢幕出題、學生平板連線的課堂賓果。41 個關鍵詞！</p><span class="best">老師開房 → 學生輸入房號</span></a>
   </div>
+
+  <div class="sec-title"><span class="code">BADGES</span><h2>🏅 徽章牆</h2><span class="score" id="bcount"></span></div>
+  <div class="badges" id="badges"></div>
+  <div class="footer">徽章和最佳紀錄會跟著帳號同步。</div>
 </main>
 <script src="../js/common.js"></script>
+<script>
+(function(){
+  'use strict';
+  function render(){
+    var st = CH4.store, rw = st.get('rewards', []), lab = st.get('labDone', {}), P = CH4.progress;
+    var mastered = CH4.CONCEPTS.filter(function(c){ return P.mastered(c.id); }).length;
+    var B = [
+      { ic:'🧠', n:'神經通訊部全連線', d:'4-1 七張概念卡都通過檢核', ok: P.unit('4-1').done === 7 },
+      { ic:'🧪', n:'激素物流部全連線', d:'4-2 七張概念卡都通過檢核', ok: P.unit('4-2').done === 7 },
+      { ic:'🌱', n:'植物感應溫室全連線', d:'4-3 五張概念卡都通過檢核', ok: P.unit('4-3').done === 5 },
+      { ic:'⚡', n:'全網通電', d:'19 個神經元全部連線', ok: P.total().done === 19 },
+      { ic:'💎', n:'精熟大師', d:'10 個以上概念達到精熟', ok: mastered >= 10 },
+      { ic:'🔬', n:'實驗達人', d:'完成實驗模擬室的所有實驗', ok: lab.temp && lab.flip && (lab.afterA || lab.afterB) && lab.ruler && lab.bean },
+      { ic:'⚡', n:'閃電反射', d:'接尺 5 次平均在 0.18 秒內', ok: rw.indexOf('badge-flash') >= 0 },
+      { ic:'🧩', n:'迷思破解者', d:'破解 3 個以上的迷思', ok: st.get('busted', []).length >= 3 },
+      { ic:'🚄', n:'訊號特快車通關', d:'8 關全部完成', ok: rw.indexOf('badge-signal') >= 0 },
+      { ic:'🩸', n:'血糖守門員', d:'激素調控室值班成功', ok: rw.indexOf('badge-hormone') >= 0 },
+      { ic:'🌼', n:'向性迷宮通關', d:'6 關全部完成', ok: rw.indexOf('badge-maze') >= 0 },
+      { ic:'🌀', n:'S 形大師', d:'向性模擬器讓莖長成 S 形', ok: rw.indexOf('a43-S') >= 0 },
+      { ic:'🎯', n:'賓果連線', d:'在協調賓果中連成一條線', ok: rw.indexOf('badge-bingo') >= 0 }
+    ];
+    document.getElementById('badges').innerHTML = B.map(function(b){ return '<div class="badge' + (b.ok ? ' got' : '') + '"><div class="ic">' + b.ic + '</div><b>' + b.n + '</b><small>' + b.d + '</small></div>'; }).join('');
+    document.getElementById('bcount').textContent = B.filter(function(b){ return b.ok; }).length + ' / ' + B.length;
+    ['signal','hormone','maze'].forEach(function(k){ var v = st.get('best-' + k, 0); document.getElementById('b-' + k).textContent = v ? '最佳紀錄 ⚡ ' + v : '尚未遊玩'; });
+  }
+  render();
+  if(window.BIO_ACCOUNT && BIO_ACCOUNT.ready) BIO_ACCOUNT.ready.then(function(){ setTimeout(render, 300); }, function(){});
+})();
+</script>
 </body>
 </html>

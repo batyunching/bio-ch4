@@ -4,19 +4,178 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>心智圖｜第4章 生物體的協調作用</title>
-<link rel="stylesheet" href="./css/style.css">
+<link rel="stylesheet" href="css/style.css">
 <script src="https://batyunching.github.io/bio/js/account.js" data-chapter="ch4" data-prefix="ch4."></script>
+<style>
+.mm-tools{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
+.mm{ list-style:none; margin:0; padding:0; }
+.mm ul{ list-style:none; margin:0; padding:0 0 0 30px; position:relative; }
+.mm li{ position:relative; padding:5px 0 5px 22px; }
+/* 神經纖維連線 */
+.mm ul > li::before{ content:""; position:absolute; left:0; top:0; bottom:0; border-left:2px solid color-mix(in srgb, var(--u, var(--c-neuro)) 55%, transparent); }
+.mm ul > li:last-child::before{ bottom:auto; height:24px; }
+.mm ul > li::after{ content:""; position:absolute; left:0; top:24px; width:20px; border-top:2px solid color-mix(in srgb, var(--u, var(--c-neuro)) 55%, transparent); }
+.node{ display:inline-flex; align-items:center; gap:8px; padding:6px 14px 6px 8px; border-radius:999px; border:1.5px solid var(--u, var(--c-neuro)); background:var(--c-panel-solid); font-weight:700; min-height:40px; position:relative; }
+.node .soma{ width:22px; height:22px; border-radius:50%; background:var(--u, var(--c-neuro)); box-shadow:0 0 10px var(--u, var(--c-neuro)); flex:0 0 auto; display:flex; align-items:center; justify-content:center; color:#0B1022; font-size:.7rem; font-weight:900; }
+.node.root{ font-size:1.25rem; padding:10px 20px 10px 10px; border-width:2.5px; border-color:var(--c-amber); }
+.node.root .soma{ background:var(--c-amber); box-shadow:0 0 14px var(--c-amber); width:30px; height:30px; }
+.node.l1{ font-size:1.08rem; }
+.node.leaf{ border-style:dashed; font-weight:500; background:transparent; }
+.node.leaf .soma{ width:10px; height:10px; box-shadow:none; }
+.node button.tg{ border:0; background:transparent; color:var(--c-muted); font:inherit; cursor:pointer; min-width:32px; min-height:32px; }
+.node a.cardlink{ text-decoration:none; font-size:.85rem; }
+.collapsed > ul{ display:none; }
+.unit-41.br, .unit-42.br, .unit-43.br{ }
+/* 挖空 */
+.blank{ display:inline-block; min-width:4.5em; padding:2px 10px; border-radius:8px; border:2px dashed var(--c-amber); color:transparent; cursor:pointer; text-align:center; background:rgba(251,191,36,.08); }
+.blank.filled{ color:var(--c-ok); border-style:solid; border-color:var(--c-ok); background:color-mix(in srgb, var(--c-ok) 14%, transparent); cursor:default; }
+.blank.shake{ animation:shake .4s; border-color:var(--c-ng); }
+@keyframes shake{ 25%{ transform:translateX(-5px);} 75%{ transform:translateX(5px);} }
+.bank{ position:sticky; bottom:12px; z-index:20; margin-top:14px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; padding:12px; border-radius:16px; background:var(--c-panel-solid); box-shadow:var(--glow); }
+.bank .chip-btn.sel{ border-color:var(--c-amber); background:rgba(251,191,36,.2); }
+.bank .chip-btn.used{ opacity:.3; pointer-events:none; }
+[hidden]{ display:none !important; }
+</style>
 </head>
 <body data-page="mindmap" data-root="./">
 <main class="wrap">
-  <div class="panel u unit-43 coming">
-    <div class="big">🛠️</div>
-    <h1>心智圖</h1>
-    <p>這一頁正在建置中，預計在<b>第5階段</b>完成，內容包括：</p>
-    <ul><li>瀏覽模式：展開、收合、跳到概念卡</li><li>挖空挑戰：隨機藏 8 個關鍵詞</li><li>迷思挖空：只藏我最常錯的概念</li></ul>
-    <div><a class="btn" href="./index.html">◀ 回第4章首頁</a></div>
+  <div class="sec-title" style="margin-top:6px"><span class="code">MIND MAP</span><h1 style="margin:0">🧠 心智圖：生物體的協調作用</h1></div>
+  <p style="color:var(--c-muted);margin-top:-6px">以課本「重點整理：概念篇」為骨架。點 ▸ 展開或收合，點 📘 跳到概念卡。挖空挑戰會藏起 8 個關鍵詞，從下方詞庫先點詞、再點空格填回去。</p>
+
+  <div class="mm-tools">
+    <div class="seg" id="segMode"><button data-v="view" aria-pressed="true">👀 瀏覽模式</button><button data-v="blank">🧩 挖空挑戰</button><button data-v="myth">⚠ 迷思挖空</button></div>
+    <button class="chip-btn" id="expandAll">全部展開</button>
+    <button class="chip-btn" id="collapseAll">只看大分類</button>
+    <span class="score" id="mmScore"></span>
   </div>
+  <div class="panel"><ul class="mm" id="mm"></ul></div>
+  <div class="bank" id="bank" hidden></div>
+  <div class="footer">內容依據課本 p.150–151「重點整理」</div>
 </main>
-<script src="./js/common.js"></script>
+<script src="js/common.js"></script>
+<script src="js/unit.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  /* 葉子用 [[ ]] 標出可挖空的關鍵詞；c ＝對應概念卡 */
+  var MAP = { t:'生物體的協調作用', k:[
+    { t:'神經系統', u:'4-1', k:[
+      { t:'受器與動器', c:'4-1-c1', k:['受器：接收[[刺激]]（眼、耳、鼻、舌、皮膚）','動器：產生反應，包括[[肌肉]]和[[腺體]]'] },
+      { t:'神經元', c:'4-1-c2', k:['神經系統的基本單位，又稱[[神經細胞]]','[[細胞本體]]：有細胞核，整合訊息','[[神經纖維]]：接收及傳導訊息'] },
+      { t:'神經系統的組成', c:'4-1-c3', k:['中樞神經：[[腦]]和[[脊髓]]','周圍神經：[[12]] 對腦神經、[[31]] 對脊神經'] },
+      { t:'中樞神經的功能', c:'4-1-c4', k:['[[大腦]]：感覺、運動、意識、記憶、思考','[[小腦]]：協調肌肉，維持平衡','[[腦幹]]：呼吸、心跳、血壓（生命中樞）','[[脊髓]]：四肢的反射中樞'] },
+      { t:'神經傳導途徑', c:'4-1-c5', k:['刺激→受器→[[感覺神經元]]→中樞神經→[[運動神經元]]→動器→反應'] },
+      { t:'意識反應與反射', c:'4-1-c7', k:['[[意識反應]]：經過大腦整合，例如接尺','[[反射]]：不經大腦的快速反應','腦幹控制：眨眼、[[咳嗽]]、唾液分泌、瞳孔縮小','脊髓控制：手摸到熱茶壺立刻[[縮回]]'] }
+    ]},
+    { t:'內分泌系統', u:'4-2', k:[
+      { t:'內分泌腺與激素', c:'4-2-c1', k:['內分泌腺分泌[[激素]]（荷爾蒙）','激素由[[血液]]運送到目標細胞'] },
+      { t:'神經 vs 內分泌', c:'4-2-c2', k:['神經系統：傳遞[[快]]、作用短暫、局部','內分泌系統：傳遞慢、作用[[持久]]、廣泛'] },
+      { t:'腦垂腺', c:'4-2-c3', k:['[[生長激素]]：促進生長','其他激素：影響其他腺體分泌'] },
+      { t:'甲狀腺・副甲狀腺', c:'4-2-c4', k:['甲狀腺素：促進細胞的[[代謝]]','副甲狀腺素：調節血液中[[鈣]]的濃度'] },
+      { t:'腎上腺', c:'4-2-c5', k:['[[腎上腺素]]：心跳呼吸加快、血壓和血糖上升'] },
+      { t:'胰島', c:'4-2-c6', k:['[[胰島素]]：降低血糖','[[升糖素]]：提高血糖'] },
+      { t:'性腺', c:'4-2-c7', k:['[[睪丸]]：雄性激素，表現男性特徵','[[卵巢]]：雌性激素，表現女性特徵'] }
+    ]},
+    { t:'植物的感應', u:'4-3', k:[
+      { t:'較快速的感應（膨壓）', c:'4-3-c2', k:['[[觸發運動]]：含羞草碰觸後小葉閉合','捕蟲運動：捕蠅草、[[毛氈苔]]','[[睡眠運動]]：酢漿草、睡蓮白天開晚上合','氣孔開閉：保衛細胞吸水，氣孔[[打開]]'] },
+      { t:'莖的向性', c:'4-3-c4', k:['[[向光性]]：朝向光源生長','[[負向地性]]：背離地心生長','[[向觸性]]：朝接觸的物體捲曲生長'] },
+      { t:'根的向性', c:'4-3-c5', k:['[[向地性]]：朝向地心生長','[[負向光性]]：背離光源生長'] }
+    ]}
+  ]};
+
+  var mode = 'view', hidden = {}, picked = null, filled = 0, total = 0;
+
+  function leafHTML(txt, li){
+    return txt.replace(/\[\[(.+?)\]\]/g, function(_, w){
+      var key = li + '|' + w;
+      if(hidden[key]) return '<span class="blank" data-key="' + CH4.esc(key) + '" data-w="' + CH4.esc(w) + '" role="button" tabindex="0" aria-label="空格">' + CH4.esc(w) + '</span>';
+      return '<b>' + CH4.esc(w) + '</b>';
+    });
+  }
+  function render(){
+    var h = '<li class="lroot"><span class="node root"><span class="soma"></span>' + MAP.t + '</span><ul>';
+    MAP.k.forEach(function(b1){
+      h += '<li class="' + CH4.unitClass(b1.u) + ' br"><span class="node l1"><button class="tg" aria-label="展開或收合">▾</button><span class="soma">' + b1.u.slice(2) + '</span>' + b1.u + ' ' + b1.t + '</span><ul>';
+      b1.k.forEach(function(b2, i2){
+        h += '<li><span class="node"><button class="tg" aria-label="展開或收合">▾</button><span class="soma"></span>' + b2.t + ' <a class="cardlink" href="' + CH4.UNIT_PAGES[b1.u] + '#' + b2.c + '" title="看概念卡">📘</a></span><ul>';
+        b2.k.forEach(function(lf, i3){ h += '<li><span class="node leaf"><span class="soma"></span><span>' + leafHTML(lf, b1.u + '.' + i2 + '.' + i3) + '</span></span></li>'; });
+        h += '</ul></li>';
+      });
+      h += '</ul></li>';
+    });
+    h += '</ul></li>';
+    $('mm').innerHTML = h;
+    $('mm').querySelectorAll('.tg').forEach(function(t){
+      t.addEventListener('click', function(){ var li = t.closest('li'); li.classList.toggle('collapsed'); t.textContent = li.classList.contains('collapsed') ? '▸' : '▾'; });
+    });
+    $('mm').querySelectorAll('.blank').forEach(function(b){
+      function tryFill(){
+        if(b.classList.contains('filled')) return;
+        if(!picked){ CH4.toast('先在下方詞庫點一個詞'); return; }
+        if(picked.getAttribute('data-w') === b.getAttribute('data-w')){
+          b.classList.add('filled'); picked.classList.remove('sel'); picked.classList.add('used'); picked = null; filled++;
+          score();
+        } else { b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); CH4.toast('不是這個詞，再想想！'); }
+      }
+      b.addEventListener('click', tryFill);
+      b.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); tryFill(); } });
+    });
+  }
+  function score(){
+    $('mmScore').textContent = total ? '已填回 ' + filled + ' / ' + total : '';
+    if(total && filled === total){
+      CH4.toast('🎉 全部填回！');
+      UNIT.rewardOnce(mode === 'myth' ? 'mm-myth' : 'mm-blank', 10, '心智圖挖空完成');
+      $('bank').innerHTML = '<b>🎉 全部填回！</b><button class="btn" id="again">再挑戰一次 ↻</button>';
+      $('again').addEventListener('click', function(){ setMode(mode); });
+    }
+  }
+  function allKeys(filterConcepts){
+    var out = [];
+    MAP.k.forEach(function(b1){ b1.k.forEach(function(b2, i2){
+      if(filterConcepts && filterConcepts.indexOf(b2.c) < 0) return;
+      b2.k.forEach(function(lf, i3){ (lf.match(/\[\[(.+?)\]\]/g) || []).forEach(function(m){ out.push(b1.u + '.' + i2 + '.' + i3 + '|' + m.slice(2, -2)); }); });
+    }); });
+    return out;
+  }
+  function weakConcepts(){
+    // 最常出現的迷思所屬概念＋答對率低的概念
+    var ans = CH4.store.get('answers', []), cnt = {}, mastery = CH4.store.get('mastery', {});
+    ans.forEach(function(a){ if(!a.ok) cnt[a.c] = (cnt[a.c] || 0) + 1; });
+    Object.keys(mastery).forEach(function(c){ var m = mastery[c]; if(m.n >= 2 && m.ok / m.n < 0.7) cnt[c] = (cnt[c] || 0) + 2; });
+    var list = Object.keys(cnt).sort(function(a, b){ return cnt[b] - cnt[a]; });
+    // 概念卡 c6/c7 與 c3 等在心智圖上合併在相近的節點
+    var alias = { '4-1-c6':'4-1-c7', '4-3-c1':'4-3-c2', '4-3-c3':'4-3-c2' };
+    return list.map(function(c){ return alias[c] || c; });
+  }
+  function setMode(v){
+    mode = v; hidden = {}; picked = null; filled = 0; total = 0;
+    if(v !== 'view'){
+      var keys;
+      if(v === 'myth'){
+        var weak = weakConcepts();
+        if(!weak.length){ CH4.toast('還沒有錯題紀錄，先用一般挖空挑戰吧！'); keys = allKeys(); }
+        else { keys = allKeys(weak.slice(0, 4)); if(keys.length < 8) keys = keys.concat(CH4.shuffle(allKeys().filter(function(k){ return keys.indexOf(k) < 0; })).slice(0, 8 - keys.length)); }
+      } else keys = allKeys();
+      CH4.shuffle(keys).slice(0, 8).forEach(function(k){ hidden[k] = 1; });
+      total = Object.keys(hidden).length;
+      var words = CH4.shuffle(Object.keys(hidden).map(function(k){ return k.split('|')[1]; }));
+      $('bank').hidden = false;
+      $('bank').innerHTML = '<b style="margin-right:4px">詞庫：</b>' + words.map(function(w){ return '<button class="chip-btn" data-w="' + CH4.esc(w) + '">' + CH4.esc(w) + '</button>'; }).join('');
+      $('bank').querySelectorAll('.chip-btn').forEach(function(c){ c.addEventListener('click', function(){
+        if(picked) picked.classList.remove('sel');
+        picked = picked === c ? null : c; if(picked) picked.classList.add('sel');
+      }); });
+      if(v === 'myth' && weakConcepts().length) CH4.toast('⚠ 迷思挖空：藏起來的是你最常錯的概念');
+    } else $('bank').hidden = true;
+    render(); score();
+  }
+  UNIT.seg($('segMode'), setMode);
+  $('expandAll').addEventListener('click', function(){ $('mm').querySelectorAll('li.collapsed').forEach(function(li){ li.classList.remove('collapsed'); var t = li.querySelector(':scope > .node .tg'); if(t) t.textContent = '▾'; }); });
+  $('collapseAll').addEventListener('click', function(){ $('mm').querySelectorAll('li.br').forEach(function(li){ li.classList.add('collapsed'); var t = li.querySelector(':scope > .node .tg'); if(t) t.textContent = '▸'; }); });
+  setMode('view');
+})();
+</script>
 </body>
 </html>

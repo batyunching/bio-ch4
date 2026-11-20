@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>協調賓果｜第4章遊戲</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://batyunching.github.io/bio/js/account.js" data-chapter="ch4" data-prefix="ch4."></script>
+<style>
+.gate{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; }
+.gate .panel{ display:flex; flex-direction:column; gap:10px; }
+.code-in{ font-family:var(--num); font-size:2rem; letter-spacing:.3em; text-align:center; width:100%; min-height:64px; border-radius:14px; border:2px solid var(--c-line); background:var(--c-panel-solid); color:var(--c-text); }
+.bigcode{ font-family:var(--num); font-size:4.4rem; font-weight:900; letter-spacing:.2em; color:var(--c-amber); text-align:center; line-height:1.1; }
+.url{ text-align:center; word-break:break-all; color:var(--c-muted); }
+.players{ display:flex; gap:6px; flex-wrap:wrap; }
+.players span{ padding:4px 10px; border-radius:999px; border:1px solid var(--c-line); font-weight:700; font-size:.85rem; }
+.clue{ font-size:1.9rem; font-weight:900; text-align:center; padding:26px 16px; border-radius:18px; background:var(--c-neuro-l); border:2px solid var(--c-neuro); min-height:140px; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px; }
+.clue small{ font-size:1rem; color:var(--c-muted); font-family:var(--num); }
+.clue .ans{ color:var(--c-amber); font-size:2.2rem; }
+.hostgrid{ display:grid; grid-template-columns:2fr 1fr; gap:16px; }
+@media (max-width:900px){ .hostgrid{ grid-template-columns:1fr; } }
+.honor{ list-style:none; margin:0; padding:0; }
+.honor li{ display:flex; justify-content:space-between; padding:6px 10px; border-bottom:1px dashed var(--c-line); font-weight:700; }
+.honor li.champ{ color:var(--c-amber); }
+.card{ display:grid; grid-template-columns:repeat(5,1fr); gap:6px; max-width:620px; margin:0 auto; }
+.card button{ aspect-ratio:1/1; border-radius:12px; border:1.5px solid var(--c-line); background:var(--c-panel-solid); color:var(--c-text); font:inherit; font-weight:900; font-size:clamp(.72rem, 2.6vw, 1.02rem); cursor:pointer; padding:4px; line-height:1.25; }
+.card button.on{ background:var(--c-neuro); color:#0B1022; border-color:var(--c-neuro); box-shadow:0 0 12px var(--c-neuro); }
+html.projector .card button.on{ color:#fff; }
+.card button.free{ background:var(--c-amber); color:#0B1022; }
+.card button.line{ outline:3px solid var(--c-amber); }
+.card button.shake{ animation:shake .4s; border-color:var(--c-ng); }
+@keyframes shake{ 25%{ transform:translateX(-4px);} 75%{ transform:translateX(4px);} }
+.bingo-ov{ position:fixed; inset:0; z-index:9500; display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(5,8,22,.75); color:#fff; pointer-events:none; animation:fadeout 3.4s forwards; }
+.bingo-ov b{ font-family:var(--num); font-size:5rem; color:var(--c-amber); text-shadow:0 0 30px var(--c-amber); }
+@keyframes fadeout{ 0%,80%{ opacity:1; } 100%{ opacity:0; } }
+[hidden]{ display:none !important; }
+</style>
+</head>
+<body data-page="games" data-root="../">
+<main class="wrap">
+  <div class="sec-title" style="margin-top:6px"><span class="code">CLASS GAME</span><h1 style="margin:0">🎯 協調賓果</h1></div>
+  <p style="color:var(--c-muted);margin-top:-6px">老師在大螢幕開房出題，學生用平板輸入房號加入。看到提示，就在自己的賓果卡上點出正確的關鍵詞，連成一條線就 BINGO！</p>
+
+  <div id="gate" class="gate">
+    <div class="panel" id="hostBox">
+      <h2 style="margin:0">👩‍🏫 老師開房</h2>
+      <p style="margin:0;color:var(--c-muted)">在教室大螢幕上開房，題目來自全章 41 個關鍵詞。</p>
+      <button class="btn" id="createBtn">建立新房間</button>
+      <button class="btn ghost" id="resumeBtn" hidden>回到上一局</button>
+      <p class="note" id="hostNote" style="color:var(--c-muted);font-size:.8rem"></p>
+    </div>
+    <div class="panel">
+      <h2 style="margin:0">🎒 學生加入</h2>
+      <label for="roomIn" style="font-weight:700">輸入老師螢幕上的 4 位數房號</label>
+      <input class="code-in" id="roomIn" inputmode="numeric" maxlength="4" autocomplete="off">
+      <button class="btn" id="joinBtn">加入 ▶</button>
+      <div class="feedback ng" id="joinErr"></div>
+    </div>
+  </div>
+
+  <!-- 老師端 -->
+  <div id="host" hidden>
+    <div class="hostgrid">
+      <div>
+        <div class="panel" id="waitBox">
+          <p style="text-align:center;margin:0">房號</p><div class="bigcode" id="hCode"></div>
+          <p class="url" id="hUrl"></p>
+          <p style="margin:10px 0 6px;font-weight:700">已加入 <span id="hCount">0</span> 人</p>
+          <div class="players" id="hPlayers"></div>
+          <button class="btn" id="startGame" style="margin-top:14px">▶ 開始遊戲</button>
+        </div>
+        <div class="panel" id="playBox" hidden>
+          <div class="clue" id="hClue"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center">
+            <button class="btn" id="reveal">公布答案</button>
+            <button class="btn" id="nextQ" style="--u:var(--c-amber)">下一題 ▶</button>
+            <span class="score" id="hTimer"></span>
+            <span style="flex:1"></span>
+            <button class="btn ghost" id="endGame">結束遊戲</button>
+          </div>
+          <p style="color:var(--c-muted);font-size:.85rem" id="hCalled"></p>
+        </div>
+      </div>
+      <div class="panel"><h3 style="margin-top:0">🏆 連線榜</h3><ol class="honor" id="hHonor"><li>還沒有人連線</li></ol></div>
+    </div>
+  </div>
+
+  <!-- 學生端 -->
+  <div id="stu" hidden>
+    <div class="panel" style="margin-bottom:14px">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><b id="sWho"></b><span class="tag">房號 <span id="sCode"></span></span><span class="score" id="sLines">連線 0 條</span></div>
+      <div class="clue" id="sClue" style="margin-top:10px;font-size:1.3rem;min-height:90px">等老師開始…</div>
+    </div>
+    <div class="card" id="card"></div>
+    <p style="text-align:center;color:var(--c-muted);font-size:.85rem">只有老師已經出過的關鍵詞才能點。點錯不扣分，但要想清楚喔！</p>
+  </div>
+
+  <p style="margin-top:16px"><a class="btn ghost" href="index.html">◀ 回遊戲大廳</a></p>
+</main>
+<script src="../js/common.js"></script>
+<script src="../data/terms.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var BYID = {}; TERMS.forEach(function(t){ BYID[t.id] = t; });
+  var PATH = 'bingo-ch4/rooms/';
+  var SITE = 'https://batyunching.github.io/bio-ch4/games/bingo.html';
+  var db = null, acct = null;
+  function ready(){ return window.BIO_ACCOUNT && BIO_ACCOUNT.ready ? BIO_ACCOUNT.ready : Promise.resolve(null); }
+  ready().then(function(){
+    acct = window.BIO_ACCOUNT && BIO_ACCOUNT.user ? BIO_ACCOUNT : null;
+    if(acct && window.firebase && firebase.database) db = firebase.database();
+    if(!db){ $('hostNote').textContent = '需要登入（並在學校網址上開啟）才能連線。'; $('createBtn').disabled = true; $('joinBtn').disabled = true; return; }
+    if(acct.sid && !acct.isTeacher){ $('hostBox').hidden = true; }
+    var saved = CH4.store.get('bingoHost', null); if(saved && acct.isTeacher) $('resumeBtn').hidden = false;
+    var q = new URLSearchParams(location.search).get('room'); if(q){ $('roomIn').value = q; }
+  });
+
+  /* ================= 老師端 ================= */
+  var H = null;
+  $('createBtn').addEventListener('click', async function(){
+    var code;
+    for(var i = 0; i < 20; i++){ code = String(1000 + Math.floor(Math.random() * 9000)); var s = await db.ref(PATH + code + '/info').get(); if(!s.exists()) break; }
+    var deck = TERMS.map(function(t){ return t.id; }).sort(function(){ return Math.random() - .5; });
+    await db.ref(PATH + code).set({ info:{ status:'wait', created: firebase.database.ServerValue.TIMESTAMP, host: acct.user.uid }, deck: deck.join(','), turn:{ n:0, state:'wait' } });
+    CH4.store.set('bingoHost', { code:code });
+    host(code);
+  });
+  $('resumeBtn').addEventListener('click', async function(){
+    var s = CH4.store.get('bingoHost', null), info = s && (await db.ref(PATH + s.code + '/info').get()).val();
+    if(!info){ CH4.toast('找不到上一局的房間'); CH4.store.set('bingoHost', null); $('resumeBtn').hidden = true; return; }
+    host(s.code);
+  });
+  function host(code){
+    var R = db.ref(PATH + code);
+    H = { code:code, R:R, n:0, deck:[], players:{}, timer:null };
+    $('gate').hidden = true; $('host').hidden = false;
+    $('hCode').textContent = code; $('hUrl').textContent = SITE + '?room=' + code;
+    R.child('deck').get().then(function(s){ H.deck = (s.val() || '').split(','); });
+    R.child('info/status').on('value', function(s){ var st = s.val(); $('waitBox').hidden = st !== 'wait'; $('playBox').hidden = st === 'wait'; });
+    R.child('turn').on('value', function(s){ var t = s.val() || {}; H.n = t.n || 0; H.turn = t; drawHostTurn(); });
+    R.child('players').on('value', function(s){
+      var p = s.val() || {}, prev = H.players; H.players = p;
+      var ids = Object.keys(p);
+      $('hCount').textContent = ids.length;
+      $('hPlayers').innerHTML = ids.map(function(k){ return '<span>' + p[k].seat + ' 號</span>'; }).join('');
+      var rank = ids.filter(function(k){ return p[k].lines > 0; }).sort(function(a, b){ return (p[b].lines - p[a].lines) || ((p[a].firstAt || 0) - (p[b].firstAt || 0)); });
+      $('hHonor').innerHTML = rank.length ? rank.map(function(k, i){ return '<li class="' + (i === 0 ? 'champ' : '') + '"><span>' + (i === 0 ? '👑 ' : '') + p[k].seat + ' 號</span><span>' + p[k].lines + ' 條</span></li>'; }).join('') : '<li>還沒有人連線</li>';
+      ids.forEach(function(k){ if(prev[k] && p[k].lines > (prev[k].lines || 0)) celebrate(p[k].seat + ' 號', p[k].lines); });
+    });
+  }
+  function drawHostTurn(){
+    var t = H.turn || {};
+    if(!t.id){ $('hClue').innerHTML = '<small>準備好了嗎？</small>按「下一題」出第一題'; $('reveal').disabled = true; return; }
+    var term = BYID[t.id];
+    $('hClue').innerHTML = '<small>第 ' + t.n + ' 題</small>' + term.clue + (t.state === 'reveal' ? '<span class="ans">答案：' + term.w + '</span>' : '');
+    $('reveal').disabled = t.state === 'reveal';
+    $('hCalled').textContent = '已出題：' + t.n + ' / ' + TERMS.length;
+  }
+  $('startGame').addEventListener('click', function(){ H.R.child('info/status').set('play'); });
+  $('nextQ').addEventListener('click', function(){
+    if(H.n >= H.deck.length){ CH4.toast('題目出完了！'); return; }
+    var id = H.deck[H.n], n = H.n + 1, up = {};
+    up['turn'] = { n:n, id:id, state:'ask', at: firebase.database.ServerValue.TIMESTAMP };
+    up['called/' + id] = n;
+    H.R.update(up);
+    clearInterval(H.timer); var left = 20; $('hTimer').textContent = '⏱ ' + left;
+    H.timer = setInterval(function(){ left--; $('hTimer').textContent = left > 0 ? '⏱ ' + left : ''; if(left <= 0){ clearInterval(H.timer); if(H.turn && H.turn.state === 'ask') H.R.child('turn/state').set('reveal'); } }, 1000);
+  });
+  $('reveal').addEventListener('click', function(){ clearInterval(H.timer); $('hTimer').textContent = ''; H.R.child('turn/state').set('reveal'); });
+  $('endGame').addEventListener('click', function(){
+    if(!confirm('確定要結束這一局嗎？')) return;
+    H.R.update({ 'info/status':'ended', 'turn/state':'ended' }); CH4.store.set('bingoHost', null); CH4.toast('遊戲結束！');
+  });
+  function celebrate(name, lines){
+    var ov = document.createElement('div'); ov.className = 'bingo-ov';
+    ov.innerHTML = '<b>BINGO!</b><div style="font-size:2rem;font-weight:900;margin-top:10px">' + name + '</div><div>累計 ' + lines + ' 條線</div>';
+    document.body.appendChild(ov); setTimeout(function(){ ov.remove(); }, 3500);
+  }
+
+  /* ================= 學生端 ================= */
+  var S = null;
+  $('joinBtn').addEventListener('click', async function(){
+    var code = $('roomIn').value.trim();
+    $('joinErr').textContent = '';
+    if(!/^\d{4}$/.test(code)){ $('joinErr').textContent = '請輸入 4 位數房號。'; return; }
+    var info = (await db.ref(PATH + code + '/info').get()).val();
+    if(!info){ $('joinErr').textContent = '找不到這個房號，請再確認一次。'; return; }
+    if(info.status === 'ended'){ $('joinErr').textContent = '這一局已經結束了。'; return; }
+    var pid = acct.sid || ('t-' + acct.user.uid.slice(0, 6));
+    var seat = acct.sid ? parseInt(acct.sid.split('-')[1], 10) : '老師';
+    var R = db.ref(PATH + code), mine = (await R.child('players/' + pid).get()).val();
+    var saved = CH4.store.get('bingoCard', null);
+    var card = (saved && saved.code === code) ? saved.card : TERMS.map(function(t){ return t.id; }).sort(function(){ return Math.random() - .5; }).slice(0, 24);
+    var marks = (saved && saved.code === code) ? saved.marks : {};
+    CH4.store.set('bingoCard', { code:code, card:card, marks:marks });
+    if(!mine) await R.child('players/' + pid).set({ seat: seat, cls: acct.sid ? acct.sid.split('-')[0] : '', lines:0, joined: firebase.database.ServerValue.TIMESTAMP });
+    S = { code:code, R:R, pid:pid, card:card, marks:marks, called:{}, lines: mine ? mine.lines || 0 : 0 };
+    $('gate').hidden = true; $('stu').hidden = false;
+    $('sWho').textContent = acct.sid ? '👤 ' + acct.sid.split('-')[0] + ' 班 ' + seat + ' 號' : '👩‍🏫 老師測試'; $('sCode').textContent = code;
+    drawCard();
+    R.child('called').on('value', function(s){ S.called = s.val() || {}; });
+    R.child('turn').on('value', function(s){
+      var t = s.val() || {};
+      if(t.state === 'ended'){ $('sClue').innerHTML = '🏁 遊戲結束！你一共連成 <b>' + S.lines + '</b> 條線'; return; }
+      if(!t.id){ $('sClue').textContent = '等老師開始…'; return; }
+      var term = BYID[t.id];
+      $('sClue').innerHTML = '<small>第 ' + t.n + ' 題</small>' + term.clue + (t.state === 'reveal' ? '<span class="ans" style="font-size:1.4rem">答案：' + term.w + '</span>' : '');
+    });
+  });
+  var LINES = [];
+  for(var r = 0; r < 5; r++){ LINES.push([0,1,2,3,4].map(function(c){ return r * 5 + c; })); LINES.push([0,1,2,3,4].map(function(c){ return c * 5 + r; })); }
+  LINES.push([0,6,12,18,24]); LINES.push([4,8,12,16,20]);
+  function cellId(i){ return i === 12 ? 'FREE' : S.card[i < 12 ? i : i - 1]; }
+  function isOn(i){ return i === 12 || !!S.marks[cellId(i)]; }
+  function drawCard(){
+    var html = '';
+    for(var i = 0; i < 25; i++){
+      var id = cellId(i);
+      html += i === 12 ? '<button class="free on" disabled>FREE</button>' : '<button data-i="' + i + '" class="' + (S.marks[id] ? 'on' : '') + '">' + BYID[id].w + '</button>';
+    }
+    $('card').innerHTML = html;
+    var done = LINES.filter(function(L){ return L.every(isOn); });
+    done.forEach(function(L){ L.forEach(function(i){ var b = $('card').children[i]; if(b) b.classList.add('line'); }); });
+    $('sLines').textContent = '連線 ' + done.length + ' 條';
+    $('card').querySelectorAll('[data-i]').forEach(function(b){ b.addEventListener('click', function(){ tap(+b.getAttribute('data-i'), b); }); });
+    return done.length;
+  }
+  function tap(i, b){
+    var id = cellId(i);
+    if(S.marks[id]) return;
+    if(!S.called[id]){ b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); CH4.toast('老師還沒出這個詞的題目喔'); return; }
+    S.marks[id] = 1; CH4.store.set('bingoCard', { code:S.code, card:S.card, marks:S.marks });
+    var lines = drawCard();
+    if(lines > S.lines){
+      var up = { lines: lines }; if(!S.lines) up.firstAt = firebase.database.ServerValue.TIMESTAMP;
+      S.lines = lines; S.R.child('players/' + S.pid).update(up);
+      var ov = document.createElement('div'); ov.className = 'bingo-ov'; ov.innerHTML = '<b>BINGO!</b><div>第 ' + lines + ' 條線</div>'; document.body.appendChild(ov); setTimeout(function(){ ov.remove(); }, 3500);
+      CH4.energy.add(10, 'BINGO！'); if(window.UNIT) UNIT.rewardOnce('badge-bingo', 10);
+      var r = CH4.store.get('rewards', []); if(r.indexOf('badge-bingo') < 0){ r.push('badge-bingo'); CH4.store.set('rewards', r); }
+    }
+  }
+})();
+</script>
+</body>
+</html>

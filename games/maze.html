@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>向性迷宮｜第4章遊戲</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://batyunching.github.io/bio/js/account.js" data-chapter="ch4" data-prefix="ch4."></script>
+<style>
+.hud{ display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
+.hud .chip{ padding:6px 14px; border-radius:999px; border:1px solid var(--c-line); font-family:var(--num); font-weight:700; }
+.goal{ font-size:1.12rem; font-weight:900; padding:12px 14px; border-radius:12px; background:var(--c-plant-l); border:1px dashed var(--c-plant); margin-bottom:10px; }
+.fig .shoot{ fill:none; stroke:#4ADE80; stroke-width:5; stroke-linecap:round; stroke-linejoin:round; }
+.fig .root{ fill:none; stroke:#FDE68A; stroke-width:4; stroke-linecap:round; stroke-linejoin:round; }
+html.projector .fig .root{ stroke:#B45309; } html.projector .fig .shoot{ stroke:#16A34A; }
+.fig .seed{ fill:#A16207; stroke:#713F12; stroke-width:2; }
+.fig .ray{ stroke:#FDE047; stroke-width:3; stroke-linecap:round; opacity:.8; }
+.ctrl{ margin:8px 0; }
+.ctrl b{ display:block; margin-bottom:4px; }
+[hidden]{ display:none !important; }
+</style>
+</head>
+<body data-page="games" data-root="../">
+<main class="wrap unit-43">
+  <div class="sec-title" style="margin-top:6px"><span class="code">GAME 03</span><h1 style="margin:0">🌱 向性迷宮</h1></div>
+  <p style="color:var(--c-muted);margin-top:-6px">利用莖的向光性、負向地性，以及根的向地性、負向光性，讓幼苗長到目標！共 6 關，每關會觀察 10 天。</p>
+  <div class="panel lab">
+    <div class="hud"><span class="chip" id="lvl">第 1 / 6 關</span><span class="chip score" id="sc">⚡ 0</span><span class="chip" id="tries"></span></div>
+    <div class="grid2">
+      <svg class="fig" id="fig" viewBox="0 0 480 400" role="img" aria-label="向性迷宮的幼苗與目標">
+        <rect id="dark" x="0" y="0" width="480" height="400" rx="14" fill="#000" opacity="0"/>
+        <g id="lamp"></g>
+        <path d="M30 390 H450" stroke="var(--c-line)" stroke-width="2" stroke-dasharray="6 6"/>
+        <text class="sml" x="450" y="384" text-anchor="end">↓ 地心方向</text>
+        <g id="target"></g>
+        <path class="root" id="rootP" d=""/><path class="shoot" id="stemP" d=""/>
+        <ellipse class="seed" id="seed" cx="240" cy="236" rx="12" ry="8"/>
+        <text x="20" y="30" class="lbl" id="dayT">第 0 天</text>
+      </svg>
+      <div>
+        <div class="goal" id="goal"></div>
+        <div id="ctrls"></div>
+        <button class="btn" id="go" style="margin-top:10px">🌱 種下去，觀察 10 天</button>
+        <div class="feedback" id="fb" aria-live="polite"></div>
+        <div class="info" id="exp" hidden></div>
+        <button class="btn" id="next" hidden style="margin-top:10px">下一關 ▶</button>
+      </div>
+    </div>
+  </div>
+  <p style="margin-top:16px"><a class="btn ghost" href="index.html">◀ 回遊戲大廳</a></p>
+</main>
+<script src="../js/common.js"></script>
+<script src="../js/unit.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var NS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs, parent){ var e = document.createElementNS(NS, tag); for(var k in attrs) e.setAttribute(k, attrs[k]); if(parent) parent.appendChild(e); return e; }
+  var C = { x:240, y:236 }, LIGHT = { top:{ x:0, y:-1 }, left:{ x:-1, y:0 }, right:{ x:1, y:0 }, none:null };
+  var LNAME = { none:'🌑 暗室', top:'⬆ 上方', left:'⬅ 左方', right:'➡ 右方' }, ONAME = { '0':'直立', '90':'向右橫放', '-90':'向左橫放', '180':'倒放' };
+  function rot(v, d){ var r = d * Math.PI / 180; return { x: v.x * Math.cos(r) - v.y * Math.sin(r), y: v.x * Math.sin(r) + v.y * Math.cos(r) }; }
+  function norm(v){ var l = Math.sqrt(v.x * v.x + v.y * v.y) || 1; return { x:v.x / l, y:v.y / l }; }
+  function ang(v){ return Math.atan2(v.y, v.x); }
+  function turn(cur, target, maxDeg, prefer){
+    var d = ang(target) - ang(cur); while(d > Math.PI) d -= 2 * Math.PI; while(d < -Math.PI) d += 2 * Math.PI;
+    if(prefer && Math.abs(d) > Math.PI - 0.02) d = prefer * Math.abs(d);
+    var m = maxDeg * Math.PI / 180; d = Math.max(-m, Math.min(m, d)); return rot(cur, d * 180 / Math.PI);
+  }
+  function inside(p){ return p.x > 14 && p.x < 466 && p.y > 40 && p.y < 386; }
+  // 與 4-3 向性模擬器相同的生長規則；回傳每一天的莖、根
+  function simulate(ori, la, lb){
+    var sDir = rot({ x:0, y:-1 }, ori), rDir = rot({ x:0, y:1 }, ori);
+    var stem = [ { x:C.x, y:C.y }, { x:C.x + sDir.x * 22, y:C.y + sDir.y * 22 } ], root = [ { x:C.x, y:C.y }, { x:C.x + rDir.x * 16, y:C.y + rDir.y * 16 } ];
+    var days = [ { s:stem.slice(), r:root.slice(), light: la } ];
+    for(var d = 1; d <= 10; d++){
+      var lt = d <= 5 ? la : lb, L = LIGHT[lt];
+      for(var k = 0; k < 6; k++){
+        sDir = turn(sDir, norm({ x: L ? L.x * 1.1 : 0, y: -0.6 + (L ? L.y * 1.1 : 0) }), 12, 1);
+        var t = stem[stem.length - 1], n = { x:t.x + sDir.x * 3.4, y:t.y + sDir.y * 3.4 }; if(inside(n)) stem.push(n);
+        rDir = turn(rDir, norm({ x: L ? -L.x * 0.45 : 0, y: 1 + (L ? -L.y * 0.45 : 0) }), 10, 1);
+        var r = root[root.length - 1], nr = { x:r.x + rDir.x * 2.6, y:r.y + rDir.y * 2.6 }; if(inside(nr)) root.push(nr);
+      }
+      days.push({ s:stem.slice(), r:root.slice(), light: lt });
+    }
+    return days;
+  }
+  // 關卡：sol ＝ 一組正確解（用來放目標）；choose ＝ 可以選的項目
+  var LEVELS = [
+    { goal:'讓<b>莖</b>長到 ⭐ 星星', part:'s', choose:['A'], fix:{ ori:0 }, sol:{ ori:0, A:'left', B:'left' }, e:'莖有<b>向光性</b>，光從左邊來，莖就彎向左邊。' },
+    { goal:'讓<b>莖</b>長到 ⭐ 星星', part:'s', choose:['A'], fix:{ ori:0 }, sol:{ ori:0, A:'right', B:'right' }, e:'光從右邊照，莖朝光源（右邊）生長。' },
+    { goal:'讓<b>根</b>長到 💧 水滴', part:'r', choose:['A'], fix:{ ori:0 }, sol:{ ori:0, A:'right', B:'right' }, e:'根有<b>負向光性</b>：光從右邊照，根就往下、並稍微偏向左邊（背離光源）生長。' },
+    { goal:'在<b>暗室</b>中，讓<b>莖</b>長到 ⭐ 星星（只能改變幼苗的擺放）', part:'s', choose:['ori'], fix:{ A:'none', B:'none' }, sol:{ ori:90, A:'none', B:'none' }, e:'暗室沒有光，莖只表現<b>負向地性</b>，會彎回朝上。向右橫放的幼苗，莖會在右邊彎上去。' },
+    { goal:'讓<b>莖</b>先經過 🔵 藍點，再長到 ⭐ 星星，彎成 S 形（前 5 天、後 5 天的光源可以不同）', part:'s', choose:['A','B'], fix:{ ori:0 }, sol:{ ori:0, A:'left', B:'right' }, via:true, e:'先讓光從左邊照，莖向左彎；再換到右邊，莖又向右彎，就成了 S 形。' },
+    { goal:'幼苗被<b>倒放</b>了！讓<b>根</b>長到 💧 水滴', part:'r', choose:['A'], fix:{ ori:180 }, sol:{ ori:180, A:'left', B:'left' }, e:'倒放後根會彎回朝下（<b>向地性</b>），光從左邊照時，根會偏向右邊（<b>負向光性</b>）。' }
+  ];
+  var li = 0, score = 0, tries = 0, cur = {}, target = null, via = null, anim = null;
+  function seg(name, opts, val){
+    return '<div class="ctrl"><b>' + name + '</b><div class="seg" data-c="' + name + '">' + opts.map(function(o){ return '<button data-v="' + o[0] + '"' + (String(o[0]) === String(val) ? ' aria-pressed="true"' : '') + '>' + o[1] + '</button>'; }).join('') + '</div></div>';
+  }
+  function load(){
+    var L = LEVELS[li]; tries = 0;
+    cur = { ori: L.fix.ori != null ? L.fix.ori : 0, A: L.fix.A || 'top', B: L.fix.B || 'top' };
+    var sim = simulate(L.sol.ori, L.sol.A, L.sol.B), last = sim[10], arr = L.part === 's' ? last.s : last.r;
+    target = arr[arr.length - 1];
+    via = L.via ? sim[5].s[sim[5].s.length - 1] : null;
+    $('lvl').textContent = '第 ' + (li + 1) + ' / ' + LEVELS.length + ' 關'; $('sc').textContent = '⚡ ' + score; $('tries').textContent = '嘗試 0 次';
+    $('goal').innerHTML = '🎯 ' + L.goal;
+    var h = '', lights = [['none', LNAME.none], ['top', LNAME.top], ['left', LNAME.left], ['right', LNAME.right]];
+    if(L.choose.indexOf('ori') >= 0) h += seg('幼苗擺放', [[0,'直立'],[90,'向右橫放'],[-90,'向左橫放'],[180,'倒放']], cur.ori);
+    else h += '<p style="margin:4px 0">幼苗擺放：<b>' + ONAME[String(cur.ori)] + '</b></p>';
+    if(L.choose.indexOf('A') >= 0) h += seg(L.choose.indexOf('B') >= 0 ? '前 5 天的光源' : '光源位置', lights, cur.A);
+    else h += '<p style="margin:4px 0">光源：<b>' + LNAME[cur.A] + '</b></p>';
+    if(L.choose.indexOf('B') >= 0) h += seg('後 5 天的光源', lights, cur.B);
+    $('ctrls').innerHTML = h;
+    $('ctrls').querySelectorAll('.seg').forEach(function(s){
+      var c = s.getAttribute('data-c');
+      UNIT.seg(s, function(v){
+        if(c === '幼苗擺放') cur.ori = +v; else if(c === '後 5 天的光源') cur.B = v; else { cur.A = v; if(L.choose.indexOf('B') < 0) cur.B = v; }
+        preview();
+      });
+    });
+    if(L.choose.indexOf('B') < 0) cur.B = cur.A;
+    $('fb').textContent = ''; $('exp').hidden = true; $('next').hidden = true; $('go').disabled = false;
+    preview();
+  }
+  function drawTarget(){
+    var L = LEVELS[li], g = $('target'); g.innerHTML = '';
+    el('circle', { cx:target.x, cy:target.y, r:22, fill: L.part === 's' ? '#FDE047' : '#38BDF8', opacity:.18 }, g);
+    var t = el('text', { x:target.x, y:target.y + 9, 'text-anchor':'middle', style:'font-size:26px' }, g); t.textContent = L.part === 's' ? '⭐' : '💧';
+    if(via){ el('circle', { cx:via.x, cy:via.y, r:22, fill:'#38BDF8', opacity:.18 }, g); var v = el('text', { x:via.x, y:via.y + 8, 'text-anchor':'middle', style:'font-size:22px' }, g); v.textContent = '🔵'; }
+  }
+  function drawLamp(lt){
+    var g = $('lamp'); g.innerHTML = ''; $('dark').setAttribute('opacity', lt === 'none' ? .55 : 0);
+    if(lt === 'none') return;
+    var P = { top:{ x:240, y:22 }, left:{ x:22, y:180 }, right:{ x:458, y:180 } }[lt], L = LIGHT[lt];
+    el('circle', { cx:P.x, cy:P.y, r:14, fill:'#FDE047' }, g);
+    for(var i = -2; i <= 2; i++){ var o = rot({ x:-L.x, y:-L.y }, i * 14); el('line', { class:'ray', x1:P.x + o.x * 20, y1:P.y + o.y * 20, x2:P.x + o.x * 46, y2:P.y + o.y * 46 }, g); }
+  }
+  function pd(pts){ return pts.map(function(p, i){ return (i ? 'L' : 'M') + p.x.toFixed(1) + ' ' + p.y.toFixed(1); }).join(' '); }
+  function drawDay(d){ $('stemP').setAttribute('d', pd(d.s)); $('rootP').setAttribute('d', pd(d.r)); drawLamp(d.light); }
+  function preview(){
+    clearInterval(anim);
+    var sim = simulate(cur.ori, cur.A, cur.B);
+    drawDay(sim[0]); $('dayT').textContent = '第 0 天'; drawTarget();
+    $('seed').setAttribute('transform', 'rotate(' + cur.ori + ' ' + C.x + ' ' + C.y + ')');
+  }
+  function near(pts, T){ return pts.some(function(p){ var dx = p.x - T.x, dy = p.y - T.y; return dx * dx + dy * dy < 24 * 24; }); }
+  function hit(pts){ return near(pts, target) && (!via || near(pts, via)); }
+  $('go').addEventListener('click', function(){
+    var L = LEVELS[li], sim = simulate(cur.ori, cur.A, cur.B), d = 0;
+    $('go').disabled = true; tries++; $('tries').textContent = '嘗試 ' + tries + ' 次'; $('fb').textContent = '';
+    clearInterval(anim);
+    anim = setInterval(function(){
+      d++; drawDay(sim[d]); $('dayT').textContent = '第 ' + d + ' 天';
+      if(d >= 10){
+        clearInterval(anim);
+        var ok = hit(L.part === 's' ? sim[10].s : sim[10].r);
+        CH4.record(L.part === 's' ? '4-3-c4' : '4-3-c5', ok, ok ? '' : 'P3', 'g-maze', 'game');
+        if(ok){
+          var pts = Math.max(10, 40 - (tries - 1) * 10); score += pts;
+          $('fb').className = 'feedback ok'; $('fb').textContent = '🎉 成功！+' + pts;
+          $('exp').hidden = false; $('exp').innerHTML = '<p>' + L.e + '</p>';
+          $('next').hidden = false; $('next').textContent = li + 1 >= LEVELS.length ? '看結果 ▶' : '下一關 ▶';
+          $('sc').textContent = '⚡ ' + score;
+        } else {
+          $('fb').className = 'feedback ng'; $('fb').textContent = '差一點！沒有長到目標。想想看：' + (L.part === 's' ? '莖會朝向光、背離地心' : '根會朝向地心、背離光源') + '，再試一次。';
+          $('go').disabled = false;
+        }
+      }
+    }, UNIT.reduced() ? 10 : 220);
+  });
+  $('next').addEventListener('click', function(){
+    if(li + 1 >= LEVELS.length){
+      $('goal').innerHTML = '🏆 全部 6 關通關！總分 ⚡ ' + score;
+      $('ctrls').innerHTML = '<button class="btn" id="again">再玩一次 ↻</button>'; $('go').hidden = true; $('next').hidden = true; $('exp').hidden = true; $('fb').textContent = '';
+      var best = CH4.store.get('best-maze', 0); if(score > best) CH4.store.set('best-maze', score);
+      UNIT.rewardOnce('badge-maze', 20, '🏅 向性迷宮通關'); CH4.energy.add(Math.round(score / 20));
+      $('again').addEventListener('click', function(){ li = 0; score = 0; $('go').hidden = false; load(); });
+      return;
+    }
+    li++; load();
+  });
+  load();
+})();
+</script>
+</body>
+</html>

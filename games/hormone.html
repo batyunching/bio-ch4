@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>激素調控室｜第4章遊戲</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://batyunching.github.io/bio/js/account.js" data-chapter="ch4" data-prefix="ch4."></script>
+<style>
+.hud{ display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
+.hud .chip{ padding:6px 14px; border-radius:999px; border:1px solid var(--c-line); font-family:var(--num); font-weight:700; }
+.event{ display:flex; align-items:center; gap:16px; padding:18px; border-radius:16px; background:var(--c-hormone-l); border:1px dashed var(--c-hormone); }
+.event .em{ font-size:3rem; }
+.event .t{ font-size:1.25rem; font-weight:900; }
+.event .clock{ font-family:var(--num); font-weight:900; font-size:1.6rem; color:var(--c-amber); margin-left:auto; }
+.tbar{ height:8px; margin:10px 0 14px; }
+.tbar > span{ transition:width .1s linear; }
+.glands{ display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; }
+.glands button{ min-height:76px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:1rem; }
+.glands button small{ color:var(--c-muted); font-weight:500; }
+.timeline{ display:flex; gap:6px; margin-top:12px; flex-wrap:wrap; }
+.timeline span{ width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; border:1px solid var(--c-line); font-size:.9rem; }
+.timeline span.ok{ background:var(--c-ok); color:#0B1022; } .timeline span.ng{ background:var(--c-ng); color:#fff; }
+[hidden]{ display:none !important; }
+</style>
+</head>
+<body data-page="games" data-root="../">
+<main class="wrap unit-42">
+  <div class="sec-title" style="margin-top:6px"><span class="code">GAME 02</span><h1 style="margin:0">🧪 激素調控室</h1></div>
+  <p style="color:var(--c-muted);margin-top:-6px">你是身體的「激素調度員」。小翔的一天會發生 10 件事，每件事限時 10 秒，派出正確的激素，讓身體維持平衡！</p>
+  <div class="panel lab">
+    <div class="hud"><span class="chip" id="cnt">事件 1 / 10</span><span class="chip score" id="sc">⚡ 0</span><span class="chip" id="hp">❤️❤️❤️</span></div>
+    <div id="game">
+      <div class="event"><span class="em" id="em"></span><span class="t" id="et"></span><span class="clock" id="clock">10</span></div>
+      <div class="progress tbar"><span id="tbar" style="width:100%"></span></div>
+      <div class="glands" id="glands"></div>
+      <div class="feedback" id="fb" aria-live="polite"></div>
+      <div class="timeline" id="tl"></div>
+    </div>
+    <div id="end" hidden></div>
+    <div id="intro"><button class="btn" id="startBtn">▶ 開始值班</button></div>
+  </div>
+  <p style="margin-top:16px"><a class="btn ghost" href="index.html">◀ 回遊戲大廳</a></p>
+</main>
+<script src="../js/common.js"></script>
+<script src="../js/unit.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var H = {
+    gh:  { n:'生長激素', g:'腦垂腺', c:'4-2-c3' },
+    thy: { n:'甲狀腺素', g:'甲狀腺', c:'4-2-c4' },
+    pth: { n:'副甲狀腺素', g:'副甲狀腺', c:'4-2-c4' },
+    adr: { n:'腎上腺素', g:'腎上腺', c:'4-2-c5' },
+    ins: { n:'胰島素', g:'胰島', c:'4-2-c6' },
+    glu: { n:'升糖素', g:'胰島', c:'4-2-c6' }
+  };
+  var EV = [
+    { em:'🍚', t:'吃完午餐，血糖升高了', a:'ins', why:'胰島素讓血糖降低。', m:{ glu:'H3', adr:'H4' } },
+    { em:'🍰', t:'吃了一大塊蛋糕，血糖飆高', a:'ins', why:'胰島素讓血糖降低。', m:{ glu:'H3', adr:'H4' } },
+    { em:'🥱', t:'早上起床還沒吃早餐，血糖偏低', a:'glu', why:'升糖素讓血糖升高。', m:{ ins:'H3' } },
+    { em:'⏳', t:'忙到很久沒吃東西，血糖下降', a:'glu', why:'升糖素讓血糖升高。', m:{ ins:'H3' } },
+    { em:'🐕', t:'一隻狗吠著衝過來！要快逃', a:'adr', why:'腎上腺素讓心跳加快、血糖上升，肌肉更有力。', m:{ ins:'H4' } },
+    { em:'🎤', t:'要上台報告，好緊張', a:'adr', why:'緊張時腎上腺素分泌增加。', m:{ ins:'H4' } },
+    { em:'🏃', t:'大隊接力最後衝刺', a:'adr', why:'運動時腎上腺素分泌增加。', m:{ ins:'H4' } },
+    { em:'🧒', t:'正在成長期，骨骼要長高', a:'gh', why:'腦垂腺分泌的生長激素促進生長。', m:{ thy:'H5' } },
+    { em:'🔥', t:'細胞需要提升代謝速率', a:'thy', why:'甲狀腺素促進細胞代謝。', m:{ pth:'H6', gh:'H5' } },
+    { em:'🦴', t:'血液中的鈣濃度偏低', a:'pth', why:'副甲狀腺素調節血液中鈣的濃度。', m:{ thy:'H6' } }
+  ];
+  var list, i, score, hp, left, timer, lock;
+  $('glands').innerHTML = Object.keys(H).map(function(k){ return '<button class="chip-btn" data-h="' + k + '">' + H[k].n + '<small>' + H[k].g + '</small></button>'; }).join('');
+  function start(){ list = CH4.shuffle(EV); i = 0; score = 0; hp = 3; $('intro').hidden = true; $('end').hidden = true; $('game').hidden = false; $('tl').innerHTML = list.map(function(){ return '<span></span>'; }).join(''); show(); }
+  function show(){
+    var e = list[i]; lock = false; left = 10;
+    $('cnt').textContent = '事件 ' + (i + 1) + ' / ' + list.length; $('sc').textContent = '⚡ ' + score; $('hp').textContent = '❤️'.repeat(hp) + '🤍'.repeat(3 - hp);
+    $('em').textContent = e.em; $('et').textContent = e.t; $('fb').textContent = '';
+    $('glands').querySelectorAll('button').forEach(function(b){ b.classList.remove('ok','ng'); b.disabled = false; });
+    clearInterval(timer);
+    var t0 = Date.now();
+    timer = setInterval(function(){
+      left = Math.max(0, 10 - (Date.now() - t0) / 1000);
+      $('clock').textContent = Math.ceil(left); $('tbar').style.width = (left * 10) + '%';
+      if(left <= 0){ clearInterval(timer); answer(null); }
+    }, 100);
+  }
+  function answer(k){
+    if(lock) return; lock = true; clearInterval(timer);
+    var e = list[i], ok = k === e.a, slot = $('tl').children[i];
+    $('glands').querySelectorAll('button').forEach(function(b){ b.disabled = true; if(b.getAttribute('data-h') === e.a) b.classList.add('ok'); if(k && b.getAttribute('data-h') === k && !ok) b.classList.add('ng'); });
+    if(ok){ var pts = 10 + Math.round(left * 2); score += pts; $('fb').className = 'feedback ok'; $('fb').textContent = '✓ 派遣成功！+' + pts + '　' + e.why; slot.className = 'ok'; slot.textContent = '✓'; }
+    else { hp--; $('fb').className = 'feedback ng'; $('fb').textContent = (k ? '✗ 派錯了！' : '⏰ 時間到！') + '應該派出「' + H[e.a].n + '」：' + e.why; slot.className = 'ng'; slot.textContent = '✗'; }
+    CH4.record(H[e.a].c, ok, k && !ok ? (e.m[k] || 'H5') : '', 'g-hormone', 'game');
+    $('sc').textContent = '⚡ ' + score; $('hp').textContent = '❤️'.repeat(Math.max(0, hp)) + '🤍'.repeat(3 - Math.max(0, hp));
+    setTimeout(function(){ if(hp <= 0 || i + 1 >= list.length) end(); else { i++; show(); } }, ok ? 1400 : 2800);
+  }
+  $('glands').querySelectorAll('button').forEach(function(b){ b.addEventListener('click', function(){ answer(b.getAttribute('data-h')); }); });
+  function end(){
+    var win = hp > 0;
+    $('game').hidden = true; $('end').hidden = false;
+    var best = CH4.store.get('best-hormone', 0); if(score > best) CH4.store.set('best-hormone', score);
+    $('end').innerHTML = '<h2>' + (win ? '🎉 值班完成，小翔的身體很平衡！' : '😵 身體失衡了…') + '</h2><p class="score" style="font-size:1.6rem">⚡ ' + score + ' 分</p><p>最佳紀錄：' + Math.max(score, best) + ' 分</p>' +
+      '<button class="btn" id="again">再值班一次 ↻</button>';
+    $('again').addEventListener('click', start);
+    if(win) UNIT.rewardOnce('badge-hormone', 20, '🏅 血糖守門員');
+    CH4.energy.add(Math.round(score / 20));
+  }
+  $('startBtn').addEventListener('click', start);
+  $('game').hidden = true;
+})();
+</script>
+</body>
+</html>

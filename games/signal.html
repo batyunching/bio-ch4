@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>訊號特快車｜第4章遊戲</title>
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://batyunching.github.io/bio/js/account.js" data-chapter="ch4" data-prefix="ch4."></script>
+<style>
+.hud{ display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
+.hud .chip{ padding:6px 14px; border-radius:999px; border:1px solid var(--c-line); font-family:var(--num); font-weight:700; }
+.scene{ font-size:1.3rem; font-weight:900; text-align:center; padding:18px; border-radius:16px; background:var(--c-neuro-l); border:1px dashed var(--c-neuro); }
+.scene .em{ font-size:2.6rem; display:block; }
+.track{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; min-height:64px; padding:12px; border-radius:14px; border:2px solid var(--c-line); margin:14px 0; background:repeating-linear-gradient(90deg, transparent 0 18px, rgba(140,165,255,.12) 18px 22px); }
+.track .car{ padding:8px 12px; border-radius:10px; background:var(--c-neuro); color:#0B1022; font-weight:900; animation:pop .25s ease; }
+html.projector .track .car{ color:#fff; }
+.track .arrow{ color:var(--c-neuro); font-weight:900; }
+.track .train{ font-size:1.6rem; }
+.track.ok{ border-color:var(--c-ok); } .track.ng{ border-color:var(--c-ng); }
+.stations{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:8px; }
+.stations .chip-btn{ min-height:56px; font-size:1rem; }
+.kind{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:12px; }
+.kind .chip-btn.on{ border-color:var(--c-amber); background:rgba(251,191,36,.2); }
+@keyframes pop{ from{ transform:scale(.6); opacity:0; } to{ transform:none; opacity:1; } }
+[hidden]{ display:none !important; }
+</style>
+</head>
+<body data-page="games" data-root="../">
+<main class="wrap unit-41">
+  <div class="sec-title" style="margin-top:6px"><span class="code">GAME 01</span><h1 style="margin:0">⚡ 訊號特快車</h1></div>
+  <p style="color:var(--c-muted);margin-top:-6px">每一關是一個生活情境。依序點選車站，鋪出正確的神經傳導路線，再判斷它是「意識反應」還是「反射」。共 8 關！</p>
+  <div class="panel lab">
+    <div class="hud"><span class="chip" id="lvl">第 1 / 8 關</span><span class="chip score" id="sc">⚡ 0</span><span class="chip" id="lives">❤️❤️❤️</span></div>
+    <div id="game">
+      <div class="scene" id="scene"></div>
+      <div class="track" id="track"><span class="train">🚄</span></div>
+      <div class="stations" id="stations"></div>
+      <div class="kind"><b>這是：</b><button class="chip-btn" data-k="c">🧠 意識反應</button><button class="chip-btn" data-k="r">⚡ 反射</button>
+        <span style="flex:1"></span><button class="btn ghost" id="undo">↶ 退一站</button><button class="btn" id="go">🚄 發車！</button></div>
+      <div class="feedback" id="fb" aria-live="polite"></div>
+      <div class="info" id="exp" hidden></div>
+      <button class="btn" id="next" hidden style="margin-top:10px">下一關 ▶</button>
+    </div>
+    <div id="end" hidden></div>
+  </div>
+  <p style="margin-top:16px"><a class="btn ghost" href="index.html">◀ 回遊戲大廳</a></p>
+</main>
+<script src="../js/common.js"></script>
+<script src="../js/unit.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var ST = ['受器','感覺神經元','大腦','腦幹','脊髓','運動神經元','動器'];
+  var CONSCIOUS = ['受器','感覺神經元','大腦','脊髓','運動神經元','動器'];
+  var SPINAL = ['受器','感覺神經元','脊髓','運動神經元','動器'];
+  var STEM = ['受器','感覺神經元','腦幹','運動神經元','動器'];
+  var LEVELS = [
+    { em:'👋', t:'看到同學迎面走來，揮手打招呼', r:CONSCIOUS, k:'c', e:'要看清楚是誰、決定揮手，經過大腦，是意識反應。大腦的命令經脊髓傳到手。' },
+    { em:'🫖', t:'手摸到熱茶壺，立刻縮回', r:SPINAL, k:'r', e:'不經大腦的快速反應，由脊髓控制，是反射。' },
+    { em:'😉', t:'沙子飛進眼睛，不經意地一直眨眼', r:STEM, k:'r', e:'不經意的眨眼由腦幹控制，是反射。' },
+    { em:'📏', t:'看到尺掉下來，用手指接住', r:CONSCIOUS, k:'c', e:'要專心看、判斷，經過大腦，是意識反應。' },
+    { em:'📌', t:'光腳踩到圖釘，腳立刻縮回', r:SPINAL, k:'r', e:'手腳立刻縮回的反射由脊髓控制。' },
+    { em:'🤧', t:'喉嚨有異物，忍不住咳嗽', r:STEM, k:'r', e:'咳嗽是腦幹控制的反射。' },
+    { em:'💡', t:'走到強光下，瞳孔立刻縮小', r:STEM, k:'r', e:'瞳孔遇強光縮小由腦幹控制。' },
+    { em:'✍️', t:'看完考卷題目，寫出答案', r:CONSCIOUS, k:'c', e:'思考答案需要大腦，是意識反應。' }
+  ];
+  var order, li = 0, route = [], kind = null, score = 0, lives = 3, t0;
+  function start(){ order = CH4.shuffle(LEVELS); li = 0; score = 0; lives = 3; $('end').hidden = true; $('game').hidden = false; level(); }
+  function level(){
+    var L = order[li]; route = []; kind = null; t0 = Date.now();
+    $('lvl').textContent = '第 ' + (li + 1) + ' / ' + order.length + ' 關';
+    $('sc').textContent = '⚡ ' + score; $('lives').textContent = '❤️'.repeat(lives) + '🤍'.repeat(3 - lives);
+    $('scene').innerHTML = '<span class="em">' + L.em + '</span>' + L.t;
+    $('stations').innerHTML = CH4.shuffle(ST).map(function(s){ return '<button class="chip-btn" data-s="' + s + '">' + s + '</button>'; }).join('');
+    $('stations').querySelectorAll('[data-s]').forEach(function(b){ b.addEventListener('click', function(){ if(route.length < 7){ route.push(b.getAttribute('data-s')); draw(); } }); });
+    document.querySelectorAll('[data-k]').forEach(function(b){ b.classList.remove('on'); });
+    $('fb').textContent = ''; $('exp').hidden = true; $('next').hidden = true; $('go').disabled = false; $('undo').disabled = false;
+    $('track').className = 'track'; draw();
+  }
+  function draw(){
+    $('track').innerHTML = '<span class="train">🚄</span>' + route.map(function(s, i){ return (i ? '<span class="arrow">›</span>' : '') + '<span class="car">' + s + '</span>'; }).join('');
+  }
+  document.querySelectorAll('[data-k]').forEach(function(b){ b.addEventListener('click', function(){ kind = b.getAttribute('data-k'); document.querySelectorAll('[data-k]').forEach(function(x){ x.classList.toggle('on', x === b); }); }); });
+  $('undo').addEventListener('click', function(){ route.pop(); draw(); });
+  $('go').addEventListener('click', function(){
+    var L = order[li];
+    if(route.length < 3){ $('fb').className = 'feedback ng'; $('fb').textContent = '路線還沒鋪好喔！'; return; }
+    if(!kind){ $('fb').className = 'feedback ng'; $('fb').textContent = '請選「意識反應」或「反射」。'; return; }
+    var okRoute = route.join() === L.r.join(), okKind = kind === L.k;
+    $('go').disabled = true; $('undo').disabled = true;
+    $('track').className = 'track ' + (okRoute && okKind ? 'ok' : 'ng');
+    if(okRoute && okKind){
+      var bonus = Math.max(0, 20 - Math.floor((Date.now() - t0) / 1000));
+      score += 30 + bonus; $('fb').className = 'feedback ok'; $('fb').textContent = '✓ 準點抵達！+' + (30 + bonus);
+    } else {
+      lives--; $('fb').className = 'feedback ng';
+      $('fb').textContent = (!okRoute ? '✗ 路線不對。' : '') + (!okKind ? '✗ 反應種類判斷錯誤。' : '');
+    }
+    CH4.record(L.k === 'c' ? '4-1-c6' : '4-1-c7', okRoute && okKind, okKind ? (okRoute ? '' : 'N4') : 'N10', 'g-signal', 'game');
+    $('exp').hidden = false; $('exp').innerHTML = '<p><b>正確路線：</b>' + L.r.join(' → ') + '（' + (L.k === 'c' ? '意識反應' : '反射') + '）</p><p>' + L.e + '</p>';
+    $('sc').textContent = '⚡ ' + score; $('lives').textContent = '❤️'.repeat(Math.max(0, lives)) + '🤍'.repeat(3 - Math.max(0, lives));
+    $('next').hidden = false; $('next').textContent = (lives <= 0 || li + 1 >= order.length) ? '看結果 ▶' : '下一關 ▶';
+  });
+  $('next').addEventListener('click', function(){
+    if(lives <= 0 || li + 1 >= order.length) return end();
+    li++; level();
+  });
+  function end(){
+    var win = lives > 0;
+    $('game').hidden = true; $('end').hidden = false;
+    var best = CH4.store.get('best-signal', 0); if(score > best) CH4.store.set('best-signal', score);
+    $('end').innerHTML = '<h2>' + (win ? '🎉 全線通車！' : '💥 列車停駛了') + '</h2><p class="score" style="font-size:1.6rem">⚡ ' + score + ' 分</p><p>最佳紀錄：' + Math.max(score, best) + ' 分</p>' +
+      (win ? '' : '<p>小提醒：要經過<b>大腦</b>判斷的是意識反應；<b>腦幹</b>管眨眼、咳嗽、瞳孔；<b>脊髓</b>管手腳縮回。</p>') +
+      '<button class="btn" id="again">再玩一次 ↻</button>';
+    $('again').addEventListener('click', start);
+    if(win){ UNIT.rewardOnce('badge-signal', 20, '🏅 訊號特快車通關'); }
+    CH4.energy.add(Math.round(score / 20));
+  }
+  start();
+})();
+</script>
+</body>
+</html>

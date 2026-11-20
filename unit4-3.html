@@ -253,7 +253,7 @@ html.projector .daytag{ color:var(--c-plant-d); }
   <div class="panel lab">
     <div class="bar">
       <span style="font-weight:700">幼苗擺放：</span>
-      <div class="seg" id="segOri"><button data-v="0" aria-pressed="true">直立</button><button data-v="90">向右橫放</button><button data-v="-90">向左橫放</button></div>
+      <div class="seg" id="segOri"><button data-v="0" aria-pressed="true">直立</button><button data-v="90">向右橫放</button><button data-v="-90">向左橫放</button><button data-v="180">向下（倒放）</button></div>
     </div>
     <div class="bar">
       <span style="font-weight:700">光源位置：</span>
@@ -444,8 +444,9 @@ html.projector .daytag{ color:var(--c-plant-d); }
   function rot(v, deg){ var r = deg * Math.PI / 180; return { x: v.x * Math.cos(r) - v.y * Math.sin(r), y: v.x * Math.sin(r) + v.y * Math.cos(r) }; }
   function norm(v){ var l = Math.sqrt(v.x * v.x + v.y * v.y) || 1; return { x:v.x / l, y:v.y / l }; }
   function ang(v){ return Math.atan2(v.y, v.x); }
-  function turn(cur, target, maxDeg){
+  function turn(cur, target, maxDeg, prefer){
     var d = ang(target) - ang(cur); while(d > Math.PI) d -= 2 * Math.PI; while(d < -Math.PI) d += 2 * Math.PI;
+    if(prefer && Math.abs(d) > Math.PI - 0.02) d = prefer * Math.abs(d); // 正好反方向時，莖和根往不同邊彎，才不會疊在一起
     var m = maxDeg * Math.PI / 180; d = Math.max(-m, Math.min(m, d));
     return rot(cur, d * 180 / Math.PI);
   }
@@ -463,12 +464,12 @@ html.projector .daytag{ color:var(--c-plant-d); }
     for(var k = 0; k < 6; k++){
       var L = LIGHT[light];
       var tS = norm({ x: 0 * 0.6 + (L ? L.x * 1.1 : 0), y: -0.6 + (L ? L.y * 1.1 : 0) });
-      sDir = turn(sDir, tS, 12);
+      sDir = turn(sDir, tS, 12, 1);
       if(stem.length && inside({ x: stem[stem.length-1].x + sDir.x * 3.4, y: stem[stem.length-1].y + sDir.y * 3.4 })) sAng.push(ang(sDir));
       var tip = stem[stem.length - 1], nx = { x: tip.x + sDir.x * 3.4, y: tip.y + sDir.y * 3.4 };
       if(inside(nx)) stem.push(nx);
       var tR = norm({ x: L ? -L.x * 0.45 : 0, y: 1 + (L ? -L.y * 0.45 : 0) });
-      rDir = turn(rDir, tR, 10);
+      rDir = turn(rDir, tR, 10, 1);
       var rt = root[root.length - 1], nr = { x: rt.x + rDir.x * 2.6, y: rt.y + rDir.y * 2.6 };
       if(inside(nr)) root.push(nr);
     }
@@ -516,6 +517,7 @@ html.projector .daytag{ color:var(--c-plant-d); }
     else if(light === 'top') t += '<li>光從上方來：莖<b>朝上（光源）</b>長。</li>';
     else t += '<li>光從' + (light === 'left' ? '左' : '右') + '方來：莖彎向<b>光源</b>（向光性），同時也受引力影響有點往上（負向地性）。</li>';
     t += '<li>根一直<b>往下（地心）</b>長（向地性）' + (light !== 'none' && light !== 'top' ? '，並稍微<b>背離光源</b>（負向光性）' : '') + '。</li></ul>';
+    if(ori === 180) t += '<p style="margin-top:6px">🙃 幼苗倒放：一開始莖朝下、根朝上。幾天後，<b>莖會慢慢彎回朝上</b>（負向地性' + (light === 'none' ? '' : '、向光性') + '），<b>根會彎回朝下</b>（向地性），所以莖和根都會長成像「U」字的彎曲。</p>';
     if(day <= 1) t += '<p style="margin-top:6px">⏱ 向性是<b>生長</b>的反應，才 1 天變化還不明顯，多等幾天再看看。</p>';
     if(challenge){
       if(sShape()){ sWin = true; UNIT.rewardOnce('a43-S', 15, 'S 形挑戰成功'); challenge = false; }

@@ -224,6 +224,13 @@
       toast(on ? '已減少動態效果' : '已恢復動態效果');
     });
     sync();
+    // 老師帳號：選單多一個「老師模式」
+    if(window.BIO_ACCOUNT && BIO_ACCOUNT.ready) BIO_ACCOUNT.ready.then(function(){
+      if(!BIO_ACCOUNT.isTeacher) return;
+      var a = document.createElement('a'); a.href = root + 'teacher.html'; a.textContent = '👩‍🏫 老師';
+      if(current === 'teacher'){ a.className = 'active'; a.setAttribute('aria-current', 'page'); }
+      nav.querySelector('.links').appendChild(a);
+    }, function(){});
   }
 
   // 盡早套用顯示設定，避免閃爍

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>老師模式｜第4章 生物體的協調作用</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://batyunching.github.io/bio/js/account.js" data-chapter="ch4" data-prefix="ch4."></script>
+<style>
+.tbar{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+.tbar select{ max-width:100%; min-height:48px; font:inherit; font-weight:700; padding:6px 12px; border-radius:12px; border:1px solid var(--c-line); background:var(--c-panel-solid); color:var(--c-text); }
+.stats{ display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin-top:14px; }
+.stat{ text-align:center; }
+.stat .v{ font-family:var(--num); font-size:1.8rem; font-weight:900; color:var(--c-amber); }
+.stat .k{ color:var(--c-muted); font-size:.82rem; }
+.hm-wrap{ overflow:auto; max-height:72vh; border-radius:12px; border:1px solid var(--c-line); }
+table.hm{ border-collapse:separate; border-spacing:2px; font-size:.78rem; }
+table.hm th{ position:sticky; top:0; background:var(--c-panel-solid); z-index:2; padding:4px; font-weight:700; vertical-align:bottom; }
+table.hm th.c{ writing-mode:vertical-rl; text-orientation:mixed; height:11.5em; white-space:nowrap; }
+table.hm th.c a{ text-decoration:none; }
+table.hm th.u41{ color:var(--c-neuro); } table.hm th.u42{ color:var(--c-hormone); } table.hm th.u43{ color:var(--c-plant); }
+html.projector table.hm th.u41{ color:var(--c-neuro-d); } html.projector table.hm th.u42{ color:var(--c-hormone-d); } html.projector table.hm th.u43{ color:var(--c-plant-d); }
+table.hm td.n{ position:sticky; left:0; background:var(--c-panel-solid); z-index:1; white-space:nowrap; font-weight:700; padding:4px 8px; }
+table.hm td.x{ width:34px; min-width:34px; height:28px; text-align:center; border-radius:6px; font-family:var(--num); font-size:.68rem; color:#0B1022; font-weight:700; }
+table.hm td.x.none{ background:rgba(140,165,255,.08); color:var(--c-muted); }
+table.hm td.x.g{ background:#4ADE80; } table.hm td.x.m{ background:#FBBF24; } table.hm td.x.b{ background:#FB7185; }
+table.hm td.x.few{ opacity:.45; }
+table.hm tr.avg td{ border-top:2px solid var(--c-line); }
+.legend{ display:flex; gap:14px; flex-wrap:wrap; font-size:.8rem; color:var(--c-muted); margin:10px 0; }
+.legend i{ display:inline-block; width:14px; height:14px; border-radius:4px; vertical-align:-2px; margin-right:4px; }
+.myths{ display:flex; flex-direction:column; gap:10px; }
+.myth-row{ display:grid; grid-template-columns:2.4em 1fr auto; gap:12px; align-items:center; padding:12px; border-radius:14px; border:1px solid var(--c-line); background:var(--c-panel); }
+.myth-row .rk{ font-family:var(--num); font-size:1.3rem; font-weight:900; color:var(--c-amber); }
+.myth-row .t{ font-weight:900; }
+.myth-row .t::before{ content:"✗ "; color:var(--c-ng); }
+.myth-row .r{ font-size:.88rem; color:var(--c-muted); }
+.myth-row .r::before{ content:"✓ 正確："; color:var(--c-ok); font-weight:700; }
+.myth-row .cnt{ text-align:right; font-size:.82rem; color:var(--c-muted); }
+.myth-row .cnt b{ font-family:var(--num); font-size:1.2rem; color:var(--c-text); }
+table.prog{ width:100%; border-collapse:collapse; font-size:.85rem; }
+table.prog th, table.prog td{ border-bottom:1px solid var(--c-line); padding:6px 8px; text-align:center; }
+table.prog th{ cursor:pointer; user-select:none; position:sticky; top:0; background:var(--c-panel-solid); }
+table.prog td:first-child, table.prog th:first-child{ text-align:left; }
+.locked{ text-align:center; padding:40px 20px; overflow-wrap:anywhere; }
+[hidden]{ display:none !important; }
+</style>
+</head>
+<body data-page="teacher" data-root="./">
+<main class="wrap">
+  <div class="sec-title" style="margin-top:6px"><span class="code">TEACHER CONSOLE</span><h1 style="margin:0">👩‍🏫 老師模式：全班學習診斷</h1></div>
+
+  <div class="panel locked" id="locked" hidden></div>
+
+  <div id="app" hidden>
+    <div class="panel">
+      <div class="tbar">
+        <b>班級</b><select id="cls" aria-label="選擇班級"></select>
+        <button class="btn" id="reload">↻ 重新讀取</button>
+        <button class="btn ghost" id="csv">⬇ 匯出 CSV</button>
+        <span style="color:var(--c-muted);font-size:.82rem" id="loadNote"></span>
+      </div>
+      <div class="stats" id="stats"></div>
+    </div>
+
+    <div class="sec-title"><span class="code">MYTH RANKING</span><h2>班級迷思排行（前 5 名）</h2></div>
+    <p style="color:var(--c-muted);font-size:.85rem;margin-top:-8px">統計全班在概念卡檢核、快問快答、練習題、遊戲中答錯時選到的迷思選項。可以直接點「投影概念卡」上課講解。</p>
+    <div class="myths" id="myths"></div>
+
+    <div class="sec-title"><span class="code">HEATMAP</span><h2>全班錯題概念熱圖</h2></div>
+    <div class="legend"><span><i style="background:#4ADE80"></i>答對率 80% 以上</span><span><i style="background:#FBBF24"></i>50～79%</span><span><i style="background:#FB7185"></i>未滿 50%</span><span><i style="background:rgba(140,165,255,.15)"></i>還沒作答</span><span>（淡色＝作答不到 3 題，僅供參考）</span></div>
+    <div class="panel" style="padding:10px"><div class="hm-wrap" id="hm"></div></div>
+
+    <div class="sec-title"><span class="code">PROGRESS</span><h2>學習進度總覽</h2></div>
+    <p style="color:var(--c-muted);font-size:.85rem;margin-top:-8px">點欄位名稱可以排序。</p>
+    <div class="panel" style="padding:10px;overflow:auto"><table class="prog" id="prog"></table></div>
+  </div>
+  <div class="footer">資料來源：學生帳號同步到雲端的第 4 章學習紀錄。只有這個班的老師（和管理人）看得到。</div>
+</main>
+<script src="js/common.js"></script>
+<script src="data/myths.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var db, me, isAdmin = false, classes = {}, rows = [], sortKey = 'seat', sortDir = 1;
+  var C = CH4.CONCEPTS;
+
+  function lock(msg){ $('locked').hidden = false; $('locked').innerHTML = msg; }
+  var ready = window.BIO_ACCOUNT && BIO_ACCOUNT.ready ? BIO_ACCOUNT.ready : Promise.resolve(null);
+  ready.then(function(){
+    var A = window.BIO_ACCOUNT;
+    if(!A || !A.online){ lock('<h2>老師模式需要在學校網址上使用</h2><p>請到 https://batyunching.github.io/bio-ch4/teacher.html 用老師帳號登入。</p>'); return; }
+    if(!A.isTeacher){ lock('<h2>🔒 這一頁只有老師可以使用</h2><p><a class="btn" href="index.html">回第4章首頁</a></p>'); return; }
+    db = firebase.database(); me = A.user;
+    db.ref('admins/' + me.uid).get().then(function(s){ isAdmin = s.val() === true; }, function(){}).then(loadClasses);
+  }, function(){ lock('<h2>登入失敗，請重新整理</h2>'); });
+
+  function loadClasses(){
+    $('app').hidden = false;
+    db.ref('classes').get().then(function(s){
+      var all = s.val() || {};
+      classes = {};
+      Object.keys(all).forEach(function(c){ if(isAdmin || all[c].owner === me.uid) classes[c] = all[c]; });
+      var keys = Object.keys(classes).sort();
+      $('cls').innerHTML = keys.map(function(c){ return '<option value="' + CH4.esc(c) + '">' + CH4.esc(c) + ' 班</option>'; }).join('') || '<option value="">（還沒有班級，請到總入口的老師工具建立）</option>';
+      var last = CH4.store.get('teacherCls', ''); if(classes[last]) $('cls').value = last;
+      if(keys.length) loadClass();
+    }, function(e){ lock('<h2>讀取班級失敗</h2><p>' + CH4.esc(e.message) + '</p>'); });
+  }
+  function parse(v, d){ try{ return v == null ? d : JSON.parse(v); }catch(e){ return d; } }
+  function loadClass(){
+    var c = $('cls').value; if(!c) return;
+    CH4.store.set('teacherCls', c);
+    $('loadNote').textContent = '讀取中…';
+    var seats = Object.keys(classes[c].seats || {}).map(Number).sort(function(a, b){ return a - b; });
+    Promise.all(seats.map(function(n){
+      var sid = c + '-' + (n < 10 ? '0' + n : n);
+      return db.ref('students/' + sid).get().then(function(s){ return { sid:sid, seat:n, v:s.val() || {} }; }, function(){ return { sid:sid, seat:n, v:{} }; });
+    })).then(function(list){
+      rows = list.map(function(x){
+        var d = (x.v.data && x.v.data.ch4) || {}, get = function(k, def){ return parse(d['ch4%2E' + k], def); };
+        var mastery = get('mastery', {}), answers = get('answers', []), understood = get('understood', []);
+        var n = 0, ok = 0; Object.keys(mastery).forEach(function(k){ n += mastery[k].n; ok += mastery[k].ok; });
+        return {
+          sid:x.sid, seat:x.seat, name:(x.v.profile && x.v.profile.name) || '',
+          mastery:mastery, answers:answers, understood:understood.length,
+          mastered:C.filter(function(cc){ var m = mastery[cc.id]; return m && m.n >= 3 && m.ok / m.n >= .8; }).length,
+          n:n, acc:n ? ok / n : null, lab:Object.keys(get('labDone', {})).length,
+          react:get('reactionBest', null), busted:get('busted', []).length, energy:get('energy', 0),
+          seen:(x.v.lastSeen && x.v.lastSeen.ch4) || 0
+        };
+      });
+      $('loadNote').textContent = '已讀取 ' + rows.length + ' 位學生　' + new Date().toLocaleTimeString('zh-TW', { hour:'2-digit', minute:'2-digit' });
+      render();
+    });
+  }
+  function cellClass(m){ if(!m || !m.n) return 'none'; var p = m.ok / m.n; return (p >= .8 ? 'g' : p >= .5 ? 'm' : 'b') + (m.n < 3 ? ' few' : ''); }
+  function render(){
+    var active = rows.filter(function(r){ return r.n > 0 || r.understood > 0; });
+    var tn = 0, tok = 0; rows.forEach(function(r){ Object.keys(r.mastery).forEach(function(k){ tn += r.mastery[k].n; tok += r.mastery[k].ok; }); });
+    $('stats').innerHTML =
+      '<div class="panel stat"><div class="v">' + active.length + ' / ' + rows.length + '</div><div class="k">已開始學習</div></div>' +
+      '<div class="panel stat"><div class="v">' + tn + '</div><div class="k">全班作答題數</div></div>' +
+      '<div class="panel stat"><div class="v">' + (tn ? Math.round(tok / tn * 100) + '%' : '—') + '</div><div class="k">全班答對率</div></div>' +
+      '<div class="panel stat"><div class="v">' + (active.length ? (active.reduce(function(s, r){ return s + r.understood; }, 0) / active.length).toFixed(1) : '—') + '</div><div class="k">平均通過概念卡（/19）</div></div>';
+
+    // 迷思排行
+    var cnt = {}, who = {};
+    rows.forEach(function(r){ r.answers.forEach(function(a){ if(a.m && MYTHS[a.m]){ cnt[a.m] = (cnt[a.m] || 0) + 1; (who[a.m] = who[a.m] || {})[r.sid] = 1; } }); });
+    var top = Object.keys(cnt).sort(function(a, b){ return Object.keys(who[b]).length - Object.keys(who[a]).length || cnt[b] - cnt[a]; }).slice(0, 5);
+    $('myths').innerHTML = top.length ? top.map(function(k, i){
+      var M = MYTHS[k], u = M.c.slice(0, 3);
+      return '<div class="myth-row ' + CH4.unitClass(u) + '"><span class="rk">#' + (i + 1) + '</span><div><div class="t">' + M.t + '</div><div class="r">' + M.r + '</div>' +
+        '<div style="margin-top:6px"><span class="tag">' + u + ' ' + C.filter(function(x){ return x.id === M.c; })[0].t + '</span>　<a href="' + CH4.UNIT_PAGES[u] + '#' + M.c + '" target="_blank" rel="noopener">📽 投影概念卡 ↗</a></div></div>' +
+        '<div class="cnt"><b>' + Object.keys(who[k]).length + '</b> 人<br>共 ' + cnt[k] + ' 次</div></div>';
+    }).join('') : '<div class="panel" style="text-align:center;color:var(--c-muted)">目前還沒有偵測到迷思（學生作答後就會出現）。</div>';
+
+    // 熱圖
+    var h = '<table class="hm"><thead><tr><th style="position:sticky;left:0;z-index:3">座號</th>' + C.map(function(c){ return '<th class="c u' + c.unit.replace('-', '') + '"><a href="' + CH4.UNIT_PAGES[c.unit] + '#' + c.id + '" target="_blank" rel="noopener">' + c.unit + ' ' + c.t + '</a></th>'; }).join('') + '</tr></thead><tbody>';
+    rows.forEach(function(r){
+      h += '<tr><td class="n">' + r.seat + ' 號' + (r.name ? ' ' + CH4.esc(r.name) : '') + '</td>' + C.map(function(c){
+        var m = r.mastery[c.id];
+        return '<td class="x ' + cellClass(m) + '" title="' + r.seat + ' 號｜' + c.t + '：' + (m && m.n ? m.ok + '/' + m.n + ' 題答對' : '還沒作答') + '">' + (m && m.n ? Math.round(m.ok / m.n * 100) : '') + '</td>';
+      }).join('') + '</tr>';
+    });
+    h += '<tr class="avg"><td class="n">全班平均</td>' + C.map(function(c){
+      var n = 0, ok = 0; rows.forEach(function(r){ var m = r.mastery[c.id]; if(m){ n += m.n; ok += m.ok; } });
+      var m = { n:n, ok:ok };
+      return '<td class="x ' + cellClass(n >= 3 ? m : (n ? { n:n, ok:ok } : null)) + '" title="全班｜' + c.t + '：' + (n ? ok + '/' + n : '還沒作答') + '">' + (n ? Math.round(ok / n * 100) : '') + '</td>';
+    }).join('') + '</tr></tbody></table>';
+    $('hm').innerHTML = h;
+    renderProg();
+  }
+  var COLS = [
+    ['seat','座號'], ['understood','概念卡通過'], ['mastered','精熟概念'], ['n','作答題數'], ['acc','答對率'], ['busted','破解迷思'], ['lab','實驗完成'], ['react','最佳反應時間'], ['energy','⚡ 能量'], ['seen','最後上線']
+  ];
+  function fmt(k, r){
+    var v = r[k];
+    if(k === 'seat') return v + ' 號' + (r.name ? ' ' + CH4.esc(r.name) : '');
+    if(k === 'understood') return v + ' / 19';
+    if(k === 'acc') return v == null ? '—' : Math.round(v * 100) + '%';
+    if(k === 'react') return v ? v.toFixed(3) + ' 秒' : '—';
+    if(k === 'seen') return v ? new Date(v).toLocaleString('zh-TW', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '還沒進來過';
+    return v;
+  }
+  function renderProg(){
+    var list = rows.slice().sort(function(a, b){ var x = a[sortKey], y = b[sortKey]; x = x == null ? -1 : x; y = y == null ? -1 : y; return (x > y ? 1 : x < y ? -1 : 0) * sortDir; });
+    $('prog').innerHTML = '<tr>' + COLS.map(function(c){ return '<th data-k="' + c[0] + '">' + c[1] + (sortKey === c[0] ? (sortDir > 0 ? ' ▲' : ' ▼') : '') + '</th>'; }).join('') + '</tr>' +
+      list.map(function(r){ return '<tr>' + COLS.map(function(c){ return '<td>' + fmt(c[0], r) + '</td>'; }).join('') + '</tr>'; }).join('');
+    $('prog').querySelectorAll('th').forEach(function(th){ th.addEventListener('click', function(){ var k = th.getAttribute('data-k'); if(sortKey === k) sortDir = -sortDir; else { sortKey = k; sortDir = k === 'seat' ? 1 : -1; } renderProg(); }); });
+  }
+  $('cls').addEventListener('change', loadClass);
+  $('reload').addEventListener('click', loadClass);
+  $('csv').addEventListener('click', function(){
+    if(!rows.length) return;
+    var head = ['座號','姓名','概念卡通過','精熟概念','作答題數','答對率','破解迷思','實驗完成','最佳反應時間(秒)'].concat(C.map(function(c){ return c.unit + ' ' + c.t + ' 答對率'; }));
+    var lines = [head].concat(rows.map(function(r){
+      return [r.seat, r.name, r.understood, r.mastered, r.n, r.acc == null ? '' : Math.round(r.acc * 100) + '%', r.busted, r.lab, r.react || ''].concat(C.map(function(c){ var m = r.mastery[c.id]; return m && m.n ? Math.round(m.ok / m.n * 100) + '%' : ''; }));
+    }));
+    var csv = '﻿' + lines.map(function(l){ return l.map(function(x){ x = String(x == null ? '' : x); return /[",\n]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; }).join(','); }).join('\n');
+    var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv' })); a.download = '第4章_' + $('cls').value + '班_學習診斷.csv'; a.click();
+  });
+})();
+</script>
+</body>
+</html>

@@ -4,19 +4,126 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>錯題概念分析｜第4章 生物體的協調作用</title>
-<link rel="stylesheet" href="./css/style.css">
+<link rel="stylesheet" href="css/style.css">
 <script src="https://batyunching.github.io/bio/js/account.js" data-chapter="ch4" data-prefix="ch4."></script>
+<style>
+.stats{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; }
+.stat{ text-align:center; }
+.stat .v{ font-family:var(--num); font-size:2rem; font-weight:900; color:var(--c-amber); }
+.stat .k{ color:var(--c-muted); font-size:.85rem; }
+.cgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+@media (max-width:900px){ .cgrid{ grid-template-columns:1fr; } }
+.crow{ display:grid; grid-template-columns:1fr 92px 64px; gap:8px; align-items:center; padding:6px 0; border-bottom:1px dashed var(--c-line); font-size:.88rem; }
+.crow a{ text-decoration:none; font-weight:700; }
+.crow .progress{ height:10px; }
+.crow .pv{ font-family:var(--num); font-size:.74rem; text-align:right; color:var(--c-muted); }
+.lv-good .progress > span{ background:var(--c-ok); box-shadow:none; }
+.lv-mid .progress > span{ background:var(--c-amber); box-shadow:none; }
+.lv-bad .progress > span{ background:var(--c-ng); box-shadow:none; }
+.myths{ display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px; }
+.mcard{ border-top:4px solid var(--c-amber); display:flex; flex-direction:column; gap:8px; }
+.mcard .rank{ font-family:var(--num); color:var(--c-amber); font-weight:900; font-size:.75rem; letter-spacing:.15em; }
+.mcard .wrongidea{ font-size:1.05rem; font-weight:900; }
+.mcard .wrongidea::before{ content:"✗ "; color:var(--c-ng); }
+.mcard .right::before{ content:"✓ "; color:var(--c-ok); font-weight:900; }
+.mcard .acts{ display:flex; gap:8px; flex-wrap:wrap; margin-top:auto; }
+.busted{ display:flex; gap:8px; flex-wrap:wrap; }
+.busted span{ padding:6px 12px; border-radius:999px; border:1px solid var(--c-ok); color:var(--c-ok); font-size:.82rem; font-weight:700; }
+.empty{ text-align:center; color:var(--c-muted); padding:24px; }
+</style>
 </head>
 <body data-page="analysis" data-root="./">
 <main class="wrap">
-  <div class="panel u unit-42 coming">
-    <div class="big">🛠️</div>
-    <h1>錯題概念分析</h1>
-    <p>這一頁正在建置中，預計在<b>第4階段</b>完成，內容包括：</p>
-    <ul><li>19 個概念的掌握度</li><li>我的前 3 名迷思與補救建議</li><li>迷思破解練習與徽章</li></ul>
-    <div><a class="btn" href="./index.html">◀ 回第4章首頁</a></div>
-  </div>
+  <div class="sec-title" style="margin-top:6px"><span class="code">DIAGNOSTICS</span><h1 style="margin:0">🔍 錯題概念分析</h1></div>
+  <p style="color:var(--c-muted);margin-top:-6px">分析你在概念卡檢核、快問快答、練習題中的作答紀錄，找出「哪個概念還不熟」和「最常出現的迷思」。</p>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="sec-title"><span class="code">MYTH RANKING</span><h2>我的迷思排行</h2></div>
+  <div id="mythArea"></div>
+
+  <div class="sec-title"><span class="code">CONCEPT MASTERY</span><h2>19 個概念的掌握度</h2></div>
+  <p style="color:var(--c-muted);font-size:.85rem;margin-top:-8px">答對率 80% 以上（至少 3 題）＝精熟；作答不到 3 題顯示「資料不足」。點概念名稱可以回到概念卡。</p>
+  <div class="cgrid" id="cgrid"></div>
+
+  <div class="sec-title"><span class="code">BUSTED</span><h2>🏅 已破解的迷思</h2></div>
+  <div class="panel"><div class="busted" id="busted"></div></div>
+
+  <div class="footer">作答紀錄會跟著帳號同步；老師可以看到全班的整體統計，不會公開個人的錯題內容給其他同學。</div>
 </main>
-<script src="./js/common.js"></script>
+<script src="js/common.js"></script>
+<script src="data/selfcheck.js"></script>
+<script src="data/myths.js"></script>
+<script src="data/questions.js"></script>
+<script src="js/unit.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var BANK = CH4.bank();
+  var names = {}; CH4.CONCEPTS.forEach(function(c){ names[c.id] = c.t; });
+
+  function render(){
+    var ans = CH4.store.get('answers', []), mastery = CH4.store.get('mastery', {}), busted = CH4.store.get('busted', []);
+    var n = 0, ok = 0; Object.keys(mastery).forEach(function(k){ n += mastery[k].n; ok += mastery[k].ok; });
+    var masteredCnt = CH4.CONCEPTS.filter(function(c){ return CH4.progress.mastered(c.id); }).length;
+    $('stats').innerHTML =
+      '<div class="panel stat"><div class="v">' + n + '</div><div class="k">作答題數</div></div>' +
+      '<div class="panel stat"><div class="v">' + (n ? Math.round(ok / n * 100) : 0) + '%</div><div class="k">整體答對率</div></div>' +
+      '<div class="panel stat"><div class="v">' + masteredCnt + ' / 19</div><div class="k">精熟的概念</div></div>' +
+      '<div class="panel stat"><div class="v">' + busted.length + '</div><div class="k">已破解的迷思</div></div>';
+
+    // 迷思統計
+    var cnt = {};
+    ans.forEach(function(a){ if(a.m && MYTHS[a.m]) cnt[a.m] = (cnt[a.m] || 0) + 1; });
+    var top = Object.keys(cnt).filter(function(k){ return busted.indexOf(k) < 0; }).sort(function(a, b){ return cnt[b] - cnt[a]; }).slice(0, 3);
+    if(!n){
+      $('mythArea').innerHTML = '<div class="panel empty">還沒有作答紀錄。先到 <a href="unit4-1.html">單元概念卡</a> 做自我檢核，或到 <a href="quiz.html">練習題</a> 練習，再回來看分析！</div>';
+    } else if(!top.length){
+      $('mythArea').innerHTML = '<div class="panel empty">目前沒有偵測到迷思 🎉 ' + (busted.length ? '你已經破解了 ' + busted.length + ' 個迷思！' : '繼續保持！') + '<br>多做一些 ★★、★★★ 的題目，分析會更準確。</div>';
+    } else {
+      $('mythArea').innerHTML = '<div class="myths">' + top.map(function(k, i){
+        var M = MYTHS[k], u = M.c.slice(0, 3);
+        return '<div class="panel mcard ' + CH4.unitClass(u) + '"><div class="rank">TOP ' + (i + 1) + '　·　出現 ' + cnt[k] + ' 次</div>' +
+          '<div class="wrongidea">你可能以為：' + M.t + '</div><div class="right">正確觀念：' + M.r + '</div>' +
+          '<div><span class="tag">' + u + ' ' + names[M.c] + '</span></div>' +
+          '<div class="acts"><a class="btn ghost" href="' + CH4.UNIT_PAGES[u] + '#' + M.c + '">📘 看概念卡</a><button class="btn" data-bust="' + k + '">🧩 迷思破解（3 題）</button></div></div>';
+      }).join('') + '</div>';
+      $('mythArea').querySelectorAll('[data-bust]').forEach(function(b){ b.addEventListener('click', function(){ bust(b.getAttribute('data-bust')); }); });
+    }
+
+    // 概念掌握度
+    $('cgrid').innerHTML = ['4-1','4-2','4-3'].map(function(u){
+      return '<div class="panel ' + CH4.unitClass(u) + '"><h3 style="margin-top:0">' + u + ' ' + CH4.UNIT_NAMES[u] + '</h3>' +
+        CH4.CONCEPT_CARDS[u].map(function(id){
+          var m = mastery[id] || { n:0, ok:0 }, p = m.n ? Math.round(m.ok / m.n * 100) : 0;
+          var cls = m.n < 3 ? '' : (p >= 80 ? 'lv-good' : (p >= 50 ? 'lv-mid' : 'lv-bad'));
+          return '<div class="crow ' + cls + '"><a href="' + CH4.UNIT_PAGES[u] + '#' + id + '">' + names[id] + '</a><div class="progress"><span style="width:' + (m.n ? p : 0) + '%' + (m.n < 3 ? ';opacity:.35' : '') + '"></span></div><span class="pv">' + (m.n < 3 ? '資料不足' : p + '%') + '</span></div>';
+        }).join('') + '</div>';
+    }).join('');
+
+    $('busted').innerHTML = busted.length ? busted.map(function(k){ return '<span title="' + MYTHS[k].r + '">✓ ' + MYTHS[k].t + '</span>'; }).join('') : '<span style="border-color:var(--c-line);color:var(--c-muted)">還沒有。從上面的迷思排行開始破解吧！</span>';
+  }
+
+  function bust(code){
+    var M = MYTHS[code];
+    var pool = BANK.filter(function(q){ return Object.keys(q.m).some(function(k){ return q.m[k] === code; }); });
+    if(pool.length < 3) pool = pool.concat(CH4.shuffle(BANK.filter(function(q){ return q.c === M.c && pool.indexOf(q) < 0; })).slice(0, 3 - pool.length));
+    UNIT.openCheck(M.c, '迷思破解：' + M.t, function(){
+      var b = CH4.store.get('busted', []);
+      if(b.indexOf(code) < 0){ b.push(code); CH4.store.set('busted', b); CH4.energy.add(10, '破解迷思！'); }
+      setTimeout(render, 50);
+    }, function(){ location.href = CH4.UNIT_PAGES[M.c.slice(0, 3)] + '#' + M.c; }, {
+      pool: pool, unit: M.c.slice(0, 3), src: 'myth',
+      passText: '🏅 迷思破解！這個迷思會移到「已破解的迷思」。',
+      failText: '還沒破解。看看正確觀念：' + M.r + '。回到概念卡複習後再試一次！',
+      reviewText: '📘 回概念卡複習'
+    });
+  }
+
+  render();
+  if(window.BIO_ACCOUNT && BIO_ACCOUNT.ready) BIO_ACCOUNT.ready.then(function(){ setTimeout(render, 300); }, function(){});
+})();
+</script>
 </body>
 </html>

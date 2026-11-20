@@ -4,19 +4,450 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>實驗模擬室｜第4章 生物體的協調作用</title>
-<link rel="stylesheet" href="./css/style.css">
+<link rel="stylesheet" href="css/style.css">
 <script src="https://batyunching.github.io/bio/js/account.js" data-chapter="ch4" data-prefix="ch4."></script>
+<style>
+.exp-head{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.exp-meta{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; margin:10px 0 14px; font-size:.88rem; }
+.exp-meta div{ padding:10px 12px; border-radius:12px; border:1px solid var(--c-line); background:rgba(140,165,255,.06); }
+.exp-meta b{ color:var(--u); display:block; font-size:.78rem; letter-spacing:.06em; }
+html.projector .exp-meta b{ color:var(--u-d); }
+.steps-bar{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+.steps-bar span{ padding:4px 12px; border-radius:999px; border:1px solid var(--c-line); font-size:.78rem; color:var(--c-muted); }
+.steps-bar span.on{ background:var(--u); color:#0B1022; border-color:var(--u); font-weight:900; }
+html.projector .steps-bar span.on{ color:#fff; }
+.water{ transition:fill .4s; }
+.hand{ transition:transform .9s ease; }
+.pick{ display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin:6px 0; }
+.whitebox{ background:#fff; border-radius:14px; border:1px solid var(--c-line); display:block; width:100%; height:auto; }
+.countdown{ font-family:var(--num); font-size:2rem; font-weight:900; color:var(--c-amber); text-align:center; }
+/* 接尺 */
+.ruler-stage{ position:relative; background:linear-gradient(180deg, rgba(34,211,238,.06), transparent); border-radius:16px; border:1px solid var(--c-line); user-select:none; touch-action:manipulation; cursor:pointer; }
+.ruler-stage svg{ display:block; width:100%; height:auto; }
+.ruler-stage .msg{ position:absolute; left:0; right:0; top:14px; text-align:center; font-weight:900; font-size:1.05rem; pointer-events:none; }
+.trials{ width:100%; border-collapse:collapse; font-size:.88rem; }
+.trials th, .trials td{ border:1px solid var(--c-line); padding:6px 8px; text-align:center; }
+.trials th{ background:var(--u-l); }
+.board{ list-style:none; margin:0; padding:0; counter-reset:r; }
+.board li{ display:flex; align-items:center; gap:10px; padding:8px 12px; border-bottom:1px dashed var(--c-line); font-weight:700; }
+.board li .rk{ font-family:var(--num); width:2.2em; color:var(--c-amber); }
+.board li .tm{ margin-left:auto; font-family:var(--num); }
+.board li.me{ background:var(--u-l); border-radius:10px; }
+.phys input{ width:5.5em; min-height:44px; font:inherit; padding:4px 8px; border-radius:10px; border:1px solid var(--c-line); background:var(--c-panel); color:var(--c-text); text-align:center; }
+.note{ font-size:.8rem; color:var(--c-muted); }
+</style>
 </head>
 <body data-page="lab" data-root="./">
 <main class="wrap">
-  <div class="panel u unit-41 coming">
-    <div class="big">🛠️</div>
-    <h1>實驗模擬室</h1>
-    <p>這一頁正在建置中，預計在<b>第4階段</b>完成，內容包括：</p>
-    <ul><li>實驗4-1：溫度感覺疲勞、正片後像、負片後像</li><li>實驗4-2：虛擬接尺測反應時間（全班前 10 名排行）</li><li>探索活動：綠豆對光的感應</li></ul>
-    <div><a class="btn" href="./index.html">◀ 回第4章首頁</a></div>
+  <div class="sec-title" style="margin-top:6px"><span class="code">LAB</span><h1 style="margin:0">🧪 實驗模擬室</h1></div>
+  <p style="color:var(--c-muted);margin-top:-6px">依課本「目的 → 器材 → 原理 → 操作 → 問題與討論」一步一步做。後像和反應時間不是模擬，而是用你自己的眼睛和手做的真實實驗！</p>
+  <nav class="toc"><a href="#e1">實驗 4-1 感覺疲勞與後像</a><a href="#e2">實驗 4-2 反應時間的測定</a><a href="#e3">探索活動 植物對光的感應</a></nav>
+
+  <!-- ================= 實驗 4-1 ================= -->
+  <div class="block-title unit-41" id="e1"><span class="num">4-1</span><h2>實驗 4-1　人體的感覺與感覺疲勞</h2><span class="kind">課本 p.138–139</span></div>
+  <div class="panel lab unit-41">
+    <div class="exp-meta">
+      <div><b>目的</b>1. 體驗皮膚對溫度的感覺疲勞。2. 體驗眼睛注視物體後產生的後像。</div>
+      <div><b>原理：感覺疲勞</b>有些受器受到連續且相同的刺激後，感覺的敏銳度會降低。</div>
+      <div><b>原理：後像</b>正片後像：視覺暫留，顏色和原物相同。負片後像：視覺暫留＋視覺疲勞，顏色和原物不同。</div>
+    </div>
+
+    <h3>一、皮膚對溫度的感覺疲勞</h3>
+    <div class="steps-bar" id="tSteps"><span class="on">① 準備三盆水</span><span>② 右手→甲、左手→丙</span><span>③ 15 秒後同時放入乙</span><span>④ 記錄感覺</span></div>
+    <div class="grid2">
+      <svg class="fig" id="tempFig" viewBox="0 0 480 272" role="img" aria-label="甲、乙、丙三盆水與兩隻手">
+        <g id="basins"></g>
+        <g class="hand" id="handR" style="transform:translate(70px,-10px)"><path d="M0 0 v62 q0 14 14 14 h16 q14 0 14 -14 v-38 q0 -6 -6 -6 q-6 0 -6 6 v-6 q0 -6 -6 -6 q-6 0 -6 6 v-4 q0 -6 -6 -6 q-6 0 -6 6 v-10 q0 -6 -6 -6 q-6 0 -6 6z" fill="#FCD9B6" stroke="#B9774A" stroke-width="2" transform="translate(-14 -40)"/><text x="8" y="-48" text-anchor="middle" class="sml">右手</text></g>
+        <g class="hand" id="handL" style="transform:translate(410px,-10px)"><path d="M0 0 v62 q0 14 14 14 h16 q14 0 14 -14 v-38 q0 -6 -6 -6 q-6 0 -6 6 v-6 q0 -6 -6 -6 q-6 0 -6 6 v-4 q0 -6 -6 -6 q-6 0 -6 6 v-10 q0 -6 -6 -6 q-6 0 -6 6z" fill="#FCD9B6" stroke="#B9774A" stroke-width="2" transform="translate(-14 -40) scale(-1 1) translate(-44 0)"/><text x="8" y="-48" text-anchor="middle" class="sml">左手</text></g>
+      </svg>
+      <div>
+        <div id="tPanel"></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:26px">二、正片後像</h3>
+    <div class="grid2">
+      <svg class="whitebox" id="flip" viewBox="0 0 300 220" role="img" aria-label="翻頁動畫：小人跳躍"></svg>
+      <div>
+        <label for="fps" style="font-weight:700">翻頁速度：每秒 <span id="fpsV">2</span> 張</label>
+        <input type="range" id="fps" min="1" max="24" value="2">
+        <div class="info" id="flipInfo"><p>就像快速翻動活動紀錄簿右下角的圖片。把速度慢慢調快，看看一張一張的圖什麼時候會「連成動作」？</p></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:26px">三、負片後像</h3>
+    <div class="grid2">
+      <div>
+        <svg class="whitebox" id="after" viewBox="0 0 400 260" role="img" aria-label="負片後像實驗圖片"></svg>
+        <div class="countdown" id="afterCd"></div>
+      </div>
+      <div>
+        <div class="seg" id="segImg" style="margin-bottom:10px"><button data-v="A" aria-pressed="true">圖片 A</button><button data-v="B">圖片 B</button></div>
+        <ol style="margin:0 0 10px;padding-left:1.2em;font-size:.92rem">
+          <li>按「開始」，眼睛<b>一直盯著圖片中央的黑點</b> 20 秒，不要移開。</li>
+          <li>時間到，圖片會變成白紙，<b>繼續看黑點</b>。</li>
+          <li>你看到了什麼顏色？選出來。</li>
+        </ol>
+        <button class="btn" id="afterGo">▶ 開始（20 秒）</button>
+        <div id="afterQ" style="margin-top:12px"></div>
+        <p class="note">若眼睛不舒服請立刻停止。</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:26px">問題與討論</h3>
+    <div class="qq" id="disc1"></div>
   </div>
+
+  <!-- ================= 實驗 4-2 ================= -->
+  <div class="block-title unit-41" id="e2"><span class="num">4-2</span><h2>實驗 4-2　反應時間的測定</h2><span class="kind">課本 p.140</span></div>
+  <div class="panel lab unit-41">
+    <div class="exp-meta">
+      <div><b>目的</b>測定用手接尺的反應時間。</div>
+      <div><b>原理</b>人體「由受器接收刺激，到動器產生反應」所需的時間，稱為反應時間。</div>
+      <div><b>換算</b>尺落下的距離越長，反應時間越長。距離 d（公分）換算成時間：t ＝ √(2d ÷ 980) 秒。</div>
+    </div>
+    <div class="grid2">
+      <div>
+        <div class="ruler-stage" id="stage" tabindex="0" role="button" aria-label="接尺區：尺開始掉落時，立刻點這裡或按空白鍵">
+          <div class="msg" id="rMsg">按「開始」，尺會在<b>隨機的時間</b>掉下來</div>
+          <svg viewBox="0 0 300 470" aria-hidden="true">
+            <g id="ruler"></g>
+            <!-- 手指 -->
+            <g id="fingers">
+              <path d="M80 418 q-6 -22 10 -30 l40 -6 q10 0 10 10 q0 8 -10 10 l-28 6" fill="#FCD9B6" stroke="#B9774A" stroke-width="2"/>
+              <path d="M220 418 q6 -22 -10 -30 l-40 -6 q-10 0 -10 10 q0 8 10 10 l28 6" fill="#FCD9B6" stroke="#B9774A" stroke-width="2"/>
+            </g>
+            <line x1="60" y1="400" x2="240" y2="400" stroke="var(--c-amber)" stroke-width="1.5" stroke-dasharray="4 4"/>
+            <text x="246" y="404" class="sml" style="fill:var(--c-amber)">手指上緣</text>
+          </svg>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+          <button class="btn" id="rStart">▶ 開始第 1 次</button>
+          <button class="btn ghost" id="rReset">↺ 重新測 5 次</button>
+        </div>
+        <p class="note">提示：尺一開始掉，就<b>立刻點接尺區</b>（或按空白鍵）。太早點會判定犯規。螢幕和觸控本身有一點延遲，所以結果可能比真的接尺稍長一些。</p>
+      </div>
+      <div>
+        <table class="trials" id="trials"><tr><th>次數</th><th>落下距離</th><th>反應時間</th></tr></table>
+        <div class="info" id="rInfo" style="margin-top:12px"><p>測 5 次後會算出平均。比比看：越到後面，反應時間有沒有變短？</p></div>
+        <h3 style="margin:18px 0 6px">🏆 全班反應時間前 10 名</h3>
+        <ol class="board" id="board"><li>載入中…</li></ol>
+        <p class="note" id="boardNote">以「5 次平均」計算，只顯示前 10 名；你的成績只有你自己看得到名次以外的數字。</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:22px">✍️ 實體接尺紀錄表（和同學用真的尺做）</h3>
+    <div class="phys" id="phys"></div>
+
+    <h3 style="margin-top:22px">問題與討論</h3>
+    <div class="qq" id="disc2"></div>
+  </div>
+
+  <!-- ================= 探索活動 ================= -->
+  <div class="block-title unit-43" id="e3"><span class="num">4-3</span><h2>探索活動　植物對光的感應</h2><span class="kind">課本 p.149</span></div>
+  <div class="panel lab unit-43">
+    <div class="exp-meta">
+      <div><b>步驟</b>1. 綠豆泡水發芽。2. A、B 培養皿各放 10 顆發芽程度相近的綠豆，棉花澆等量的水。</div>
+      <div><b>步驟</b>3. A 用開口朝<b>側面</b>的不透光紙盒罩住；B 用開口朝<b>上</b>的紙盒罩住。</div>
+      <div><b>步驟</b>4. 放在光照充足處，每天澆等量的水。5. 記錄 A、B 綠豆的生長情形。</div>
+    </div>
+    <div class="grid2">
+      <svg class="fig" id="beanFig" viewBox="0 0 520 280" role="img" aria-label="A、B 兩組綠豆幼苗在不同開口方向的紙盒中生長"></svg>
+      <div>
+        <label for="beanDay" style="font-weight:700">經過天數：<span id="beanDayV">0</span> 天</label>
+        <input type="range" id="beanDay" min="0" max="5" value="0">
+        <div class="info" id="beanInfo"><p>拖曳滑桿，觀察 A、B 兩組綠豆的莖朝哪個方向生長。</p></div>
+        <p style="margin-top:10px"><a class="btn ghost" href="unit4-3.html#a4" style="--u:var(--c-plant)">🌱 到向性模擬器挑戰「S 形」</a></p>
+      </div>
+    </div>
+    <h3 style="margin-top:18px">探究時間：找出變因</h3>
+    <div class="qq" id="disc3"></div>
+  </div>
+
+  <div class="footer">國中自然（生物）一上・第4章｜實驗 4-1、4-2、探索活動（課本 p.138–140、149）｜圖形皆為原創 SVG 繪製</div>
 </main>
-<script src="./js/common.js"></script>
+<script src="js/common.js"></script>
+<script src="js/unit.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var NS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs, parent){ var e = document.createElementNS(NS, tag); for(var k in attrs) e.setAttribute(k, attrs[k]); if(parent) parent.appendChild(e); return e; }
+  var labDone = CH4.store.get('labDone', {});
+  function markDone(k, why){ if(!labDone[k]){ labDone[k] = 1; CH4.store.set('labDone', labDone); CH4.energy.add(10, why); } }
+
+  /* ================= 一、溫度感覺疲勞 ================= */
+  var B = [ { k:'甲', t:'約 10℃', x:80, c:'#7DD3FC' }, { k:'乙', t:'約 25℃', x:240, c:'#C4B5FD' }, { k:'丙', t:'約 40℃', x:400, c:'#FCA5A5' } ];
+  B.forEach(function(b){
+    var g = el('g', {}, $('basins'));
+    el('path', { d:'M' + (b.x - 66) + ' 150 L' + (b.x - 54) + ' 236 L' + (b.x + 54) + ' 236 L' + (b.x + 66) + ' 150 Z', fill:'none', stroke:'var(--c-muted)', 'stroke-width':3 }, g);
+    el('path', { class:'water', d:'M' + (b.x - 62) + ' 170 L' + (b.x - 54) + ' 232 L' + (b.x + 54) + ' 232 L' + (b.x + 62) + ' 170 Z', fill:b.c, 'fill-opacity':.55 }, g);
+    var t = el('text', { x:b.x, y:262, 'text-anchor':'middle', class:'lbl' }, g); t.textContent = b.k + '盆　' + b.t;
+  });
+  var tStage = 0;
+  function tStep(n){ tStage = n; $('tSteps').querySelectorAll('span').forEach(function(s, i){ s.classList.toggle('on', i === n); }); }
+  function hand(id, x, y){ $(id).style.transform = 'translate(' + x + 'px,' + y + 'px)'; }
+  function tRender(){
+    var P = $('tPanel');
+    if(tStage === 0){
+      P.innerHTML = '<div class="info"><h3>① 準備</h3><p>甲盆冰水（約 10℃）、乙盆室溫水（約 25℃）、丙盆熱水（約 40℃）。</p></div><button class="btn" id="tGo1" style="margin-top:10px">② 右手放入甲盆、左手放入丙盆</button>';
+      $('tGo1').addEventListener('click', function(){ hand('handR', 80, 150); hand('handL', 400, 150); tStep(1); tRender(); });
+    } else if(tStage === 1){
+      P.innerHTML = '<div class="info"><h3>② 浸泡中…</h3><p>右手泡冰水、左手泡熱水，要泡 15 秒。</p><div class="countdown" id="tCd">15</div></div><button class="btn ghost" id="tSkip" style="margin-top:10px">⏩ 快轉</button>';
+      var s = 15, timer = setInterval(function(){ s--; if($('tCd')) $('tCd').textContent = s; if(s <= 0){ clearInterval(timer); next(); } }, 1000);
+      function next(){ clearInterval(timer); hand('handR', 214, 150); hand('handL', 266, 150); tStep(2); tRender(); }
+      $('tSkip').addEventListener('click', next);
+    } else if(tStage === 2){
+      P.innerHTML = '<div class="info"><h3>③ 兩手同時放入乙盆（室溫水）</h3><p>先預測：這時候兩隻手會有什麼感覺？</p>' +
+        '<div class="pick"><b>右手（剛泡冰水）：</b><span class="opts" data-h="R"><button class="chip-btn" data-v="冷">冷</button><button class="chip-btn" data-v="熱">熱</button><button class="chip-btn" data-v="同">不冷不熱</button></span></div>' +
+        '<div class="pick"><b>左手（剛泡熱水）：</b><span class="opts" data-h="L"><button class="chip-btn" data-v="冷">冷</button><button class="chip-btn" data-v="熱">熱</button><button class="chip-btn" data-v="同">不冷不熱</button></span></div></div>' +
+        '<button class="btn" id="tCheck" style="margin-top:10px" disabled>④ 看結果</button>';
+      var pick = {};
+      P.querySelectorAll('.opts').forEach(function(o){
+        o.querySelectorAll('button').forEach(function(b){ b.addEventListener('click', function(){ o.querySelectorAll('button').forEach(function(x){ x.classList.remove('ok'); }); b.classList.add('ok'); pick[o.getAttribute('data-h')] = b.getAttribute('data-v'); $('tCheck').disabled = !(pick.R && pick.L); }); });
+      });
+      $('tCheck').addEventListener('click', function(){
+        var right = pick.R === '熱' && pick.L === '冷';
+        tStep(3);
+        P.innerHTML = '<div class="info"><h3>④ 結果：右手覺得「熱」，左手覺得「冷」</h3>' +
+          '<p>' + (right ? '✓ 你預測對了！' : '你的預測：右手「' + (pick.R === '同' ? '不冷不熱' : pick.R) + '」、左手「' + (pick.L === '同' ? '不冷不熱' : pick.L) + '」。和結果不一樣，想想看為什麼？') + '</p>' +
+          '<p>同一盆 25℃ 的水，兩手感覺卻相反！右手泡過冰水，對「冷」的感覺疲勞了，所以覺得乙盆比較熱；左手泡過熱水，對「熱」的感覺疲勞，所以覺得乙盆比較冷。</p>' +
+          '<p><b>推論：</b>皮膚的受器受到連續相同的刺激後，敏銳度會降低（感覺疲勞），所以人對溫度的感覺是「相對的」。</p></div>' +
+          '<button class="btn ghost" id="tAgain" style="margin-top:10px">↺ 再做一次</button>';
+        $('tAgain').addEventListener('click', function(){ hand('handR', 70, -10); hand('handL', 410, -10); tStep(0); tRender(); });
+        markDone('temp', '完成溫度感覺疲勞實驗');
+      });
+    }
+  }
+  tRender();
+
+  /* ================= 二、正片後像（翻頁動畫） ================= */
+  var frames = [0, 1, 2, 3, 2, 1];
+  function figure(k){ // k: 0 蹲 → 3 跳到最高
+    var y = 150 - k * 22, arm = -30 - k * 32, leg = 8 + k * 7;
+    return '<line x1="20" y1="190" x2="280" y2="190" stroke="#94A3B8" stroke-width="3"/>' +
+      '<g stroke="#1E293B" stroke-width="6" stroke-linecap="round" fill="none">' +
+      '<circle cx="150" cy="' + (y - 52) + '" r="15" fill="#FCD9B6" stroke-width="3"/>' +
+      '<line x1="150" y1="' + (y - 36) + '" x2="150" y2="' + (y + 4) + '"/>' +
+      '<line x1="150" y1="' + (y - 26) + '" x2="' + (150 - 34 * Math.cos(arm * Math.PI / 180)) + '" y2="' + (y - 26 + 34 * Math.sin(arm * Math.PI / 180)) + '"/>' +
+      '<line x1="150" y1="' + (y - 26) + '" x2="' + (150 + 34 * Math.cos(arm * Math.PI / 180)) + '" y2="' + (y - 26 + 34 * Math.sin(arm * Math.PI / 180)) + '"/>' +
+      '<line x1="150" y1="' + (y + 4) + '" x2="' + (150 - leg) + '" y2="' + Math.min(188, y + 40) + '"/>' +
+      '<line x1="150" y1="' + (y + 4) + '" x2="' + (150 + leg) + '" y2="' + Math.min(188, y + 40) + '"/></g>' +
+      '<text x="290" y="24" text-anchor="end" style="font:700 13px var(--font);fill:#64748B">第 ' + (frames.indexOf(k) + 1) + ' 張</text>';
+  }
+  var fi = 0, fTimer = null;
+  function flipTick(){ $('flip').innerHTML = figure(frames[fi % frames.length]); fi++; }
+  function setFps(v){
+    $('fpsV').textContent = v; clearInterval(fTimer); fTimer = setInterval(flipTick, 1000 / v);
+    $('flipInfo').innerHTML = v < 8 ? '<p>現在看得出是<b>一張一張</b>的圖。繼續把速度調快…</p>'
+      : '<p>變成<b>連續的跳躍動作</b>了！每張圖的影像在眼中會短暫停留（<b>視覺暫留</b>），前一張還沒消失下一張就來了，這就是<b>正片後像</b>，顏色和原圖相同。卡通、電影也是這個原理。</p>';
+    if(v >= 12) markDone('flip', '觀察正片後像');
+  }
+  $('fps').addEventListener('input', function(){ setFps(+this.value); });
+  flipTick(); setFps(2);
+
+  /* ================= 三、負片後像 ================= */
+  var IMG = {
+    A: { svg:'<rect width="400" height="260" fill="#fff"/><circle cx="200" cy="140" r="78" fill="#EF4444"/><path d="M204 66 C230 30 268 34 280 46 C256 70 228 74 204 66Z" fill="#16A34A"/><circle cx="200" cy="140" r="4" fill="#000"/>',
+         q:'紅色蘋果的位置，看起來是什麼顏色？', o:['青綠色（藍綠色）','紅色','黃色','黑色'], a:0, e:'紅色的負片後像是它的互補色——青綠色；綠色葉子則會變成粉紅（洋紅）色。' },
+    B: { svg:'<rect width="400" height="260" fill="#1D4ED8"/><path d="M200 50 L222 112 L288 112 L234 150 L254 214 L200 176 L146 214 L166 150 L112 112 L178 112 Z" fill="#FACC15"/><circle cx="200" cy="140" r="4" fill="#000"/>',
+         q:'黃色星星的位置，看起來是什麼顏色？', o:['藍色','黃色','紅色','綠色'], a:0, e:'黃色的負片後像是藍色；藍色背景則變成淡黃色。顏色和原圖不同，就是負片後像。' }
+  };
+  var imgK = 'A', aTimer = null;
+  function showImg(){ $('after').innerHTML = IMG[imgK].svg; $('afterQ').innerHTML = ''; $('afterCd').textContent = ''; }
+  UNIT.seg($('segImg'), function(v){ imgK = v; clearInterval(aTimer); showImg(); $('afterGo').disabled = false; });
+  showImg();
+  $('afterGo').addEventListener('click', function(){
+    showImg(); $('afterGo').disabled = true;
+    var s = 20; $('afterCd').textContent = '盯著黑點… ' + s;
+    aTimer = setInterval(function(){
+      s--; $('afterCd').textContent = s > 0 ? '盯著黑點… ' + s : '';
+      if(s <= 0){
+        clearInterval(aTimer);
+        $('after').innerHTML = '<rect width="400" height="260" fill="#fff"/><circle cx="200" cy="140" r="4" fill="#000"/>';
+        $('afterCd').textContent = '繼續看黑點！';
+        var Q = IMG[imgK];
+        $('afterQ').innerHTML = '<p style="font-weight:900;margin:0 0 6px">' + Q.q + '</p><div class="pick">' + Q.o.map(function(t, k){ return '<button class="chip-btn" data-k="' + k + '">' + t + '</button>'; }).join('') + '</div><div class="feedback" id="afFb"></div>';
+        var done = false;
+        $('afterQ').querySelectorAll('[data-k]').forEach(function(b){ b.addEventListener('click', function(){
+          if(done) return; done = true; var ok = +b.getAttribute('data-k') === Q.a;
+          b.classList.add(ok ? 'ok' : 'ng'); if(!ok) $('afterQ').querySelector('[data-k="' + Q.a + '"]').classList.add('ok');
+          $('afFb').className = 'feedback ' + (ok ? 'ok' : ''); $('afFb').textContent = (ok ? '✓ 你看到了！' : '大部分人會看到正確答案標示的顏色。') + Q.e;
+          $('afterGo').disabled = false; $('afterGo').textContent = '▶ 再看一次（20 秒）'; markDone('after' + imgK, '觀察負片後像');
+        }); });
+      }
+    }, 1000);
+  });
+
+  UNIT.quickQuiz($('disc1'), [
+    { c:'4-1-c1', q:'雙手放入乙盆後，左右手感覺不同。可以得到什麼推論？', o:['受器受到連續相同的刺激後，敏銳度會降低','左右手的受器種類不同','乙盆的水溫在一直改變','冷熱的感覺在手上產生'], a:0, e:'這就是感覺疲勞。' },
+    { c:'4-1-c1', q:'用手放在別人額頭判斷是否發燒，結果一定準確嗎？', o:['不一定，手原本的溫度和感覺疲勞會影響判斷','一定準確','只有在冬天才準確','只要閉上眼睛就準確'], a:0, e:'感覺是相對的，最好用溫度計測量。' },
+    { c:'4-1-c1', q:'正片後像、負片後像和原圖相比，何者正確？', o:['正片後像顏色和原圖相同；負片後像顏色和原圖不同','兩者顏色都和原圖相同','兩者顏色都和原圖不同','正片後像顏色不同；負片後像顏色相同'], a:0, e:'正片後像：視覺暫留；負片後像：視覺暫留＋視覺疲勞。' }
+  ], 3);
+
+  /* ================= 實驗 4-2 反應時間 ================= */
+  var PX = 12, ZERO = 400; // 每公分 12 px；0 公分對齊手指上緣
+  (function drawRuler(){
+    var g = $('ruler');
+    el('rect', { x:118, y:ZERO - 30 * PX - 8, width:64, height:30 * PX + 16, rx:6, fill:'#FEF3C7', stroke:'#B45309', 'stroke-width':2 }, g);
+    for(var c = 0; c <= 30; c++){
+      var y = ZERO - c * PX;
+      el('line', { x1:118, x2: 118 + (c % 5 ? 12 : 22), y1:y, y2:y, stroke:'#78350F', 'stroke-width': c % 5 ? 1.2 : 2 }, g);
+      if(c % 5 === 0){ var t = el('text', { x:160, y:y + 5, 'text-anchor':'middle', style:'font:700 14px var(--num);fill:#78350F' }, g); t.textContent = c; }
+    }
+  })();
+  var state = 'idle', t0 = 0, raf = null, dropTimer = null, trials = [], best = CH4.store.get('reactionBest', null);
+  function setRuler(cm){ $('ruler').setAttribute('transform', 'translate(0 ' + (cm * PX) + ')'); }
+  function tFromD(d){ return Math.sqrt(2 * d / 980); }
+  function startTrial(){
+    if(trials.length >= 5) return;
+    state = 'wait'; setRuler(0); $('rStart').disabled = true;
+    $('rMsg').innerHTML = '專心看尺……（' + (trials.length + 1) + ' / 5）';
+    dropTimer = setTimeout(function(){
+      state = 'fall'; t0 = performance.now(); $('rMsg').innerHTML = '';
+      (function fall(now){
+        var t = (now - t0) / 1000, d = 490 * t * t;
+        setRuler(Math.min(d, 38));
+        if(d > 30){ state = 'idle'; $('rMsg').innerHTML = '😵 尺掉到地上了！（超過 30 公分）這次不算，再試一次。'; $('rStart').disabled = false; return; }
+        if(state === 'fall') raf = requestAnimationFrame(fall);
+      })(t0);
+    }, 1200 + Math.random() * 2600);
+  }
+  function catchIt(){
+    if(state === 'wait'){ clearTimeout(dropTimer); state = 'idle'; $('rMsg').innerHTML = '⛔ 太早了！要<b>看到尺開始掉</b>才接。這次不算。'; $('rStart').disabled = false; return; }
+    if(state !== 'fall') return;
+    state = 'idle'; cancelAnimationFrame(raf);
+    var t = (performance.now() - t0) / 1000, d = 490 * t * t;
+    if(d > 30){ setRuler(38); $('rMsg').innerHTML = '😵 尺掉到地上了！（超過 30 公分）這次不算，再試一次。'; $('rStart').disabled = false; return; }
+    setRuler(d);
+    trials.push({ d:d, t:t });
+    $('rMsg').innerHTML = '接住了！落下 <b>' + d.toFixed(1) + '</b> 公分 → 反應時間 <b>' + t.toFixed(3) + '</b> 秒';
+    renderTrials();
+    $('rStart').disabled = trials.length >= 5;
+    $('rStart').textContent = trials.length >= 5 ? '已完成 5 次' : '▶ 開始第 ' + (trials.length + 1) + ' 次';
+    if(trials.length === 5) finishSet();
+  }
+  function renderTrials(){
+    var rows = trials.map(function(r, i){ return '<tr><td>第 ' + (i + 1) + ' 次</td><td>' + r.d.toFixed(1) + ' 公分</td><td>' + r.t.toFixed(3) + ' 秒</td></tr>'; }).join('');
+    if(trials.length === 5){
+      var ad = trials.reduce(function(s, r){ return s + r.d; }, 0) / 5, at = trials.reduce(function(s, r){ return s + r.t; }, 0) / 5;
+      rows += '<tr style="font-weight:900"><td>平均</td><td>' + ad.toFixed(1) + ' 公分</td><td>' + at.toFixed(3) + ' 秒</td></tr>';
+    }
+    $('trials').innerHTML = '<tr><th>次數</th><th>落下距離</th><th>反應時間</th></tr>' + rows;
+  }
+  function finishSet(){
+    var at = trials.reduce(function(s, r){ return s + r.t; }, 0) / 5;
+    var first2 = (trials[0].t + trials[1].t) / 2, last2 = (trials[3].t + trials[4].t) / 2;
+    $('rInfo').innerHTML = '<p>5 次平均反應時間：<b class="score">' + at.toFixed(3) + ' 秒</b></p>' +
+      '<p>' + (last2 < first2 ? '後兩次比前兩次快，練習後反應時間<b>縮短</b>了！因為越來越熟練、注意力更集中。' : '後兩次沒有比較快。可以休息一下再測一次，比比看。') + '</p>' +
+      '<p class="note">神經傳導途徑：眼內受器 → 感覺神經元 → 大腦 → 脊髓 → 運動神經元 → 手指肌肉（意識反應）</p>';
+    markDone('ruler', '完成 5 次接尺');
+    if(best === null || at < best){ best = at; CH4.store.set('reactionBest', +at.toFixed(3)); submit(at); }
+    else loadBoard();
+    if(at < 0.18 && UNIT.rewardOnce('badge-flash', 10)) CH4.toast('🏅 獲得徽章：閃電反射（平均 0.18 秒內）');
+  }
+  $('rStart').addEventListener('click', function(e){ e.stopPropagation(); startTrial(); });
+  $('rReset').addEventListener('click', function(e){ e.stopPropagation(); clearTimeout(dropTimer); cancelAnimationFrame(raf); state = 'idle'; trials = []; setRuler(0); renderTrials(); $('rStart').disabled = false; $('rStart').textContent = '▶ 開始第 1 次'; $('rMsg').innerHTML = '按「開始」，尺會在<b>隨機的時間</b>掉下來'; });
+  $('stage').addEventListener('pointerdown', function(e){ e.preventDefault(); catchIt(); });
+  document.addEventListener('keydown', function(e){ if(e.code === 'Space' && (state === 'fall' || state === 'wait')){ e.preventDefault(); catchIt(); } });
+
+  /* 排行榜（Firebase：leaderboards/ch4-reaction/{班級}/{班級-座號}） */
+  function acct(){ return window.BIO_ACCOUNT && BIO_ACCOUNT.sid && window.firebase && firebase.database ? BIO_ACCOUNT : null; }
+  function boardRef(){ var a = acct(); return a ? firebase.database().ref('leaderboards/ch4-reaction/' + a.sid.split('-')[0]) : null; }
+  function submit(at){
+    var r = boardRef(), a = acct();
+    if(!r){ loadBoard(); return; }
+    r.child(a.sid).get().then(function(s){
+      var v = s.val();
+      if(!v || at < v.t) return r.child(a.sid).set({ t: +at.toFixed(3), at: firebase.database.ServerValue.TIMESTAMP });
+    }).then(loadBoard, function(e){ console.warn(e); loadBoard('rules'); });
+  }
+  function loadBoard(err){
+    var r = boardRef(), me = acct();
+    if(!r){
+      $('board').innerHTML = '<li>登入後才能看到全班排行。' + (best ? '你的最佳平均：' + best.toFixed(3) + ' 秒' : '') + '</li>'; return;
+    }
+    r.orderByChild('t').limitToFirst(10).get().then(function(s){
+      var list = []; s.forEach(function(c){ list.push({ sid:c.key, t:c.val().t }); });
+      if(!list.length){ $('board').innerHTML = '<li>還沒有人上榜，快來當第一名！</li>'; return; }
+      $('board').innerHTML = list.map(function(x, i){
+        var seat = parseInt(x.sid.split('-')[1], 10);
+        return '<li class="' + (me && x.sid === me.sid ? 'me' : '') + '"><span class="rk">#' + (i + 1) + '</span>' + seat + ' 號' + (me && x.sid === me.sid ? '（你）' : '') + '<span class="tm">' + x.t.toFixed(3) + ' 秒</span></li>';
+      }).join('');
+      var inTop = me && list.some(function(x){ return x.sid === me.sid; });
+      $('boardNote').textContent = '以 5 次平均計算，只顯示前 10 名。' + (best && !inTop ? '你的最佳平均：' + best.toFixed(3) + ' 秒，繼續加油！' : '');
+    }, function(){
+      $('board').innerHTML = '<li>排行榜暫時無法讀取（老師需要更新資料庫規則）。' + (best ? '你的最佳平均：' + best.toFixed(3) + ' 秒' : '') + '</li>';
+    });
+  }
+  if(window.BIO_ACCOUNT && BIO_ACCOUNT.ready) BIO_ACCOUNT.ready.then(function(){ loadBoard(); }, function(){ loadBoard(); }); else loadBoard();
+
+  /* 實體接尺紀錄表 */
+  $('phys').innerHTML = '<table class="trials"><tr><th>次數</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>平均</th></tr>' +
+    '<tr><td>落下距離（公分）</td>' + [0,1,2,3,4].map(function(i){ return '<td><input type="number" min="0" max="45" step="0.5" inputmode="decimal" data-i="' + i + '" aria-label="第' + (i + 1) + '次落下距離"></td>'; }).join('') + '<td id="pAvgD">—</td></tr>' +
+    '<tr><td>反應時間（秒）</td>' + [0,1,2,3,4].map(function(i){ return '<td id="pT' + i + '">—</td>'; }).join('') + '<td id="pAvgT">—</td></tr></table>' +
+    '<p class="note">輸入尺被接住時，手指上緣的刻度。系統會用 t ＝ √(2d ÷ 980) 換算成秒數（和活動紀錄簿的附表一致）。</p>';
+  $('phys').querySelectorAll('input').forEach(function(inp){
+    inp.addEventListener('input', function(){
+      var ds = [], ts = [];
+      $('phys').querySelectorAll('input').forEach(function(x){ var i = +x.getAttribute('data-i'), d = parseFloat(x.value); if(d >= 0){ var t = tFromD(d); $('pT' + i).textContent = t.toFixed(2); ds.push(d); ts.push(t); } else $('pT' + i).textContent = '—'; });
+      $('pAvgD').textContent = ds.length ? (ds.reduce(function(a, b){ return a + b; }, 0) / ds.length).toFixed(1) : '—';
+      $('pAvgT').textContent = ts.length ? (ts.reduce(function(a, b){ return a + b; }, 0) / ts.length).toFixed(2) : '—';
+    });
+  });
+
+  UNIT.quickQuiz($('disc2'), [
+    { c:'4-1-c6', q:'用手接尺的神經傳導途徑，何者正確？', o:['眼內受器→感覺神經元→大腦→脊髓→運動神經元→手指肌肉','手指皮膚受器→感覺神經元→脊髓→運動神經元→手指肌肉','眼內受器→運動神經元→大腦→感覺神經元→手指肌肉','眼內受器→感覺神經元→腦幹→運動神經元→手指肌肉'], a:0, e:'接尺要看到並判斷，經過大腦，是意識反應。' },
+    { c:'4-1-c6', q:'接尺多次後，能不能縮短接尺的反應時間？', o:['能，練習後越來越熟練、注意力集中','不能，反應時間是天生固定的','不能，練習只會讓手變累','能，因為接尺變成了反射'], a:0, e:'練習可以縮短反應時間，但接尺仍是經過大腦的意識反應。' },
+    { c:'4-1-c6', q:'開車緊急踩煞車的反應時間，通常比接尺長，為什麼？', o:['要判斷的情況較複雜，且命令傳到腳的路徑較長','踩煞車是反射，比較慢','腳沒有感覺神經元','踩煞車不必經過大腦'], a:0, e:'判斷路況需要時間，命令傳到腿部的距離也比手長。' }
+  ], 3);
+
+  /* ================= 探索活動：綠豆 ================= */
+  function beans(day){
+    var s = '<rect x="0" y="0" width="520" height="280" fill="transparent"/>';
+    [[130, 'A', 'side'], [390, 'B', 'up']].forEach(function(g){
+      var x = g[0];
+      s += '<ellipse cx="' + x + '" cy="232" rx="92" ry="16" fill="#E2E8F0" opacity=".5"/><ellipse cx="' + x + '" cy="228" rx="80" ry="10" fill="#F8FAFC" opacity=".8"/>';
+      // 綠豆苗
+      for(var i = 0; i < 5; i++){
+        var bx = x - 50 + i * 25, h = day * 24, bend = g[2] === 'side' ? day * 9 : 0;
+        if(day > 0){
+          s += '<path d="M' + bx + ' 226 Q' + bx + ' ' + (226 - h * 0.6) + ' ' + (bx + bend) + ' ' + (226 - h) + '" stroke="#65A30D" stroke-width="3" fill="none"/>';
+          s += '<ellipse cx="' + (bx + bend) + '" cy="' + (226 - h) + '" rx="6" ry="3.5" fill="#4ADE80" transform="rotate(' + (bend * 2) + ' ' + (bx + bend) + ' ' + (226 - h) + ')"/>';
+        }
+        s += '<ellipse cx="' + bx + '" cy="226" rx="5" ry="4" fill="#65A30D" stroke="#3F6212"/>';
+      }
+      // 紙盒（半透明表示）
+      if(g[2] === 'side'){
+        s += '<path d="M' + (x - 96) + ' 236 V60 H' + (x + 96) + ' V120 M' + (x + 96) + ' 190 V236" stroke="var(--c-muted)" stroke-width="3" fill="none"/>';
+        s += '<rect x="' + (x - 96) + '" y="60" width="192" height="176" fill="var(--c-muted)" opacity=".08"/>';
+        for(var r = 0; r < 3; r++) s += '<line x1="' + (x + 150) + '" y1="' + (138 + r * 18) + '" x2="' + (x + 104) + '" y2="' + (140 + r * 18) + '" stroke="#FDE047" stroke-width="3" stroke-linecap="round"/>';
+        s += '<text x="' + (x + 100) + '" y="112" class="sml" style="fill:#EAB308">開口</text>';
+      } else {
+        s += '<path d="M' + (x - 96) + ' 236 V60 H' + (x - 30) + ' M' + (x + 30) + ' 60 H' + (x + 96) + ' V236" stroke="var(--c-muted)" stroke-width="3" fill="none"/>';
+        s += '<rect x="' + (x - 96) + '" y="60" width="192" height="176" fill="var(--c-muted)" opacity=".08"/>';
+        for(var r2 = 0; r2 < 3; r2++) s += '<line x1="' + (x - 18 + r2 * 18) + '" y1="12" x2="' + (x - 18 + r2 * 18) + '" y2="54" stroke="#FDE047" stroke-width="3" stroke-linecap="round"/>';
+        s += '<text x="' + (x + 36) + '" y="52" class="sml" style="fill:#EAB308">開口</text>';
+      }
+      s += '<text x="' + x + '" y="266" text-anchor="middle" class="lbl">' + g[1] + '：開口朝' + (g[2] === 'side' ? '側面' : '上') + '</text>';
+    });
+    $('beanFig').innerHTML = s;
+    $('beanDayV').textContent = day;
+    $('beanInfo').innerHTML = day === 0 ? '<p>拖曳滑桿，觀察 A、B 兩組綠豆的莖朝哪個方向生長。</p>'
+      : day < 3 ? '<p>第 ' + day + ' 天：莖開始長高，彎曲還不太明顯。向性需要一段時間才看得出來。</p>'
+      : '<p>第 ' + day + ' 天：<b>A 組</b>（開口朝側面）的莖<b>彎向開口</b>，也就是光進來的方向；<b>B 組</b>（開口朝上）的莖<b>筆直向上</b>。這證明莖有<b>向光性</b>。</p>';
+    if(day >= 4) markDone('bean', '完成綠豆探索活動');
+  }
+  $('beanDay').addEventListener('input', function(){ beans(+this.value); });
+  beans(0);
+  UNIT.quickQuiz($('disc3'), [
+    { c:'4-3-c4', q:'本實驗的操作變因是什麼？', o:['紙盒開口的方向（光照方向）','綠豆的數量','每天的澆水量','綠豆莖的生長方向'], a:0, e:'刻意改變的條件是操作變因。' },
+    { c:'4-3-c4', q:'下列何者屬於「控制變因」？', o:['綠豆的數量和澆水量','紙盒開口的方向','綠豆莖的生長方向','光照的方向'], a:0, e:'保持相同的條件是控制變因。' },
+    { c:'4-3-c4', q:'本實驗的應變變因是什麼？', o:['綠豆莖的生長方向','紙盒開口的方向','綠豆的數量','棉花的量'], a:0, e:'隨操作變因改變、要觀察記錄的結果是應變變因。' },
+    { c:'4-3-c4', q:'若想讓綠豆的莖彎成「S」形，可以怎麼做？', o:['先讓光從一側照幾天，再改從另一側照幾天','一直讓光從正上方照','把綠豆放在暗室','不斷碰觸綠豆的莖'], a:0, e:'莖有向光性，改變光源方向，生長方向就跟著改變。' }
+  ], 4);
+})();
+</script>
 </body>
 </html>

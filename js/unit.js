@@ -72,7 +72,8 @@
 
   /* ---------- 概念卡自我檢核：隨機 3 題，全對才算「我懂了」 ---------- */
   var dlg = null;
-  function openCheck(id, title, onPass, onReview){
+  function openCheck(id, title, onPass, onReview, opts){
+    opts = opts || {};
     if(!dlg){
       dlg = document.createElement('div'); dlg.className = 'check-overlay'; dlg.hidden = true;
       dlg.innerHTML = '<div class="check-box" role="dialog" aria-modal="true" aria-labelledby="chkTitle"><button class="icon-btn check-x" aria-label="關閉">✕</button><div class="check-body"></div></div>';
@@ -84,15 +85,15 @@
     var body = dlg.querySelector('.check-body'), qs, i, score, results;
     var last = document.activeElement;
     function close(){ dlg.hidden = true; document.body.style.overflow = ''; if(last && last.focus) last.focus(); }
-    function start(){ qs = CH4.shuffle(SELFCHECK[id]).slice(0, 3); i = 0; score = 0; results = []; render(); }
+    function start(){ qs = CH4.shuffle(opts.pool || SELFCHECK[id]).slice(0, 3); i = 0; score = 0; results = []; render(); }
     function dots(){ return '<div class="check-dots">' + qs.map(function(q, k){ return '<span class="' + (k < results.length ? (results[k] ? 'ok' : 'ng') : (k === i ? 'cur' : '')) + '"></span>'; }).join('') + '</div>'; }
     function render(){
       if(i >= qs.length){
         var ok = score === qs.length;
         body.innerHTML = '<div class="check-kicker">SELF CHECK · ' + CH4.esc(title) + '</div>' + dots() +
           '<h3 id="chkTitle" class="check-result ' + (ok ? 'ok' : 'ng') + '">' + (ok ? '🎉 3 題全對，通過檢核！' : '答對 ' + score + ' / 3，還差一點點') + '</h3>' +
-          '<p>' + (ok ? '這個神經元已經連線，首頁的神經網路會亮起來。' : '要 3 題全對才算真的懂了。回到卡片再看一次重點，再來挑戰！每次的題目都會不一樣。') + '</p>' +
-          '<div class="check-nav">' + (ok ? '<button class="btn" data-act="close">完成 ✓</button>' : '<button class="btn ghost" data-act="review">📘 回卡片再看一次</button><button class="btn" data-act="again">↻ 再檢核一次</button>') + '</div>';
+          '<p>' + (ok ? (opts.passText || '這個神經元已經連線，首頁的神經網路會亮起來。') : (opts.failText || '要 3 題全對才算真的懂了。回到卡片再看一次重點，再來挑戰！每次的題目都會不一樣。')) + '</p>' +
+          '<div class="check-nav">' + (ok ? '<button class="btn" data-act="close">完成 ✓</button>' : '<button class="btn ghost" data-act="review">' + (opts.reviewText || '📘 回卡片再看一次') + '</button><button class="btn" data-act="again">↻ 再檢核一次</button>') + '</div>';
         if(ok) onPass();
         var b;
         if((b = body.querySelector('[data-act="close"]'))) { b.addEventListener('click', close); b.focus(); }
@@ -118,7 +119,8 @@
           fb.className = 'feedback ' + (ok ? 'ok' : 'ng'); fb.textContent = ok ? '✓ 答對了！' : '✗ 答錯了，正確答案已標出。';
           body.querySelector('.check-exp').textContent = q.e;
           results.push(ok); if(ok) score++;
-          record(id, ok);
+          var chosen = Number(b.getAttribute('data-k'));
+          record(q.c || id, ok, q.m ? q.m[chosen] : '', q.id || '', opts.src || 'check');
           body.querySelector('.check-dots').outerHTML = dots();
           var nx = body.querySelector('[data-act="next"]'); nx.hidden = false; nx.focus();
           nx.addEventListener('click', function(){ i++; render(); });
@@ -126,18 +128,13 @@
       });
       var first = body.querySelector('[data-k]'); if(first) first.focus();
     }
-    dlg.className = 'check-overlay ' + CH4.unitClass(unitOf(id));
+    dlg.className = 'check-overlay ' + CH4.unitClass(opts.unit || unitOf(id));
     dlg.hidden = false; document.body.style.overflow = 'hidden';
     start();
   }
 
   /* ---------- 練習紀錄（神經元精熟度）：每題答完呼叫 ---------- */
-  function record(conceptId, correct){
-    var m = CH4.store.get('mastery', {});
-    var r = m[conceptId] || { n:0, ok:0 };
-    r.n++; if(correct) r.ok++;
-    m[conceptId] = r; CH4.store.set('mastery', m);
-  }
+  function record(conceptId, correct, myth, qid, src){ CH4.record(conceptId, correct, myth, qid, src || 'unit'); }
 
   /* ---------- 快問快答：從題庫抽 n 題 ----------
      題目格式：{ c:'4-1-c4', q:'題目', o:['A','B','C','D'], a:2, e:'詳解' } */

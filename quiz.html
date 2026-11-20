@@ -4,19 +4,202 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>練習題｜第4章 生物體的協調作用</title>
-<link rel="stylesheet" href="./css/style.css">
+<link rel="stylesheet" href="css/style.css">
 <script src="https://batyunching.github.io/bio/js/account.js" data-chapter="ch4" data-prefix="ch4."></script>
+<style>
+.setup .row{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:10px 0; }
+.setup .row > b{ min-width:4em; }
+.setup .count{ color:var(--c-muted); font-size:.85rem; }
+.qhead{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px; }
+.qhead .stars{ color:var(--c-amber); font-weight:900; letter-spacing:.1em; }
+.qtext{ font-size:1.2rem; font-weight:900; margin:10px 0 14px; }
+.qopts{ display:flex; flex-direction:column; gap:10px; }
+.qopts .chip-btn{ text-align:left; min-height:56px; font-size:1rem; padding:10px 16px; }
+.qopts .chip-btn .lt{ font-family:var(--num); color:var(--c-muted); margin-right:10px; }
+.mythbox{ margin-top:10px; padding:10px 14px; border-radius:12px; background:rgba(251,191,36,.08); border:1px dashed rgba(251,191,36,.6); font-size:.92rem; }
+.mythbox b.t{ color:var(--c-amber); display:block; font-family:var(--num); font-size:.68rem; letter-spacing:.12em; }
+html.projector .mythbox b.t{ color:var(--c-amber-d); }
+.exp{ margin-top:10px; color:var(--c-muted); }
+.qnav{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-top:16px; }
+.result-big{ font-family:var(--num); font-size:2.6rem; font-weight:900; color:var(--c-amber); }
+.wlist{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+.wlist li{ display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border:1px solid var(--c-line); border-radius:12px; background:var(--c-panel); }
+.wlist li .q{ flex:1; }
+.wlist li small{ color:var(--c-muted); display:block; }
+[hidden]{ display:none !important; }
+</style>
 </head>
 <body data-page="quiz" data-root="./">
 <main class="wrap">
-  <div class="panel u unit-41 coming">
-    <div class="big">🛠️</div>
-    <h1>練習題</h1>
-    <p>這一頁正在建置中，預計在<b>第4階段</b>完成，內容包括：</p>
-    <ul><li>選單元、難度、題數</li><li>作答後立即看詳解與迷思說明</li><li>答錯自動進錯題本</li></ul>
-    <div><a class="btn" href="./index.html">◀ 回第4章首頁</a></div>
+  <div class="sec-title" style="margin-top:6px"><span class="code">TRAINING</span><h1 style="margin:0">✏️ 練習題</h1></div>
+  <p style="color:var(--c-muted);margin-top:-6px">選單元、難度和題數，作答後立刻看詳解。答錯時會告訴你「可能是哪一種迷思」，錯題也會自動放進錯題本。</p>
+
+  <!-- 設定 -->
+  <div class="panel setup" id="setup">
+    <div class="row"><b>單元</b>
+      <div class="seg" id="segU"><button data-v="all" aria-pressed="true">全章</button><button data-v="4-1">4-1 神經系統</button><button data-v="4-2">4-2 內分泌系統</button><button data-v="4-3">4-3 植物的感應</button></div>
+    </div>
+    <div class="row"><b>難度</b>
+      <div class="seg" id="segL"><button data-v="0" aria-pressed="true">綜合</button><button data-v="1">★ 基礎</button><button data-v="2">★★ 進階</button><button data-v="3">★★★ 挑戰</button></div>
+    </div>
+    <div class="row"><b>題數</b>
+      <div class="seg" id="segN"><button data-v="10" aria-pressed="true">10 題</button><button data-v="20">20 題</button><button data-v="999">全部</button></div>
+      <span class="count" id="avail"></span>
+    </div>
+    <div class="row" style="margin-top:16px">
+      <button class="btn" id="startBtn">開始練習 ▶</button>
+      <button class="btn ghost" id="wrongBtn">📒 只練錯題本</button>
+      <button class="btn ghost" id="viewWrong">查看錯題本</button>
+      <a class="btn ghost" href="analysis.html">🔍 錯題概念分析</a>
+    </div>
   </div>
+
+  <!-- 作答 -->
+  <div class="panel" id="play" hidden>
+    <div class="qhead"><span class="tag" id="qTag"></span><span class="stars" id="qStars"></span><span style="margin-left:auto" class="score" id="qScore"></span></div>
+    <div class="progress"><span id="qBar"></span></div>
+    <div class="qtext" id="qText"></div>
+    <div class="qopts" id="qOpts"></div>
+    <div class="feedback" id="qFb" aria-live="polite"></div>
+    <div id="qMyth"></div>
+    <div class="exp" id="qExp"></div>
+    <div class="qnav"><button class="btn ghost" id="quitBtn">✕ 結束</button><button class="btn" id="nextBtn" hidden>下一題 ▶</button></div>
+  </div>
+
+  <!-- 結果 -->
+  <div class="panel" id="result" hidden></div>
+
+  <!-- 錯題本 -->
+  <div class="panel" id="wrongView" hidden>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><h2 style="margin:0">📒 錯題本</h2><span class="count" id="wCount" style="color:var(--c-muted)"></span>
+      <span style="flex:1"></span><button class="btn ghost" id="wClear">清空錯題本</button><button class="btn ghost" id="wClose">✕ 關閉</button></div>
+    <p style="color:var(--c-muted);font-size:.85rem">用「只練錯題本」練習時，同一題連續答對 2 次，就會自動從錯題本移除。</p>
+    <ul class="wlist" id="wList"></ul>
+  </div>
+
+  <div class="footer">國中自然（生物）一上・第4章 生物體的協調作用｜題目改寫自課本與練習本</div>
 </main>
-<script src="./js/common.js"></script>
+<script src="js/common.js"></script>
+<script src="data/selfcheck.js"></script>
+<script src="data/myths.js"></script>
+<script src="data/questions.js"></script>
+<script src="js/unit.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var BANK = CH4.bank(), BYID = {};
+  BANK.forEach(function(q){ BYID[q.id] = q; });
+  var cfg = { u:'all', lv:0, n:10 }, run = null;
+  var STARS = { 1:'★', 2:'★★', 3:'★★★' };
+  var conceptName = {}; CH4.CONCEPTS.forEach(function(c){ conceptName[c.id] = c.t; });
+
+  function filtered(){ return BANK.filter(function(q){ return (cfg.u === 'all' || q.u === cfg.u) && (!cfg.lv || q.lv === cfg.lv); }); }
+  function refreshAvail(){
+    $('avail').textContent = '符合條件的題目：' + filtered().length + ' 題';
+    var w = CH4.wrongBook.list().filter(function(id){ return BYID[id]; });
+    $('wrongBtn').textContent = '📒 只練錯題本（' + w.length + '）'; $('wrongBtn').disabled = !w.length;
+  }
+  UNIT.seg($('segU'), function(v){ cfg.u = v; refreshAvail(); });
+  UNIT.seg($('segL'), function(v){ cfg.lv = +v; refreshAvail(); });
+  UNIT.seg($('segN'), function(v){ cfg.n = +v; });
+
+  function show(id){ ['setup','play','result','wrongView'].forEach(function(k){ $(k).hidden = k !== id && !(id === 'play' && k === 'setup' && false); }); window.scrollTo({ top:0, behavior:'smooth' }); }
+  function start(list, mode){
+    if(!list.length){ CH4.toast('沒有符合條件的題目'); return; }
+    // 綜合難度時，基礎題放前面，循序漸進
+    run = { list:list, i:0, score:0, wrong:[], mode:mode };
+    show('play'); render();
+  }
+  $('startBtn').addEventListener('click', function(){
+    var f = CH4.shuffle(filtered()).slice(0, cfg.n);
+    if(!cfg.lv) f.sort(function(a, b){ return a.lv - b.lv; });
+    start(f, 'normal');
+  });
+  $('wrongBtn').addEventListener('click', function(){
+    start(CH4.shuffle(CH4.wrongBook.list().map(function(id){ return BYID[id]; }).filter(Boolean)), 'wrong');
+  });
+
+  function render(){
+    var q = run.list[run.i];
+    $('qTag').className = 'tag ' + CH4.unitClass(q.u);
+    $('qTag').textContent = q.u + '｜' + conceptName[q.c];
+    $('qStars').textContent = STARS[q.lv];
+    $('qScore').textContent = '⚡ ' + run.score + ' / ' + run.i + '　第 ' + (run.i + 1) + ' / ' + run.list.length + ' 題';
+    $('qBar').style.width = (run.i / run.list.length * 100) + '%';
+    $('qText').textContent = q.q;
+    var order = CH4.shuffle(q.o.map(function(t, k){ return k; }));
+    $('qOpts').innerHTML = order.map(function(k, n){ return '<button class="chip-btn" data-k="' + k + '"><span class="lt">' + 'ABCD'[n] + '</span>' + CH4.esc(q.o[k]) + '</button>'; }).join('');
+    $('qFb').textContent = ''; $('qFb').className = 'feedback'; $('qMyth').innerHTML = ''; $('qExp').textContent = ''; $('nextBtn').hidden = true;
+    var done = false;
+    $('qOpts').querySelectorAll('[data-k]').forEach(function(b){
+      b.addEventListener('click', function(){
+        if(done) return; done = true;
+        var k = +b.getAttribute('data-k'), ok = k === q.a, myth = ok ? '' : (q.m[k] || '');
+        b.classList.add(ok ? 'ok' : 'ng'); if(!ok) $('qOpts').querySelector('[data-k="' + q.a + '"]').classList.add('ok');
+        $('qFb').className = 'feedback ' + (ok ? 'ok' : 'ng'); $('qFb').textContent = ok ? '✓ 答對了！' : '✗ 答錯了，正確答案已標出。';
+        $('qExp').textContent = '詳解：' + q.e;
+        if(myth && window.MYTHS[myth]){
+          var M = MYTHS[myth];
+          $('qMyth').innerHTML = '<div class="mythbox"><b class="t">⚠ 迷思偵測</b>你可能以為：<b>' + M.t + '</b><br>正確觀念：' + M.r +
+            '　<a href="' + CH4.UNIT_PAGES[q.u] + '#' + q.c + '">📘 看概念卡</a></div>';
+        } else if(!ok){
+          $('qMyth').innerHTML = '<div class="mythbox"><b class="t">📘 再複習</b>回到概念卡「' + conceptName[q.c] + '」再看一次：<a href="' + CH4.UNIT_PAGES[q.u] + '#' + q.c + '">前往 ▶</a></div>';
+        }
+        CH4.record(q.c, ok, myth, q.id, run.mode === 'wrong' ? 'wrongbook' : 'quiz');
+        if(ok){ run.score++; CH4.energy.add(2); } else run.wrong.push(q.id);
+        // 錯題本
+        var streak = CH4.store.get('wbStreak', {});
+        if(!ok){ CH4.wrongBook.add(q.id); streak[q.id] = 0; }
+        else if(run.mode === 'wrong'){
+          streak[q.id] = (streak[q.id] || 0) + 1;
+          if(streak[q.id] >= 2){ CH4.wrongBook.remove(q.id); delete streak[q.id]; $('qFb').textContent += '　連續答對 2 次，已從錯題本移除 🎉'; }
+          else $('qFb').textContent += '　（再答對 1 次就會從錯題本移除）';
+        }
+        CH4.store.set('wbStreak', streak);
+        var nx = $('nextBtn'); nx.hidden = false; nx.textContent = run.i + 1 >= run.list.length ? '看結果 ▶' : '下一題 ▶'; nx.focus();
+      });
+    });
+  }
+  $('nextBtn').addEventListener('click', function(){ run.i++; if(run.i >= run.list.length) finish(); else render(); });
+  $('quitBtn').addEventListener('click', function(){ if(run.i > 0) finish(); else { show('setup'); refreshAvail(); } });
+
+  function finish(){
+    var n = run.i >= run.list.length ? run.list.length : run.i;
+    var pct = n ? Math.round(run.score / n * 100) : 0;
+    var byC = {};
+    run.wrong.forEach(function(id){ var c = BYID[id].c; byC[c] = (byC[c] || 0) + 1; });
+    var weak = Object.keys(byC).sort(function(a, b){ return byC[b] - byC[a]; });
+    if(n >= 10 && pct === 100) CH4.energy.add(20, '全對獎勵');
+    $('result').innerHTML =
+      '<h2 style="margin-top:0">練習完成！</h2>' +
+      '<div class="result-big">' + run.score + ' / ' + n + '</div><p>答對率 ' + pct + '%' + (pct === 100 ? '　全對！神經訊號暢通 ⚡' : '') + '</p>' +
+      (weak.length ? '<h3>這次要加強的概念</h3><ul>' + weak.map(function(c){ var u = c.slice(0,3); return '<li>' + u + ' ' + conceptName[c] + '（錯 ' + byC[c] + ' 題）　<a href="' + CH4.UNIT_PAGES[u] + '#' + c + '">📘 看概念卡</a></li>'; }).join('') + '</ul>' : '') +
+      '<div class="qnav" style="justify-content:flex-start">' +
+        (run.wrong.length ? '<button class="btn" id="redoWrong">練這次答錯的題 ↻</button>' : '') +
+        '<button class="btn ghost" id="again">再練一次</button><a class="btn ghost" href="analysis.html">🔍 看錯題概念分析</a><button class="btn ghost" id="toSetup">回到設定</button></div>';
+    show('result');
+    var rw = $('redoWrong'); if(rw) rw.addEventListener('click', function(){ start(CH4.shuffle(run.wrong.map(function(id){ return BYID[id]; })), 'wrong'); });
+    $('again').addEventListener('click', function(){ $('startBtn').click(); });
+    $('toSetup').addEventListener('click', function(){ show('setup'); refreshAvail(); });
+  }
+
+  function renderWrong(){
+    var w = CH4.wrongBook.list().filter(function(id){ return BYID[id]; });
+    $('wCount').textContent = '共 ' + w.length + ' 題';
+    $('wList').innerHTML = w.length ? w.map(function(id){
+      var q = BYID[id];
+      return '<li><span class="tag ' + CH4.unitClass(q.u) + '">' + q.u + '</span><span class="q">' + CH4.esc(q.q) + '<small>答案：' + CH4.esc(q.o[q.a]) + '｜' + conceptName[q.c] + '</small></span><button class="chip-btn" data-rm="' + id + '">移除</button></li>';
+    }).join('') : '<li>錯題本是空的，太棒了！</li>';
+    $('wList').querySelectorAll('[data-rm]').forEach(function(b){ b.addEventListener('click', function(){ CH4.wrongBook.remove(b.getAttribute('data-rm')); renderWrong(); }); });
+  }
+  $('viewWrong').addEventListener('click', function(){ renderWrong(); show('wrongView'); });
+  $('wClose').addEventListener('click', function(){ show('setup'); refreshAvail(); });
+  $('wClear').addEventListener('click', function(){ if(confirm('確定要清空錯題本嗎？')){ CH4.wrongBook.clear(); renderWrong(); } });
+
+  show('setup'); refreshAvail();
+  if(window.BIO_ACCOUNT && BIO_ACCOUNT.ready) BIO_ACCOUNT.ready.then(function(){ setTimeout(refreshAvail, 300); }, function(){});
+})();
+</script>
 </body>
 </html>

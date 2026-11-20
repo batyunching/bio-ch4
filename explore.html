@@ -4,19 +4,174 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>科學漫遊｜第4章 生物體的協調作用</title>
-<link rel="stylesheet" href="./css/style.css">
+<link rel="stylesheet" href="css/style.css">
 <script src="https://batyunching.github.io/bio/js/account.js" data-chapter="ch4" data-prefix="ch4."></script>
+<style>
+.fig .wire{ fill:none; stroke:var(--c-line); stroke-width:5; stroke-linecap:round; }
+.fig .wire.on{ stroke:var(--c-neuro); }
+.fig .wire.cut{ stroke:var(--c-muted); stroke-dasharray:6 6; }
+.fig .node rect{ fill:var(--c-panel-solid); stroke:var(--c-line); stroke-width:2; }
+.fig .node.off rect{ opacity:.35; }
+.fig .xmark{ stroke:var(--c-ng); stroke-width:5; stroke-linecap:round; }
+.tl{ display:flex; gap:12px; overflow-x:auto; padding:8px 4px 16px; scroll-snap-type:x mandatory; }
+.tl .ev{ flex:0 0 220px; scroll-snap-align:start; border-top:4px solid var(--c-hormone); display:flex; flex-direction:column; gap:6px; cursor:pointer; }
+.tl .ev .yr{ font-family:var(--num); font-weight:900; color:var(--c-hormone); }
+html.projector .tl .ev .yr{ color:var(--c-hormone-d); }
+.tl .ev .em{ font-size:2rem; }
+.tl .ev p{ margin:0; font-size:.88rem; }
+.tl-line{ height:4px; border-radius:4px; background:linear-gradient(90deg,var(--c-plant),var(--c-neuro),var(--c-hormone)); margin:4px 0; }
+</style>
 </head>
 <body data-page="explore" data-root="./">
 <main class="wrap">
-  <div class="panel u unit-43 coming">
-    <div class="big">🛠️</div>
-    <h1>科學漫遊</h1>
-    <p>這一頁正在建置中，預計在<b>第4階段</b>完成，內容包括：</p>
-    <ul><li>聰明的「花現」：菊花與光照</li><li>麻醉的秘密：神經傳導在哪裡被阻斷</li><li>疼痛的故事：時間軸</li></ul>
-    <div><a class="btn" href="./index.html">◀ 回第4章首頁</a></div>
+  <div class="sec-title" style="margin-top:6px"><span class="code">EXPLORE</span><h1 style="margin:0">🔭 科學漫遊</h1></div>
+  <p style="color:var(--c-muted);margin-top:-6px">課本「科學漫遊」的三個故事，用操作的方式讀懂它們。</p>
+  <nav class="toc"><a href="#x1">🌼 聰明的「花現」</a><a href="#x2">💉 麻醉的秘密</a><a href="#x3">📜 疼痛的故事</a></nav>
+
+  <!-- 花現 -->
+  <div class="block-title unit-43" id="x1"><span class="num">🌼</span><h2>聰明的「花現」：讓菊花在缺貨時開花</h2><span class="kind">課本 p.152</span></div>
+  <div class="panel lab unit-43">
+    <p style="margin-top:0">光照和黑暗的長短會影響植物開花。菊花原本在<b>秋冬</b>開花，但那時是盛產期、賣不到好價錢。花農可以怎麼做？</p>
+    <div class="bar"><b>季節：</b><div class="seg" id="segSeason"><button data-v="fall" aria-pressed="true">🍂 秋冬</button><button data-v="summer">☀ 春夏</button></div></div>
+    <div class="bar"><b>花農的做法：</b><div class="seg" id="segTreat"><button data-v="none" aria-pressed="true">不處理</button><button data-v="lamp">💡 夜晚點燈（延長光照）</button><button data-v="cloth">⬛ 黑布遮光（縮短光照）</button></div></div>
+    <div class="grid2">
+      <svg class="fig" id="mumFig" viewBox="0 0 480 240" role="img" aria-label="菊花田"></svg>
+      <div class="info" id="mumInfo"></div>
+    </div>
   </div>
+
+  <!-- 麻醉 -->
+  <div class="block-title unit-41" id="x2"><span class="num">💉</span><h2>麻醉的秘密：為什麼感覺不到痛？</h2><span class="kind">課本 p.153</span></div>
+  <div class="panel lab unit-41">
+    <p style="margin-top:0">「痛」要在<b>大腦</b>產生。只要訊息在半路被擋住、或大腦暫時失去作用，就不會感覺到痛。選一種麻醉方式看看：</p>
+    <div class="bar"><div class="seg" id="segAn"><button data-v="none" aria-pressed="true">沒有麻醉</button><button data-v="local">局部麻醉</button><button data-v="half">半身麻醉</button><button data-v="full">全身麻醉</button></div></div>
+    <div class="grid2">
+      <svg class="fig" id="anFig" viewBox="0 0 560 230" role="img" aria-label="痛覺的神經傳導途徑與麻醉作用的位置">
+        <path class="wire" id="aw1" d="M110 170 H250"/>
+        <path class="wire" id="aw2" d="M290 140 V80"/>
+        <g class="node" id="an1"><rect x="20" y="140" width="90" height="60" rx="12"/><text x="65" y="166" text-anchor="middle" class="lbl">受器</text><text x="65" y="186" text-anchor="middle" class="sml">手術部位</text></g>
+        <g class="node" id="an2"><rect x="250" y="140" width="80" height="60" rx="12"/><text x="290" y="175" text-anchor="middle" class="lbl">脊髓</text></g>
+        <g class="node" id="an3"><rect x="238" y="20" width="104" height="60" rx="14"/><text x="290" y="56" text-anchor="middle" class="lbl">大腦</text></g>
+        <text x="180" y="160" text-anchor="middle" class="sml">感覺神經元</text>
+        <g id="xmarks"></g>
+        <text id="anOut" x="430" y="56" text-anchor="middle" style="font-size:22px;font-weight:900"></text>
+        <text id="anOut2" x="430" y="86" text-anchor="middle" class="sml"></text>
+      </svg>
+      <div class="info" id="anInfo"></div>
+    </div>
+    <h3 style="margin:18px 0 8px">想一想</h3>
+    <div class="qq" id="anQ"></div>
+  </div>
+
+  <!-- 疼痛的故事 -->
+  <div class="block-title unit-42" id="x3"><span class="num">📜</span><h2>疼痛的故事：人類對抗疼痛的歷史</h2><span class="kind">課本 p.154–155</span></div>
+  <div class="panel lab unit-42">
+    <p style="margin-top:0">疼痛就像身體的警報系統。左右滑動時間軸，看看人類怎麼了解疼痛、減緩疼痛。</p>
+    <div class="tl-line"></div>
+    <div class="tl" id="tl"></div>
+    <h3 style="margin:10px 0 8px">🧩 時間軸挑戰：把這 5 件事依時間先後排好</h3>
+    <div class="grid2">
+      <ul class="sortlist" id="tlSort"></ul>
+      <div><button class="btn" id="tlCheck">✓ 檢查順序</button> <button class="btn ghost" id="tlNew">↻ 換一組</button><div class="feedback" id="tlFb"></div></div>
+    </div>
+  </div>
+
+  <div class="footer">國中自然（生物）一上・第4章 科學漫遊（課本 p.152–155）｜圖形皆為原創 SVG 繪製</div>
 </main>
-<script src="./js/common.js"></script>
+<script src="js/common.js"></script>
+<script src="js/unit.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+
+  /* ===== 花現 ===== */
+  var season = 'fall', treat = 'none';
+  function mum(){
+    var bloom = (season === 'fall' && treat !== 'lamp') || (season === 'summer' && treat === 'cloth');
+    var s = '<rect width="480" height="240" rx="14" fill="' + (season === 'fall' ? '#FDE68A' : '#BBF7D0') + '" fill-opacity=".18"/>';
+    s += '<rect x="0" y="190" width="480" height="50" fill="#92400E" opacity=".35"/>';
+    for(var i = 0; i < 9; i++){
+      var x = 40 + i * 50, y = 120 + (i % 2) * 18;
+      s += '<path d="M' + x + ' 196 V' + y + '" stroke="#65A30D" stroke-width="3"/><ellipse cx="' + (x - 8) + '" cy="' + (y + 40) + '" rx="9" ry="4" fill="#4ADE80" transform="rotate(-30 ' + (x - 8) + ' ' + (y + 40) + ')"/>';
+      if(bloom){
+        for(var p = 0; p < 12; p++) s += '<ellipse class="flower" cx="' + x + '" cy="' + (y - 9) + '" rx="3.2" ry="10" fill="#FACC15" transform="rotate(' + (p * 30) + ' ' + x + ' ' + y + ')"/>';
+        s += '<circle cx="' + x + '" cy="' + y + '" r="6" fill="#B45309"/>';
+      } else s += '<ellipse cx="' + x + '" cy="' + (y - 4) + '" rx="6" ry="8" fill="#65A30D" stroke="#3F6212"/>';
+    }
+    if(treat === 'lamp') for(var k = 0; k < 3; k++){ var lx = 80 + k * 160; s += '<line x1="' + lx + '" y1="10" x2="' + lx + '" y2="40" stroke="var(--c-muted)" stroke-width="2"/><circle cx="' + lx + '" cy="46" r="10" fill="#FDE047"/><path d="M' + (lx - 30) + ' 70 L' + lx + ' 56 L' + (lx + 30) + ' 70" stroke="#FDE047" stroke-width="2" fill="none" opacity=".7"/>'; }
+    if(treat === 'cloth') s += '<path d="M10 70 Q240 20 470 70 V110 H10Z" fill="#0F172A" opacity=".75"/><text x="240" y="80" text-anchor="middle" style="fill:#E2E8F0;font-weight:700;font-size:14px">黑布遮光</text>';
+    s += '<text x="20" y="226" class="lbl" style="fill:var(--c-text)">' + (season === 'fall' ? '🍂 秋冬' : '☀ 春夏') + '　' + (bloom ? '🌼 開花了' : '🌱 只有花苞，沒開花') + '</text>';
+    $('mumFig').innerHTML = s;
+    var txt;
+    if(season === 'fall' && treat === 'none') txt = '秋冬不處理：菊花照常<b>開花</b>。但大家都在這時開花，是盛產期，賣不到好價錢。';
+    else if(season === 'fall' && treat === 'lamp') txt = '秋冬夜晚<b>點燈延長光照</b>：菊花被「騙」了，<b>不開花</b>。花農把開花時間延後到缺貨的時候。（彰化田尾的花農就是這樣做）';
+    else if(season === 'fall' && treat === 'cloth') txt = '秋冬本來就會開花，用黑布遮光一樣會<b>開花</b>，沒有特別的好處。';
+    else if(season === 'summer' && treat === 'none') txt = '春夏不處理：菊花<b>不開花</b>，所以這時市場上菊花缺貨。';
+    else if(season === 'summer' && treat === 'lamp') txt = '春夏再點燈延長光照，菊花還是<b>不開花</b>。';
+    else txt = '春夏用<b>黑布遮光、縮短光照</b>：菊花以為秋冬到了而<b>開花</b>！這時是缺貨期，菊花能賣到較好的價錢。🎉';
+    $('mumInfo').innerHTML = '<p>' + txt + '</p><p class="note" style="font-size:.82rem;color:var(--c-muted)">重點：光照和黑暗的時間長短，會影響植物開花。</p>';
+    if(season === 'summer' && treat === 'cloth') UNIT.rewardOnce('ex-mum', 5, '找到讓菊花春夏開花的方法');
+  }
+  UNIT.seg($('segSeason'), function(v){ season = v; mum(); });
+  UNIT.seg($('segTreat'), function(v){ treat = v; mum(); });
+  mum();
+
+  /* ===== 麻醉 ===== */
+  var AN = {
+    none:  { x:[], out:'😣 好痛！', out2:'訊息順利傳到大腦', info:'<h3>沒有麻醉</h3><p>受器 → 感覺神經元 → 脊髓 → 大腦，大腦產生<b>痛覺</b>。</p>' },
+    local: { x:[[180,170]], out:'😌 不痛', out2:'訊息在感覺神經元被阻斷', info:'<h3>局部麻醉</h3><p>麻醉藥注射在手術部位，作用在<b>感覺神經元</b>，阻斷訊息傳導，訊息到不了大腦，所以不痛。人是清醒的。</p><p>例：<b>拔牙</b>、外科小手術。</p>' },
+    half:  { x:[[290,110]], out:'😌 下半身不痛', out2:'訊息無法經脊髓上傳', info:'<h3>半身麻醉</h3><p>麻醉藥注射在脊椎骨的骨縫間，作用在<b>脊髓</b>：下半身的訊息無法經脊髓傳到大腦，所以不會痛。人是清醒的。</p><p>例：泌尿系統手術、<b>剖腹產</b>。</p>' },
+    full:  { x:[[290,110],[290,50]], out:'😴 失去意識', out2:'中樞神經系統暫停作用', info:'<h3>全身麻醉</h3><p>吸入麻醉氣體或靜脈注射，作用在<b>中樞神經系統</b>：病人失去意識、身體無法動彈，也不會感覺疼痛。</p><p>例：頭頸部、胸部等大手術。</p>' }
+  };
+  function an(v){
+    var a = AN[v];
+    $('xmarks').innerHTML = a.x.map(function(p){ return '<path class="xmark" d="M' + (p[0] - 14) + ' ' + (p[1] - 14) + ' L' + (p[0] + 14) + ' ' + (p[1] + 14) + ' M' + (p[0] + 14) + ' ' + (p[1] - 14) + ' L' + (p[0] - 14) + ' ' + (p[1] + 14) + '"/>'; }).join('');
+    $('aw1').setAttribute('class', 'wire ' + (v === 'local' ? 'cut' : 'on'));
+    $('aw2').setAttribute('class', 'wire ' + (v === 'none' ? 'on' : 'cut'));
+    $('an3').setAttribute('class', 'node' + (v === 'full' ? ' off' : ''));
+    $('an2').setAttribute('class', 'node' + (v === 'full' || v === 'half' ? ' off' : ''));
+    $('anOut').textContent = a.out; $('anOut2').textContent = a.out2;
+    $('anInfo').innerHTML = a.info;
+  }
+  UNIT.seg($('segAn'), an); an('none');
+  UNIT.quickQuiz($('anQ'), [
+    { c:'4-1-c5', q:'局部麻醉藥主要作用在哪裡？', o:['感覺神經元','運動神經元','大腦','小腦'], a:0, e:'阻斷感覺神經元的訊息傳導，訊息到不了大腦。' },
+    { c:'4-1-c4', q:'剖腹產常用半身麻醉，麻醉藥作用在哪裡？', o:['脊髓','大腦','腦幹','手術部位的皮膚'], a:0, e:'下半身的訊息無法經脊髓傳到大腦。' },
+    { c:'4-1-c7', q:'為什麼麻醉後就感覺不到痛？', o:['痛覺在大腦產生，訊息到不了大腦或大腦暫停作用','麻醉讓受器消失','麻醉讓脊髓產生不痛的感覺','麻醉讓傷口立刻癒合'], a:0, e:'所有感覺都在大腦產生。' }
+  ], 3);
+
+  /* ===== 疼痛的故事 ===== */
+  var EV = [
+    { y:-6000, yr:'西元前 6000 年', em:'🌿', t:'祕魯人發現嚼古柯葉能夠止痛。' },
+    { y:-2000, yr:'西元前 2000 年', em:'👻', t:'美索不達米亞人認為疼痛是邪靈在作祟。' },
+    { y:-1000, yr:'西元前 1000 年', em:'📍', t:'周朝開始利用針灸來止痛。' },
+    { y:-410,  yr:'西元前 410 年',  em:'🏛️', t:'希臘人開始知道，疼痛是因為身體出了問題。' },
+    { y:200,   yr:'西元 200 年',    em:'🍵', t:'東漢名醫華佗利用麻沸散，達到手術時的麻醉效果。' },
+    { y:1578,  yr:'西元 1578 年',   em:'📖', t:'名醫李時珍在《本草綱目》中提出，延胡索能治全身上下的疼痛。' },
+    { y:1805,  yr:'西元 1805 年',   em:'⚗️', t:'德國藥師瑟圖納分離出嗎啡，可用來止痛。' },
+    { y:1897,  yr:'西元 1897 年',   em:'💊', t:'化學家霍夫曼合成了阿斯匹靈，可用來止痛。' },
+    { y:1906,  yr:'西元 1906 年',   em:'🧠', t:'諾貝爾獎得主謝靈頓提出：有害刺激可能造成創傷時，神經元會把訊息傳到大腦，產生痛覺。' },
+    { y:1973,  yr:'西元 1973 年',   em:'🔬', t:'珀特和斯奈德發現人腦中有能和嗎啡結合的受器，使嗎啡能發揮止痛作用。' }
+  ];
+  $('tl').innerHTML = EV.map(function(e){ return '<div class="panel ev"><span class="em">' + e.em + '</span><span class="yr">' + e.yr + '</span><p>' + e.t + '</p></div>'; }).join('');
+  var set = [];
+  function newSet(){
+    set = CH4.shuffle(EV).slice(0, 5);
+    $('tlSort').innerHTML = set.map(function(e){ return '<li data-y="' + e.y + '"><span class="n"></span>' + e.em + ' ' + e.t.replace(/。$/, '') + '<span class="mv"><button data-mv="up" aria-label="上移">▲</button><button data-mv="down" aria-label="下移">▼</button></span></li>'; }).join('');
+    UNIT.sortable($('tlSort'), function(){ $('tlFb').textContent = ''; });
+    $('tlFb').textContent = '';
+  }
+  $('tlNew').addEventListener('click', newSet);
+  $('tlCheck').addEventListener('click', function(){
+    var lis = Array.prototype.slice.call($('tlSort').children), ys = lis.map(function(li){ return +li.getAttribute('data-y'); });
+    var sorted = ys.slice().sort(function(a, b){ return a - b; }), ok = 0;
+    lis.forEach(function(li, i){ var g = ys[i] === sorted[i]; li.classList.toggle('ok', g); li.classList.toggle('ng', !g); if(g) ok++; });
+    if(ok === lis.length){ $('tlFb').className = 'feedback ok'; $('tlFb').textContent = '✓ 順序全對！' + lis.map(function(li){ return EV.filter(function(e){ return e.y === +li.getAttribute('data-y'); })[0].yr; }).join(' → '); UNIT.rewardOnce('ex-tl', 5, '時間軸挑戰成功'); }
+    else { $('tlFb').className = 'feedback ng'; $('tlFb').textContent = '有 ' + (lis.length - ok) + ' 件事位置不對，看看上面的時間軸再試試。'; }
+  });
+  newSet();
+})();
+</script>
 </body>
 </html>

@@ -78,6 +78,28 @@
     }
   };
 
+  /* ---------- 作答紀錄：精熟度（mastery）＋作答明細（answers，給錯題概念分析和老師熱圖） ---------- */
+  function record(conceptId, correct, myth, qid, src){
+    var m = store.get('mastery', {});
+    var r = m[conceptId] || { n:0, ok:0 };
+    r.n++; if(correct) r.ok++;
+    m[conceptId] = r; store.set('mastery', m);
+    var a = store.get('answers', []);
+    a.push({ q: qid || '', c: conceptId, ok: correct ? 1 : 0, m: (!correct && myth) ? myth : '', s: src || '', t: Date.now() });
+    if(a.length > 600) a = a.slice(a.length - 600);
+    store.set('answers', a);
+  }
+
+  /* ---------- 題庫：★ 基礎＝概念卡自我檢核題，★★／★★★＝data/questions.js ---------- */
+  function bank(){
+    var out = [];
+    if(window.SELFCHECK) Object.keys(SELFCHECK).forEach(function(c){
+      SELFCHECK[c].forEach(function(q, i){ out.push({ id: c + '-s' + i, c: c, u: c.slice(0, 3), lv: 1, q: q.q, o: q.o, a: q.a, e: q.e, m: q.m || {} }); });
+    });
+    (window.EXTRA_QUESTIONS || []).forEach(function(q){ out.push({ id: q.id, c: q.c, u: q.c.slice(0, 3), lv: q.lv, q: q.q, o: q.o, a: q.a, e: q.e, m: q.m || {} }); });
+    return out;
+  }
+
   /* ---------- 錯題本 ---------- */
   var wrongBook = {
     list: function(){ return store.get('wrongbook', []); },
@@ -229,7 +251,7 @@
   window.CH4 = {
     PORTAL_URL: PORTAL_URL, CH3_URL: CH3_URL,
     UNIT_NAMES: UNIT_NAMES, UNIT_PAGES: UNIT_PAGES, CONCEPTS: CONCEPTS, CONCEPT_CARDS: CONCEPT_CARDS,
-    store: store, progress: progress, wrongBook: wrongBook, energy: energy, icons: icons,
+    store: store, progress: progress, wrongBook: wrongBook, record: record, bank: bank, energy: energy, icons: icons,
     toast: toast, shuffle: shuffle, unitClass: unitClass, esc: esc
   };
 })();
